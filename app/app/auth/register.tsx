@@ -14,11 +14,14 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { AppColors } from "@/constants/theme";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -34,37 +37,37 @@ export default function RegisterScreen() {
   const handleRegister = async () => {
     // Validation
     if (!fullName || !email || !phone || !password || !confirmPassword) {
-      Alert.alert("Error", "Please fill all required fields");
+      Alert.alert(t("error"), t("auth.fillAllFields"));
       return;
     }
 
     if (fullName.length > 255) {
-      Alert.alert("Error", "Full name must be less than 255 characters");
+      Alert.alert(t("error"), "Full name must be less than 255 characters");
       return;
     }
 
     if (!validateEmail(email)) {
-      Alert.alert("Error", "Please enter a valid email address");
+      Alert.alert(t("error"), t("auth.invalidEmail"));
       return;
     }
 
     if (email.length > 254) {
-      Alert.alert("Error", "Email must be less than 254 characters");
+      Alert.alert(t("error"), "Email must be less than 254 characters");
       return;
     }
 
     if (phone.length > 20) {
-      Alert.alert("Error", "Phone number must be less than 20 characters");
+      Alert.alert(t("error"), "Phone number must be less than 20 characters");
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters");
+      Alert.alert(t("error"), t("auth.passwordTooShort"));
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
+      Alert.alert(t("error"), "Passwords do not match");
       return;
     }
 
@@ -84,11 +87,11 @@ export default function RegisterScreen() {
       const data = response.data;
 
       Alert.alert(
-        "Success",
+        t("success"),
         "Registration successful! Please login to continue.",
         [
           {
-            text: "OK",
+            text: t("auth.ok") || "OK",
             onPress: () => router.push("/auth/login"),
           },
         ]
@@ -125,16 +128,13 @@ export default function RegisterScreen() {
           errorMessage = fieldErrors || "Registration failed";
         }
 
-        Alert.alert("Registration Failed", errorMessage);
+        Alert.alert(t("auth.registrationFailed"), errorMessage);
       } else if (error.request) {
         // Request made but no response
-        Alert.alert(
-          "Error",
-          "Unable to connect to server. Please check your internet connection."
-        );
+        Alert.alert(t("error"), t("auth.networkError"));
       } else {
         // Something else happened
-        Alert.alert("Error", "An unexpected error occurred");
+        Alert.alert(t("error"), "An unexpected error occurred");
       }
     } finally {
       setLoading(false);
@@ -150,16 +150,16 @@ export default function RegisterScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.logo}>🧠</Text>
-          <Text style={styles.title}>Autispart</Text>
-          <Text style={styles.subtitle}>Create your account</Text>
+          <Text style={styles.title}>{t("appName")}</Text>
+          <Text style={styles.subtitle}>{t("auth.registerTitle")}</Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Full Name *</Text>
+            <Text style={styles.label}>{t("fullName")} *</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your full name"
+              placeholder={t("auth.fullNamePlaceholder")}
               value={fullName}
               onChangeText={setFullName}
               autoCapitalize="words"
@@ -167,10 +167,10 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email *</Text>
+            <Text style={styles.label}>{t("email")} *</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your email"
+              placeholder={t("auth.emailPlaceholder")}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -179,10 +179,10 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Phone Number *</Text>
+            <Text style={styles.label}>{t("phone")} *</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your phone number"
+              placeholder={t("auth.phonePlaceholder")}
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
@@ -190,10 +190,12 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password * (min 6 characters)</Text>
+            <Text style={styles.label}>
+              {t("password")} * (min 6 characters)
+            </Text>
             <TextInput
               style={styles.input}
-              placeholder="Create a password"
+              placeholder={t("auth.passwordPlaceholder")}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -201,7 +203,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirm Password *</Text>
+            <Text style={styles.label}>{t("password")} * (confirm)</Text>
             <TextInput
               style={styles.input}
               placeholder="Re-enter your password"
@@ -217,9 +219,9 @@ export default function RegisterScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#ffffff" />
+              <ActivityIndicator color={AppColors.white} />
             ) : (
-              <Text style={styles.buttonText}>Create Account</Text>
+              <Text style={styles.buttonText}>{t("auth.registerButton")}</Text>
             )}
           </TouchableOpacity>
 
@@ -234,9 +236,9 @@ export default function RegisterScreen() {
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account?</Text>
+            <Text style={styles.footerText}>{t("alreadyHaveAccount")}</Text>
             <TouchableOpacity onPress={() => router.push("/auth/login")}>
-              <Text style={styles.footerLink}>Login</Text>
+              <Text style={styles.footerLink}>{t("login")}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -248,7 +250,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: AppColors.white,
   },
   scrollContent: {
     flexGrow: 1,
@@ -266,12 +268,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#1e40af",
+    color: AppColors.primary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: "#64748b",
+    color: AppColors.textLight,
   },
   form: {
     flex: 1,
@@ -282,19 +284,19 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#334155",
+    color: AppColors.textPrimary,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: AppColors.background,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: AppColors.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#1e40af",
+    backgroundColor: AppColors.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: "center",
@@ -302,10 +304,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonDisabled: {
-    backgroundColor: "#94a3b8",
+    backgroundColor: AppColors.disabled,
   },
   buttonText: {
-    color: "#ffffff",
+    color: AppColors.white,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -317,23 +319,23 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#e2e8f0",
+    backgroundColor: AppColors.border,
   },
   dividerText: {
     marginHorizontal: 16,
-    color: "#94a3b8",
+    color: AppColors.textSecondary,
     fontSize: 14,
   },
   secondaryButton: {
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: AppColors.border,
     borderRadius: 12,
     padding: 16,
     alignItems: "center",
     marginBottom: 20,
   },
   secondaryButtonText: {
-    color: "#334155",
+    color: AppColors.textPrimary,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -345,11 +347,11 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   footerText: {
-    color: "#64748b",
+    color: AppColors.textLight,
     fontSize: 14,
   },
   footerLink: {
-    color: "#1e40af",
+    color: AppColors.secondary,
     fontSize: 14,
     fontWeight: "600",
     marginLeft: 4,
