@@ -30,6 +30,23 @@ export default function RootLayout() {
           name="questionnaire/question-2"
           options={{ headerShown: false }}
         />
+        {/* M-CHAT Screening Screens */}
+        <Stack.Screen
+          name="mchat/medical-history"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="mchat/instructions"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="mchat/questions"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="mchat/results"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"

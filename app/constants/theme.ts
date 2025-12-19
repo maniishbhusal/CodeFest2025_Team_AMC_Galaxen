@@ -9,7 +9,7 @@ import { Platform } from "react-native";
 const primaryBlue = "#ADD8E6"; // Light blue
 const lightBlue = "#D6EAF8"; // Lighter blue variant
 const darkBlue = "#87CEEB"; // Darker light blue
-const pantonePink = "FDB5CE"; // Light pink
+const pantonePink = "#FDB5CE"; // Light pink
 const lightPink = "#FFD4E0"; // Lighter pink variant
 const white = "#FFFFFF";
 const offWhite = "#FAFAFA";
