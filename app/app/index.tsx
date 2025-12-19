@@ -18,9 +18,9 @@ export default function Index() {
     opacity.value = withTiming(1, { duration: 1000 });
     scale.value = withSpring(1);
 
-    // Navigate to login after 3 seconds
+    // Navigate to registration after 3 seconds
     const timer = setTimeout(() => {
-      router.replace("/auth/login");
+      router.replace("/auth/register");
     }, 3000);
 
     return () => clearTimeout(timer);

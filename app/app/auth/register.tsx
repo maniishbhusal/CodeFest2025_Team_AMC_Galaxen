@@ -12,20 +12,30 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const router = useRouter();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [age, setAge] = useState("");
+  const [guardian, setGuardian] = useState("");
 
-  const handleLogin = () => {
-    // TODO: Add authentication logic
-    if (!email || !password) {
-      alert("Please fill all fields");
+  const handleRegister = () => {
+    // TODO: Add validation
+    if (!fullName || !email || !password || !confirmPassword) {
+      alert("Please fill all required fields");
       return;
     }
 
-    // Navigate to questionnaire after login
-    router.replace("/questionnaire/welcome");
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    // Navigate to login after successful registration
+    router.push("/auth/login");
   };
 
   return (
@@ -37,13 +47,24 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.logo}>🧠</Text>
-          <Text style={styles.title}>NeuroCare</Text>
-          <Text style={styles.subtitle}>Welcome back</Text>
+          <Text style={styles.title}>Autispart</Text>
+          <Text style={styles.subtitle}>Create your account</Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>Full Name *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your full name"
+              value={fullName}
+              onChangeText={setFullName}
+              autoCapitalize="words"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email *</Text>
             <TextInput
               style={styles.input}
               placeholder="Enter your email"
@@ -55,22 +76,40 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>Phone Number</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your password"
+              placeholder="Enter your phone number"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Create a password"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
             />
           </View>
 
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Confirm Password *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
+          </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Create Account</Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -84,9 +123,9 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account?</Text>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.footerLink}>Sign Up</Text>
+            <Text style={styles.footerText}>Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.push("/auth/login")}>
+              <Text style={styles.footerLink}>Login</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -107,7 +146,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     marginTop: 40,
-    marginBottom: 40,
+    marginBottom: 30,
   },
   logo: {
     fontSize: 60,
@@ -127,7 +166,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   label: {
     fontSize: 14,
@@ -143,20 +182,12 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
   },
-  forgotPassword: {
-    alignSelf: "flex-end",
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    color: "#1e40af",
-    fontSize: 14,
-    fontWeight: "600",
-  },
   button: {
     backgroundColor: "#1e40af",
     borderRadius: 12,
     padding: 16,
     alignItems: "center",
+    marginTop: 8,
     marginBottom: 20,
   },
   buttonText: {
@@ -197,6 +228,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
+    marginBottom: 30,
   },
   footerText: {
     color: "#64748b",
