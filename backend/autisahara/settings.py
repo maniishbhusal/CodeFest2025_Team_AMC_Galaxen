@@ -38,9 +38,7 @@ INSTALLED_APPS = [
     "accounts",
     "children",
     "assessments",
-    "curriculum",
-    "progress",
-    "reports",
+    "therapy",
 ]
 
 MIDDLEWARE = [
@@ -122,10 +120,10 @@ REST_FRAMEWORK = {
     ],
 }
 
-# JWT Settings
+# JWT Settings - Extended for hackathon
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=8),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=8),
     "ROTATE_REFRESH_TOKENS": False,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }

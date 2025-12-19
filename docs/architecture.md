@@ -22,13 +22,11 @@
 ```
 AutiSahara-nepal/
 ├── backend/                    # Django REST Framework
-│   ├── AutiSahara/             # Project settings
+│   ├── autisahara/            # Project settings
 │   ├── accounts/              # User auth (parents, doctors)
 │   ├── children/              # Child profiles & medical history
 │   ├── assessments/           # M-CHAT & video submissions
-│   ├── curriculum/            # General & specialized tasks
-│   ├── progress/              # Daily progress tracking
-│   └── reports/               # Doctor reports
+│   └── therapy/               # Curriculum, progress, reviews
 │
 ├── dashboard/                  # React (Doctor Portal)
 │   ├── src/
@@ -1017,48 +1015,165 @@ POST   /api/parent/household/                 # Submit household info
 
 ### Child Management
 ```
-POST   /api/children/                         # Add child (Section 1)
-GET    /api/children/                         # List my children
-GET    /api/children/{id}/                    # Child details
-PUT    /api/children/{id}/                    # Update child info
+POST   /api/children/register/       # RECOMMENDED - All sections at once
+POST   /api/children/                # Basic info only
+GET    /api/children/                # List my children
+GET    /api/children/{id}/           # Child details
+PUT    /api/children/{id}/           # Update child
 ```
 
-### Child Additional Info
-```
-POST   /api/children/{id}/education/          # Submit Section 5
-GET    /api/children/{id}/education/
-POST   /api/children/{id}/health/             # Submit Section 6
-GET    /api/children/{id}/health/
+#### POST /api/children/register/ - FULL EXAMPLE
+```json
+{
+  "full_name": "Aarav Sharma",
+  "date_of_birth": "2022-03-15",
+  "age_years": 2,
+  "age_months": 8,
+  "gender": "male",
+
+  "education": {
+    "goes_to_school": true,
+    "school_name": "Little Stars School",
+    "grade_class": "Nursery",
+    "school_type": "private",
+    "transport_mode": "private_vehicle",
+    "wake_up_time": "07:00",
+    "breakfast_time": "08:00",
+    "school_start_time": "09:30",
+    "school_end_time": "14:00",
+    "lunch_time": "12:30",
+    "nap_start_time": "15:00",
+    "nap_end_time": "16:30",
+    "evening_activities": "Playing with toys",
+    "dinner_time": "19:00",
+    "sleep_time": "21:00"
+  },
+
+  "health": {
+    "height_cm": 85.5,
+    "weight_kg": 12.0,
+    "has_vaccinations": "yes",
+    "medical_conditions": "",
+    "takes_medication": false,
+    "medication_list": "",
+    "seen_pediatrician": true,
+    "seen_psychiatrist": false,
+    "seen_speech_therapist": false,
+    "seen_occupational_therapist": false,
+    "seen_psychologist": false,
+    "seen_special_educator": false,
+    "seen_neurologist": false,
+    "seen_traditional_healer": false,
+    "seen_none": false
+  },
+
+  "medical_history": {
+    "pregnancy_infection": false,
+    "pregnancy_infection_desc": "",
+    "birth_complications": false,
+    "birth_complications_desc": "",
+    "brain_injury_first_year": false,
+    "brain_injury_desc": "",
+    "family_autism_history": false
+  }
+}
 ```
 
-### Medical History (A1-A4)
+**Field Options:**
+| Field | Values |
+|-------|--------|
+| gender | `"male"` `"female"` `"other"` |
+| school_type | `"government"` `"private"` `"special"` |
+| transport_mode | `"walk"` `"bus"` `"private_vehicle"` `"other"` |
+| has_vaccinations | `"yes"` `"no"` `"not_sure"` |
+| Time fields | `"HH:MM"` format (24-hour) |
+
+---
+
+### Child Additional Info (for updating individual sections)
 ```
-POST   /api/children/{id}/medical-history/    # Submit A1-A4
-GET    /api/children/{id}/medical-history/
+POST   /api/children/{id}/education/          # Create/Update Section 5
+POST   /api/children/{id}/health/             # Create/Update Section 6
+POST   /api/children/{id}/medical-history/    # Create/Update A1-A4
 ```
+
+---
 
 ### M-CHAT Assessment
 ```
-POST   /api/children/{id}/mchat/              # Submit M-CHAT (20 questions)
-       Body: { q1: bool, q2: bool, ..., q20: bool }
-       → Auto-calculates score and risk_level
-GET    /api/children/{id}/mchat/              # Get M-CHAT results
+POST   /api/children/{id}/mchat/     # Submit screening
+GET    /api/children/{id}/mchat/     # Get results
 ```
+
+#### POST /api/children/{id}/mchat/ - FULL EXAMPLE
+```json
+{
+  "q1": true,
+  "q2": false,
+  "q3": true,
+  "q4": true,
+  "q5": false,
+  "q6": true,
+  "q7": true,
+  "q8": true,
+  "q9": true,
+  "q10": true,
+  "q11": true,
+  "q12": false,
+  "q13": true,
+  "q14": true,
+  "q15": true,
+  "q16": true,
+  "q17": true,
+  "q18": true,
+  "q19": true,
+  "q20": true
+}
+```
+
+**Scoring:** `true` = YES, `false` = NO
+- **Reverse questions (q2, q5, q12):** YES = concerning
+- **All others:** NO = concerning
+- **Risk:** 0-2 = Low, 3-7 = Medium, 8-20 = High
+
+---
 
 ### Video Upload
 ```
-POST   /api/children/{id}/videos/             # Upload assessment video
-       Body: { video_type, video_file, description }
-GET    /api/children/{id}/videos/             # List videos
+POST   /api/children/{id}/videos/    # Upload video
+GET    /api/children/{id}/videos/    # List videos
 DELETE /api/children/{id}/videos/{vid_id}/
 ```
 
+#### POST /api/children/{id}/videos/ - EXAMPLE
+```json
+{
+  "video_type": "walking",
+  "video_url": "https://cloudflare-stream-url.com/video123",
+  "description": "Child walking in living room"
+}
+```
+
+**video_type options:** `"walking"` `"eating"` `"speaking"` `"behavior"` `"playing"` `"other"`
+
+---
+
 ### Assessment Submission
 ```
-POST   /api/children/{id}/assessment/submit/  # Final submit with confirmation
-       Body: { parent_confirmed: true }
-GET    /api/children/{id}/assessment/status/  # Check status
+POST   /api/children/{id}/assessment/submit/   # Final submit
+GET    /api/children/{id}/assessment/status/   # Check status
 ```
+
+#### POST /api/children/{id}/assessment/submit/ - EXAMPLE
+```json
+{
+  "parent_confirmed": true
+}
+```
+
+**Status values:** `"pending"` → `"in_review"` → `"accepted"` → `"completed"`
+
+---
 
 ### Doctor Dashboard
 ```
@@ -1069,41 +1184,85 @@ POST   /api/doctor/patients/{child_id}/accept/ # Accept patient
 GET    /api/doctor/patients/active/           # My active patients
 ```
 
-### Curriculum Management
+### Curriculum Management (Therapy App)
 ```
-GET    /api/curriculum/                       # List all curriculum
-GET    /api/curriculum/{id}/                  # Details + tasks
-POST   /api/curriculum/                       # Create (doctor only)
-POST   /api/curriculum/{id}/tasks/            # Add task
+GET    /api/therapy/curricula/                # List all curricula
+GET    /api/therapy/curricula/{id}/           # Details + tasks
 ```
 
-### Assign Curriculum
+### Doctor Dashboard (Therapy App)
 ```
-POST   /api/doctor/patients/{child_id}/assign-curriculum/
-       Body: { curriculum_id, start_date }
-GET    /api/doctor/patients/{child_id}/curriculum/
-```
-
-### Daily Progress (Parent)
-```
-GET    /api/children/{id}/today/              # Today's tasks
-POST   /api/children/{id}/progress/           # Submit progress
-       Body: { task_id, status, video_url?, notes? }
-GET    /api/children/{id}/progress/history/
+GET    /api/therapy/doctor/pending/           # Pending patients for review
+GET    /api/therapy/doctor/patients/          # Accepted patients
+GET    /api/therapy/doctor/patient/{id}/      # Full patient details
+POST   /api/therapy/doctor/patient/{id}/accept/     # Accept patient
+POST   /api/therapy/doctor/patient/{id}/assign/     # Assign curriculum
+GET    /api/therapy/doctor/patient/{id}/progress/   # View progress
+POST   /api/therapy/doctor/patient/{id}/review/     # Create review
 ```
 
-### Doctor Review
-```
-GET    /api/doctor/patients/{child_id}/progress/    # All progress
-POST   /api/doctor/patients/{child_id}/review/      # Submit review
-GET    /api/doctor/patients/{child_id}/reviews/     # All reviews
+#### POST /api/therapy/doctor/patient/{id}/assign/ - EXAMPLE
+```json
+{
+  "curriculum_id": 1,
+  "start_date": "2024-01-20"
+}
 ```
 
-### Reports
+#### POST /api/therapy/doctor/patient/{id}/review/ - EXAMPLE
+```json
+{
+  "review_period": 15,
+  "observations": "Child shows good progress with eye contact tasks...",
+  "spectrum_identified": "mild",
+  "recommendations": "Continue with current curriculum, increase social tasks"
+}
 ```
-POST   /api/doctor/patients/{child_id}/diagnosis/   # Create report
-GET    /api/children/{id}/reports/                  # Parent view
+
+---
+
+### Parent Progress (Therapy App)
 ```
+GET    /api/therapy/child/{id}/today/         # Today's tasks
+POST   /api/therapy/child/{id}/submit/        # Submit progress
+POST   /api/therapy/child/{id}/advance/       # Advance to next day
+GET    /api/therapy/child/{id}/history/       # Progress history
+GET    /api/therapy/child/{id}/curriculum/    # Curriculum status
+```
+
+#### POST /api/therapy/child/{id}/submit/ - EXAMPLE
+```json
+{
+  "task_id": 1,
+  "status": "done_with_help",
+  "video_url": "https://cloudflare-stream-url.com/progress123",
+  "notes": "Child completed task with assistance"
+}
+```
+
+**status options:** `"not_done"` `"done_with_help"` `"done_without_help"`
+
+---
+
+### Diagnosis Reports (Therapy App)
+```
+POST   /api/therapy/doctor/patient/{child_id}/diagnosis/   # Create diagnosis report
+GET    /api/therapy/child/{id}/reports/                    # View diagnosis reports
+POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with parent
+```
+
+#### POST /api/therapy/doctor/patient/{id}/diagnosis/ - EXAMPLE
+```json
+{
+  "has_autism": true,
+  "spectrum_type": "mild",
+  "detailed_report": "Based on M-CHAT screening and behavioral observations, the child shows signs consistent with mild autism spectrum disorder...",
+  "next_steps": "1. Enroll in speech therapy program\n2. Start 15-day introductory curriculum\n3. Schedule follow-up in 2 weeks",
+  "shared_with_parent": true
+}
+```
+
+**spectrum_type options:** `"none"` `"mild"` `"moderate"` `"severe"`
 
 ---
 
@@ -1244,32 +1403,39 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 2.1 Child Model (children/models.py)
+✅ 2.1 Child Model (children/models.py)
    - Section 1 fields: full_name, dob, age_years, age_months, gender
    - ForeignKey to Parent
 
-□ 2.2 ChildEducation Model
+✅ 2.2 ChildEducation Model
    - All Section 5 fields
    - ForeignKey to Child
 
-□ 2.3 ChildHealth Model
+✅ 2.3 ChildHealth Model
    - All Section 6 fields
    - ForeignKey to Child
 
-□ 2.4 Child Endpoints
+✅ 2.4 Child Endpoints
    - POST /api/children/
    - GET /api/children/
    - GET /api/children/{id}/
    - PUT /api/children/{id}/
 
-□ 2.5 Parent Profile Endpoints
+✅ 2.5 Parent Profile Endpoints (Done in Phase 1)
    - POST /api/parent/profile/
    - GET /api/parent/profile/
    - POST /api/parent/household/
 
-□ 2.6 Child Education & Health Endpoints
+✅ 2.6 Child Education & Health Endpoints
    - POST /api/children/{id}/education/
    - POST /api/children/{id}/health/
+   - POST /api/children/{id}/medical-history/
+
+✅ 2.7 Combined Child Registration Endpoint (RECOMMENDED)
+   - POST /api/children/register/
+   - Accepts child info + education + health + medical_history in ONE call
+   - Frontend collects all form data, submits at the end
+   - Returns complete child profile with all sections
 ```
 
 #### Mobile Tasks
@@ -1319,6 +1485,12 @@ GET    /api/children/{id}/reports/                  # Parent view
    - Consent checkboxes
    - Declaration checkbox
    - Submit all data
+
+□ 2.15 Submit Child Registration
+   - Collect all form data from Sections 1, 5, 6, A1-A4
+   - Call POST /api/children/register/ with combined payload
+   - Show success message with child ID
+   - Navigate to M-CHAT screening
 ```
 
 ---
@@ -1330,30 +1502,41 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 3.1 MedicalHistory Model (assessments/models.py)
+✅ 3.1 MedicalHistory Model (Done in Phase 2 - children/models.py)
    - A1-A4 boolean fields
    - Description fields for each
    - requires_specialist auto-flag
 
-□ 3.2 MChatResponse Model
+✅ 3.2 MChatResponse Model (assessments/models.py)
    - q1-q20 boolean fields
    - total_score integer
    - risk_level enum
 
-□ 3.3 M-CHAT Scoring Logic
+✅ 3.3 M-CHAT Scoring Logic
    - Implement calculate_mchat_score()
    - Handle reverse questions (2, 5, 12)
    - Calculate risk level
 
-□ 3.4 Medical History Endpoints
+✅ 3.4 Medical History Endpoints (Done in Phase 2)
    - POST /api/children/{id}/medical-history/
    - GET /api/children/{id}/medical-history/
 
-□ 3.5 M-CHAT Endpoints
+✅ 3.5 M-CHAT Endpoints
    - POST /api/children/{id}/mchat/
      → Auto-calculate and save score
    - GET /api/children/{id}/mchat/
+
+✅ 3.6 Assessment Video Endpoints (Phase 4 - done early)
+   - POST /api/children/{id}/videos/
+   - GET /api/children/{id}/videos/
+   - DELETE /api/children/{id}/videos/{vid_id}/
+
+✅ 3.7 Assessment Submit Endpoints (Phase 4 - done early)
+   - POST /api/children/{id}/assessment/submit/
+   - GET /api/children/{id}/assessment/status/
 ```
+
+**Note for Frontend:** Video & Assessment endpoints are ready. See Phase 4 Mobile Tasks for UI implementation.
 
 #### Mobile Tasks
 
@@ -1411,27 +1594,27 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 4.1 Cloudflare Stream Integration
-   - Create cloudflare.py service
-   - Upload video function
-   - Get video URL function
+⏭️ 4.1 Cloudflare Stream Integration (SKIPPED - Frontend handles upload)
+   - Frontend uploads video directly to Cloudflare Stream
+   - Frontend sends video_url to backend
+   - No backend upload service needed for hackathon
 
-□ 4.2 AssessmentVideo Model
+✅ 4.2 AssessmentVideo Model (Done in Phase 3)
    - video_type enum
    - video_url, description
    - ForeignKey to Child
 
-□ 4.3 ChildAssessment Model
+✅ 4.3 ChildAssessment Model (Done in Phase 3)
    - status enum (pending, in_review, accepted, completed)
    - parent_confirmed boolean
    - assigned_doctor ForeignKey
 
-□ 4.4 Video Endpoints
+✅ 4.4 Video Endpoints (Done in Phase 3)
    - POST /api/children/{id}/videos/
    - GET /api/children/{id}/videos/
    - DELETE /api/children/{id}/videos/{vid_id}/
 
-□ 4.5 Assessment Submit Endpoint
+✅ 4.5 Assessment Submit Endpoint (Done in Phase 3)
    - POST /api/children/{id}/assessment/submit/
    - GET /api/children/{id}/assessment/status/
 ```
@@ -1439,36 +1622,32 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Mobile Tasks
 
 ```
-□ 4.6 Video Type Selection Screen
-   - Walking, Eating, Speaking, Behavior, Other
-   - Description for each type
+□ 4.6 Video Upload Screen
+   - Select video type: Walking, Eating, Speaking, Behavior, Playing, Other
+   - "Choose from Gallery" button (pick existing video from device)
+   - Preview selected video
+   - Add description text field
+   - Upload to Cloudflare Stream
+   - Show upload progress bar
+   - Submit button → POST /api/children/{id}/videos/
 
-□ 4.7 Video Recording Screen
-   - Camera preview
-   - Record button
-   - Stop button
-   - Preview recorded video
-
-□ 4.8 Video Upload Screen
-   - Show selected video
-   - Add description
-   - Upload progress bar
-   - Submit button
-
-□ 4.9 Video List Screen
+□ 4.7 Video List Screen
    - Show all uploaded videos
-   - Video type, thumbnail, date
-   - Delete option
+   - Video thumbnail, type label, date
+   - Play video option
+   - Delete option → DELETE /api/children/{id}/videos/{vid_id}/
+   - "Add Another Video" button
 
-□ 4.10 Confirmation Screen
-   - Summary of all submitted info
-   - Declaration checkbox
-   - Final submit button
+□ 4.8 Confirmation Screen
+   - Summary of all submitted info (child, M-CHAT score, videos count)
+   - Declaration checkbox: "I confirm this information is accurate"
+   - Final submit button → POST /api/children/{id}/assessment/submit/
 
-□ 4.11 Success Screen
+□ 4.9 Success Screen
    - "Assessment submitted!"
    - "A doctor will review soon"
-   - Status tracking info
+   - Show assessment status
+   - "View Status" button → GET /api/children/{id}/assessment/status/
 ```
 
 #### Dashboard Tasks
@@ -1494,38 +1673,54 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 5.1 Curriculum Model
+✅ 5.1 Curriculum Model (therapy/models.py)
    - title, description, duration_days
    - type (general/specialized)
    - spectrum_type (for specialized)
+   - created_by (FK to Doctor)
 
-□ 5.2 CurriculumTask Model
+✅ 5.2 CurriculumTask Model
    - day_number, title
    - why_description, instructions
-   - demo_video_url
+   - demo_video_url, order_index
 
-□ 5.3 ChildCurriculum Model
+✅ 5.3 ChildCurriculum Model
    - Assigns curriculum to child
    - start_date, end_date, current_day
+   - status (active/paused/completed)
 
-□ 5.4 DailyProgress Model
+✅ 5.4 DailyProgress Model
    - task_id, day_number, date
    - status enum (not_done, done_with_help, done_without_help)
-   - video_url, notes
+   - video_url, parent_notes
 
-□ 5.5 Seed Sample Curriculum
+✅ 5.5 DoctorReview Model
+   - review_period (15, 30, 45)
+   - observations, spectrum_identified, recommendations
+
+□ 5.6 Seed Sample Curriculum
    - Create 15-day general curriculum
    - Add 5-10 sample tasks
 
-□ 5.6 Curriculum Endpoints
-   - GET /api/curriculum/
-   - GET /api/curriculum/{id}/
-   - POST /api/doctor/patients/{child_id}/assign-curriculum/
+✅ 5.7 Curriculum Endpoints (GET /api/therapy/curricula/)
+   - GET /api/therapy/curricula/
+   - GET /api/therapy/curricula/{id}/
 
-□ 5.7 Progress Endpoints
-   - GET /api/children/{id}/today/
-   - POST /api/children/{id}/progress/
-   - GET /api/children/{id}/progress/history/
+✅ 5.8 Doctor Dashboard Endpoints
+   - GET /api/therapy/doctor/pending/
+   - GET /api/therapy/doctor/patients/
+   - GET /api/therapy/doctor/patient/{child_id}/
+   - POST /api/therapy/doctor/patient/{child_id}/accept/
+   - POST /api/therapy/doctor/patient/{child_id}/assign/
+   - GET /api/therapy/doctor/patient/{child_id}/progress/
+   - POST /api/therapy/doctor/patient/{child_id}/review/
+
+✅ 5.9 Parent Progress Endpoints
+   - GET /api/therapy/child/{id}/today/
+   - POST /api/therapy/child/{id}/submit/
+   - POST /api/therapy/child/{id}/advance/
+   - GET /api/therapy/child/{id}/history/
+   - GET /api/therapy/child/{id}/curriculum/
 ```
 
 #### Mobile Tasks
@@ -1592,22 +1787,23 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 6.1 DiagnosisReport Model
+✅ 6.1 DiagnosisReport Model
    - has_autism boolean
-   - spectrum_type
+   - spectrum_type (none/mild/moderate/severe)
    - detailed_report, next_steps
+   - shared_with_parent boolean
 
-□ 6.2 DoctorReview Model
+✅ 6.2 DoctorReview Model (Done in Phase 5)
    - review_period, observations
    - spectrum_identified, recommendations
 
-□ 6.3 Report Endpoints
-   - POST /api/doctor/patients/{child_id}/diagnosis/
-   - GET /api/children/{id}/reports/
+✅ 6.3 Report Endpoints
+   - POST /api/therapy/doctor/patient/{child_id}/diagnosis/
+   - GET /api/therapy/child/{id}/reports/
+   - POST /api/therapy/doctor/report/{id}/toggle-share/
 
-□ 6.4 Review Endpoints
-   - POST /api/doctor/patients/{child_id}/review/
-   - GET /api/doctor/patients/{child_id}/reviews/
+✅ 6.4 Review Endpoints (Done in Phase 5)
+   - POST /api/therapy/doctor/patient/{child_id}/review/
 ```
 
 #### Mobile Tasks
@@ -2010,6 +2206,41 @@ When access token expires (after 60 min), use refresh token:
 | 8 | PUT | `/api/parent/profile/` | ✅ Yes | Update parent |
 | 9 | GET | `/api/parent/household/` | ✅ Yes | Get household |
 | 10 | POST | `/api/parent/household/` | ✅ Yes | Create/update household |
+| 11 | POST | `/api/children/register/` | ✅ Yes | **Register child (all sections at once)** |
+| 12 | POST | `/api/children/` | ✅ Yes | Add child (basic info only) |
+| 13 | GET | `/api/children/` | ✅ Yes | List my children |
+| 14 | GET | `/api/children/{id}/` | ✅ Yes | Get child details |
+| 15 | PUT | `/api/children/{id}/` | ✅ Yes | Update child info |
+| 16 | POST | `/api/children/{id}/education/` | ✅ Yes | Create/update education |
+| 17 | POST | `/api/children/{id}/health/` | ✅ Yes | Create/update health |
+| 18 | POST | `/api/children/{id}/medical-history/` | ✅ Yes | Create/update medical history |
+| 19 | POST | `/api/children/{id}/mchat/` | ✅ Yes | Submit M-CHAT screening |
+| 20 | GET | `/api/children/{id}/mchat/` | ✅ Yes | Get M-CHAT results |
+| 21 | POST | `/api/children/{id}/videos/` | ✅ Yes | Upload assessment video |
+| 22 | GET | `/api/children/{id}/videos/` | ✅ Yes | List videos |
+| 23 | DELETE | `/api/children/{id}/videos/{vid}/` | ✅ Yes | Delete video |
+| 24 | POST | `/api/children/{id}/assessment/submit/` | ✅ Yes | Submit final assessment |
+| 25 | GET | `/api/children/{id}/assessment/status/` | ✅ Yes | Get assessment status |
+| **Therapy - Curriculum** |
+| 26 | GET | `/api/therapy/curricula/` | ✅ Yes | List all curricula |
+| 27 | GET | `/api/therapy/curricula/{id}/` | ✅ Yes | Get curriculum details |
+| **Therapy - Doctor Dashboard** |
+| 28 | GET | `/api/therapy/doctor/pending/` | ✅ Doctor | Pending patients |
+| 29 | GET | `/api/therapy/doctor/patients/` | ✅ Doctor | Accepted patients |
+| 30 | GET | `/api/therapy/doctor/patient/{id}/` | ✅ Doctor | Patient details |
+| 31 | POST | `/api/therapy/doctor/patient/{id}/accept/` | ✅ Doctor | Accept patient |
+| 32 | POST | `/api/therapy/doctor/patient/{id}/assign/` | ✅ Doctor | Assign curriculum |
+| 33 | GET | `/api/therapy/doctor/patient/{id}/progress/` | ✅ Doctor | View progress |
+| 34 | POST | `/api/therapy/doctor/patient/{id}/review/` | ✅ Doctor | Create review |
+| 35 | POST | `/api/therapy/doctor/patient/{id}/diagnosis/` | ✅ Doctor | Create diagnosis report |
+| 36 | POST | `/api/therapy/doctor/report/{id}/toggle-share/` | ✅ Doctor | Toggle report sharing |
+| **Therapy - Parent Progress** |
+| 37 | GET | `/api/therapy/child/{id}/today/` | ✅ Parent | Today's tasks |
+| 38 | POST | `/api/therapy/child/{id}/submit/` | ✅ Parent | Submit progress |
+| 39 | POST | `/api/therapy/child/{id}/advance/` | ✅ Parent | Advance day |
+| 40 | GET | `/api/therapy/child/{id}/history/` | ✅ Yes | Progress history |
+| 41 | GET | `/api/therapy/child/{id}/curriculum/` | ✅ Yes | Curriculum status |
+| 42 | GET | `/api/therapy/child/{id}/reports/` | ✅ Yes | View diagnosis reports |
 
 ---
 
@@ -2049,6 +2280,48 @@ When access token expires (after 60 min), use refresh token:
 **Household:**
 ```json
 {"has_mother":true,"has_father":true,"siblings_count":1,"has_maternal_grandparents":true,"has_paternal_grandparents":false,"has_uncle_aunt":false,"has_other_relatives":false,"has_helper":false}
+```
+
+**Child Full Registration (RECOMMENDED - all sections at once):**
+```json
+{
+  "full_name": "Aarav Sharma",
+  "date_of_birth": "2022-03-15",
+  "age_years": 2,
+  "age_months": 8,
+  "gender": "male",
+  "education": {
+    "goes_to_school": true,
+    "school_name": "Little Stars School",
+    "grade_class": "Nursery",
+    "school_type": "private",
+    "transport_mode": "private_vehicle"
+  },
+  "health": {
+    "height_cm": 85,
+    "weight_kg": 12,
+    "has_vaccinations": "yes",
+    "takes_medication": false,
+    "seen_pediatrician": true,
+    "seen_none": false
+  },
+  "medical_history": {
+    "pregnancy_infection": false,
+    "birth_complications": false,
+    "brain_injury_first_year": false,
+    "family_autism_history": false
+  }
+}
+```
+
+**Child Basic Only (minimal):**
+```json
+{"full_name":"Aarav Sharma","date_of_birth":"2022-03-15","age_years":2,"age_months":8,"gender":"male"}
+```
+
+**M-CHAT Screening (all 20 questions):**
+```json
+{"q1":true,"q2":false,"q3":true,"q4":true,"q5":false,"q6":true,"q7":true,"q8":true,"q9":true,"q10":true,"q11":true,"q12":false,"q13":true,"q14":true,"q15":true,"q16":true,"q17":true,"q18":true,"q19":true,"q20":true}
 ```
 
 ---
