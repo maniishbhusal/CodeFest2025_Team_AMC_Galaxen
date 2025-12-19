@@ -1363,35 +1363,38 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Mobile Tasks
 
 ```
-□ 1.16 React Native Setup
-   cd mobile
-   npx create-expo-app . --template blank
-   npm install @react-navigation/native @react-navigation/stack
-   npm install react-native-screens react-native-safe-area-context
-   npm install axios @react-native-async-storage/async-storage
+✅ 1.16 React Native Setup
+   - Using Expo 54.0.30 with Expo Router
+   - Installed: axios, AsyncStorage, i18next, react-native-reanimated
+   - File-based routing configured
 
-□ 1.17 Setup Navigation
-   - Create navigation container
-   - Create Auth stack (Login, Register)
-   - Create Main stack (placeholder)
+✅ 1.17 Setup Navigation
+   - Stack navigation (Expo Router)
+   - Auth stack: /auth/login, /auth/register
+   - Form stack: /form/section-1 through section-7
+   - Tab navigation: Home, Resources, Journal, Chat, Profile
 
-□ 1.18 Auth Context
-   - Create AuthContext
-   - Store JWT in AsyncStorage
-   - Create useAuth hook
+✅ 1.18 Auth Context
+   - LanguageContext for multilingual support (EN/NE)
+   - JWT token stored in AsyncStorage
+   - User data persistence
 
-□ 1.19 API Service
-   - Create axios instance
-   - Add JWT interceptor
+✅ 1.19 API Service
+   - Axios with EXPO_PUBLIC_BASE_URL from .env
+   - Bearer token authorization in headers
+   - 30s timeout configured
 
-□ 1.20 Login Screen
-   - Email + Password inputs
-   - Login button
-   - Link to Register
+✅ 1.20 Login Screen
+   - Email + Password inputs with validation
+   - API call to /api/auth/login/
+   - Token extraction and AsyncStorage save
+   - Redirect to /form/section-1 on success
 
-□ 1.21 Parent Register Screen
-   - Email, Password, Name, Phone
-   - Submit and auto-login
+✅ 1.21 Parent Register Screen
+   - Full Name, Email, Phone, Password, Confirm Password
+   - Validation (email format, password length, matching)
+   - API call to /api/auth/register/parent/
+   - Error handling with field-specific messages
 ```
 
 ---
@@ -1441,56 +1444,59 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Mobile Tasks
 
 ```
-□ 2.7 Create Form Navigation
-   - Step indicator component
-   - Progress bar
+✅ 2.7 Create Form Navigation
+   - StepIndicator component showing 1/7 progress
+   - Back/Next navigation buttons
+   - Bilingual labels (Nepali/English)
 
-□ 2.8 Section 1 Screen: Child Basic Info
+✅ 2.8 Section 1 Screen: Child Basic Info (app/form/section-1.tsx)
    - Full name input
-   - Date of birth picker
-   - Age inputs (years, months)
-   - Gender selection
-   - Nepali labels
+   - Date of birth with DateTimePicker
+   - Age auto-calculated (years/months)
+   - Gender selection (Male/Female/Other)
+   - Nepali labels included
 
-□ 2.9 Section 2 Screen: Parent Info
+✅ 2.9 Section 2 Screen: Parent Info (app/form/section-2.tsx)
    - Mother: name, age, occupation
    - Father: name, age, occupation
-   - Primary caregiver selector
+   - Primary caregiver selector (Mother/Father/Both/Other)
 
-□ 2.10 Section 3 Screen: Contact Info
-   - Address, municipality, district
-   - Province selector (7 provinces)
-   - Phone numbers
+✅ 2.10 Section 3 Screen: Contact Info (app/form/section-3.tsx)
+   - Address, Municipality, District
+   - Province dropdown (7 provinces)
+   - Primary & Alternate phone
    - WhatsApp checkbox
    - Email (optional)
 
-□ 2.11 Section 4 Screen: Household
-   - Multi-select checkboxes
+✅ 2.11 Section 4 Screen: Household (app/form/section-4.tsx)
+   - Multi-select: Grandparents, Siblings, Uncles/Aunts, etc.
    - Siblings count input
+   - Info box explaining purpose
 
-□ 2.12 Section 5 Screen: Education & Routine
+✅ 2.12 Section 5 Screen: Education & Routine (app/form/section-5.tsx)
    - School yes/no toggle
-   - Conditional school fields
-   - Time pickers for routine
+   - Conditional: School name, Grade, Type (Public/Private/Special)
+   - Time pickers: Wake up, Sleep time
 
-□ 2.13 Section 6 Screen: Health
-   - Height, weight inputs
-   - Vaccination status
-   - Medical conditions text
-   - Medication fields
-   - Professionals seen checkboxes
+✅ 2.13 Section 6 Screen: Health (app/form/section-6.tsx)
+   - Height (cm) & Weight (kg)
+   - Vaccination status (Complete/Incomplete/Unknown)
+   - Medical conditions textarea
+   - Medication yes/no with details
+   - Professionals consulted (8 options multi-select)
 
-□ 2.14 Section 7 Screen: Technology & Consent
-   - Smartphone comfort level
-   - Consent checkboxes
-   - Declaration checkbox
-   - Submit all data
+✅ 2.14 Section 7 Screen: Technology & Consent (app/form/section-7.tsx)
+   - Smartphone comfort (1-5 scale)
+   - Data collection consent (required)
+   - Video recording consent (optional)
+   - Declaration checkbox (required)
 
-□ 2.15 Submit Child Registration
-   - Collect all form data from Sections 1, 5, 6, A1-A4
-   - Call POST /api/children/register/ with combined payload
-   - Show success message with child ID
-   - Navigate to M-CHAT screening
+✅ 2.15 Submit Child Registration
+   - Collects all form data from AsyncStorage
+   - Validates required fields
+   - POST /api/children/register/ with Bearer token
+   - Clears form data on success
+   - Redirects to /(tabs) dashboard
 ```
 
 ---
@@ -1541,33 +1547,40 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Mobile Tasks
 
 ```
-□ 3.6 Medical History Screen (A1-A4)
-   - 4 questions with Yes/No
-   - Description field when Yes
-   - Warning banner if any Yes
-   - Nepali translations
+✅ 3.6 Medical History Screen (A1-A4) (app/mchat/medical-history.tsx)
+   - 4 questions (A1-A4) with Yes/No buttons
+   - Description field appears when Yes selected
+   - Warning banner if any risk factors detected
+   - Nepali/English bilingual labels
 
-□ 3.7 M-CHAT Instructions Screen
-   - Explain the questionnaire
-   - Age requirement note
+✅ 3.7 M-CHAT Instructions Screen (app/mchat/instructions.tsx)
+   - Explains the questionnaire purpose
+   - Age requirement note (16-30 months)
    - "Keep in mind usual behavior" instruction
+   - Scoring breakdown (Low/Medium/High risk)
+   - Privacy note about confidentiality
 
-□ 3.8 M-CHAT Questions Screen
-   - 20 questions (can be paginated or scrollable)
-   - Yes/No selection for each
-   - Question number indicator
+✅ 3.8 M-CHAT Questions Screen (app/mchat/questions.tsx)
+   - All 20 M-CHAT questions with pagination
+   - Yes/No selection with visual feedback
+   - Progress bar and question number indicator
    - Examples shown under each question
+   - Navigation dots to jump between questions
+   - Handles reverse-scored questions (Q2, Q5, Q12)
 
-□ 3.9 M-CHAT Submit & Results
-   - Submit all 20 answers
-   - Show calculated score
-   - Show risk level (color coded)
-   - Low = green, Medium = yellow, High = red
+✅ 3.9 M-CHAT Submit & Results
+   - Submits all 20 answers to API
+   - Falls back to local scoring if offline
+   - Calculates total score and risk level
+   - API endpoint: POST /api/children/{id}/mchat/
 
-□ 3.10 Risk Level Result Screen
-   - Display score (X/20)
-   - Display risk level with explanation
-   - "Next: Upload Videos" button
+✅ 3.10 Risk Level Result Screen (app/mchat/results.tsx)
+   - Display score (X/20) with circular indicator
+   - Color-coded risk level badge
+   - Detailed result explanation (Nepali/English)
+   - Recommendations based on risk level
+   - Next steps guide for parents
+   - Navigate to dashboard button
 ```
 
 #### Dashboard Tasks
@@ -1622,28 +1635,28 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Mobile Tasks
 
 ```
-□ 4.6 Video Upload Screen
+✅ 4.6 Video Upload Screen (app/app/videos/upload.tsx)
    - Select video type: Walking, Eating, Speaking, Behavior, Playing, Other
    - "Choose from Gallery" button (pick existing video from device)
    - Preview selected video
    - Add description text field
-   - Upload to Cloudflare Stream
+   - Upload to Cloudflare Stream (with fallback to local URI)
    - Show upload progress bar
    - Submit button → POST /api/children/{id}/videos/
 
-□ 4.7 Video List Screen
+✅ 4.7 Video List Screen (app/app/videos/list.tsx)
    - Show all uploaded videos
    - Video thumbnail, type label, date
    - Play video option
    - Delete option → DELETE /api/children/{id}/videos/{vid_id}/
    - "Add Another Video" button
 
-□ 4.8 Confirmation Screen
+✅ 4.8 Confirmation Screen (app/app/videos/confirmation.tsx)
    - Summary of all submitted info (child, M-CHAT score, videos count)
    - Declaration checkbox: "I confirm this information is accurate"
    - Final submit button → POST /api/children/{id}/assessment/submit/
 
-□ 4.9 Success Screen
+✅ 4.9 Success Screen (app/app/videos/success.tsx)
    - "Assessment submitted!"
    - "A doctor will review soon"
    - Show assessment status
@@ -1726,33 +1739,38 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Mobile Tasks
 
 ```
-□ 5.8 Curriculum Overview Screen
+✅ 5.8 Curriculum Overview Screen (app/therapy/curriculum.tsx)
    - Show assigned curriculum
    - Duration, start date, current day
    - Progress indicator
+   - Links to today's tasks and history
 
-□ 5.9 Today's Tasks Screen
-   - List today's tasks
-   - Task card with title
+✅ 5.9 Today's Tasks Screen (app/therapy/today.tsx)
+   - List today's tasks with completion status
+   - Task card with title and description
+   - Progress summary at top
+   - Advance to next day button
 
-□ 5.10 Task Detail Screen
-   - WHY section (highlighted)
+✅ 5.10 Task Detail Screen (app/therapy/task-detail.tsx)
+   - WHY section (highlighted in blue)
    - Video player for demo
-   - Text instructions
+   - Numbered text instructions
+   - Submit progress button
 
-□ 5.11 Progress Submit Screen
+✅ 5.11 Progress Submit Screen (app/therapy/submit-progress.tsx)
    - Three options:
      ○ Not Done
      ○ Done with Help
      ○ Done without Help
-   - Video recording option
+   - Video recording/upload option
    - Notes field
    - Submit button
 
-□ 5.12 Progress History Screen
-   - Calendar or list view
-   - Show status for each day
-   - Color coded
+✅ 5.12 Progress History Screen (app/therapy/history.tsx)
+   - Calendar grid view with color coding
+   - Day-by-day progress details
+   - Status summary stats
+   - Legend for color indicators
 ```
 
 #### Dashboard Tasks
