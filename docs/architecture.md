@@ -1,4 +1,4 @@
-# NeuroCare Nepal - Development Architecture
+# AutiSahara Nepal - Development Architecture
 
 > **48-Hour Hackathon Build Guide**
 > Step-by-step development tasks for the team.
@@ -20,9 +20,9 @@
 ## Project Structure
 
 ```
-neurocare-nepal/
+AutiSahara-nepal/
 ├── backend/                    # Django REST Framework
-│   ├── neurocare/             # Project settings
+│   ├── AutiSahara/             # Project settings
 │   ├── accounts/              # User auth (parents, doctors)
 │   ├── children/              # Child profiles & medical history
 │   ├── assessments/           # M-CHAT & video submissions
@@ -1121,7 +1121,7 @@ GET    /api/children/{id}/reports/                  # Parent view
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
    pip install django djangorestframework djangorestframework-simplejwt django-cors-headers
-   django-admin startproject neurocare .
+   django-admin startproject AutiSahara .
    python manage.py startapp accounts
    python manage.py startapp children
    python manage.py startapp assessments
@@ -1679,7 +1679,7 @@ cd backend
 python -m venv venv
 venv\Scripts\activate  # Windows
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers pillow
-django-admin startproject neurocare .
+django-admin startproject AutiSahara .
 python manage.py startapp accounts
 python manage.py startapp children
 python manage.py startapp assessments

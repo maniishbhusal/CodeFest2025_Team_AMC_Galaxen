@@ -16,7 +16,7 @@ const Footer = () => {
             <div className="flex items-center gap-3 mb-4">
               <img 
                 src="/logo.png" 
-                alt="NeuroCare Logo" 
+                alt="AutiSahara Logo" 
                 className="w-12 h-12 object-contain"
               />
               <h3 
@@ -28,7 +28,7 @@ const Footer = () => {
                   backgroundClip: "text",
                 }}
               >
-                NeuroCare
+                AutiSahara
               </h3>
             </div>
             <p className="text-white/80 mb-6 text-lg leading-relaxed">
@@ -75,7 +75,7 @@ const Footer = () => {
             <ul className="space-y-4 text-white/70">
               <li className="flex items-start gap-3 group">
                 <Mail className="h-5 w-5 mt-1 flex-shrink-0 text-primary group-hover:scale-110 transition-transform" />
-                <span className="group-hover:text-white transition-colors">support@neurocare.com.np</span>
+                <span className="group-hover:text-white transition-colors">support@AutiSahara.com.np</span>
               </li>
               <li className="flex items-start gap-3 group">
                 <Phone className="h-5 w-5 mt-1 flex-shrink-0 text-accent group-hover:scale-110 transition-transform" />
@@ -105,7 +105,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/70">
-          <p className="font-medium">© 2024 NeuroCare. All rights reserved. Made with ❤️ for Nepal's families.</p>
+          <p className="font-medium">© 2024 AutiSahara. All rights reserved. Made with ❤️ for Nepal's families.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white hover:scale-105 transition-all duration-300 font-medium">
               Privacy Policy

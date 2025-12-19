@@ -11,7 +11,7 @@ export default function WelcomeScreen() {
 
       <View style={styles.content}>
         <Text style={styles.emoji}></Text>
-        <Text style={styles.title}>Welcome to NeuroCare</Text>
+        <Text style={styles.title}>Welcome to AutiSahara</Text>
         <Text style={styles.description}>
           We'll ask you a few questions to better understand your mental health
           needs and provide personalized support.

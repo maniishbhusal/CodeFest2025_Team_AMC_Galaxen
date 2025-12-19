@@ -1,7 +1,7 @@
 import React from 'react';
 import { Globe, Brain, Zap, Video } from 'lucide-react';
 
-export default function NeuroCareVision() {
+export default function AutiSaharaVision() {
   return (
     <section className="py-24 md:py-32 bg-gradient-to-br from-orange-50 via-white to-amber-50/30">
       <div className="container mx-auto px-4">
@@ -15,7 +15,7 @@ export default function NeuroCareVision() {
           
           <h2 className="text-5xl md:text-6xl font-bold mb-6 font-serif">
             <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent">
-              NeuroCare
+              AutiSahara
             </span>
           </h2>
           
