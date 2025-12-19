@@ -5,9 +5,13 @@ from .views import (
     ChildEducationView,
     ChildHealthView,
     MedicalHistoryView,
+    ChildFullRegistrationView,
 )
 
 urlpatterns = [
+    # Full Registration (ONE endpoint for all sections)
+    path('register/', ChildFullRegistrationView.as_view(), name='child-full-registration'),
+
     # Child CRUD
     path('', ChildListCreateView.as_view(), name='child-list-create'),
     path('<int:pk>/', ChildDetailView.as_view(), name='child-detail'),

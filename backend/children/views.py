@@ -14,6 +14,7 @@ from .serializers import (
     ChildEducationSerializer,
     ChildHealthSerializer,
     MedicalHistorySerializer,
+    ChildFullRegistrationSerializer,
 )
 
 
@@ -379,4 +380,89 @@ class MedicalHistoryView(APIView):
         if serializer.is_valid():
             serializer.save(child=child)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChildFullRegistrationView(APIView):
+    """
+    Register a child with ALL sections in ONE API call.
+    Frontend collects all form data and submits at once.
+    """
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Complete child registration (all sections)",
+        operation_description="""
+        Creates a child profile with ALL related information in ONE API call.
+
+        **Use Case**: Frontend collects all form data across multiple screens,
+        then submits everything together at the end.
+
+        **Sections included**:
+        - **Section 1** (required): Child basic info (name, DOB, age, gender)
+        - **Section 5** (optional): Education & daily routine
+        - **Section 6** (optional): Health information
+        - **A1-A4** (optional): Medical history background
+
+        **Example Request**:
+        ```json
+        {
+            "full_name": "Aarav Sharma",
+            "date_of_birth": "2022-03-15",
+            "age_years": 2,
+            "age_months": 8,
+            "gender": "male",
+            "education": {
+                "goes_to_school": true,
+                "school_name": "ABC School",
+                "grade_class": "Nursery"
+            },
+            "health": {
+                "height_cm": 85,
+                "weight_kg": 12,
+                "has_vaccinations": "yes"
+            },
+            "medical_history": {
+                "pregnancy_infection": false,
+                "birth_complications": false,
+                "brain_injury_first_year": false,
+                "family_autism_history": false
+            }
+        }
+        ```
+
+        **After this**: Proceed to M-CHAT screening via POST /api/children/{id}/mchat/
+        """,
+        request_body=ChildFullRegistrationSerializer,
+        responses={
+            201: openapi.Response(
+                description="Child registered successfully with all sections",
+                examples={
+                    "application/json": {
+                        "id": 1,
+                        "full_name": "Aarav Sharma",
+                        "date_of_birth": "2022-03-15",
+                        "age_years": 2,
+                        "age_months": 8,
+                        "gender": "male",
+                        "education": {"goes_to_school": True, "school_name": "ABC School"},
+                        "health": {"height_cm": 85, "weight_kg": 12},
+                        "medical_history": {"requires_specialist": False},
+                        "created_at": "2024-01-15T10:30:00Z"
+                    }
+                }
+            ),
+            400: "Validation error"
+        },
+        tags=["Children"]
+    )
+    def post(self, request):
+        serializer = ChildFullRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            child = serializer.save(parent=request.user)
+            # Return full details using ChildDetailSerializer
+            return Response(
+                ChildDetailSerializer(child).data,
+                status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

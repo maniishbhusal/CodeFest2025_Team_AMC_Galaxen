@@ -1017,48 +1017,165 @@ POST   /api/parent/household/                 # Submit household info
 
 ### Child Management
 ```
-POST   /api/children/                         # Add child (Section 1)
-GET    /api/children/                         # List my children
-GET    /api/children/{id}/                    # Child details
-PUT    /api/children/{id}/                    # Update child info
+POST   /api/children/register/       # RECOMMENDED - All sections at once
+POST   /api/children/                # Basic info only
+GET    /api/children/                # List my children
+GET    /api/children/{id}/           # Child details
+PUT    /api/children/{id}/           # Update child
 ```
 
-### Child Additional Info
-```
-POST   /api/children/{id}/education/          # Submit Section 5
-GET    /api/children/{id}/education/
-POST   /api/children/{id}/health/             # Submit Section 6
-GET    /api/children/{id}/health/
+#### POST /api/children/register/ - FULL EXAMPLE
+```json
+{
+  "full_name": "Aarav Sharma",
+  "date_of_birth": "2022-03-15",
+  "age_years": 2,
+  "age_months": 8,
+  "gender": "male",
+
+  "education": {
+    "goes_to_school": true,
+    "school_name": "Little Stars School",
+    "grade_class": "Nursery",
+    "school_type": "private",
+    "transport_mode": "private_vehicle",
+    "wake_up_time": "07:00",
+    "breakfast_time": "08:00",
+    "school_start_time": "09:30",
+    "school_end_time": "14:00",
+    "lunch_time": "12:30",
+    "nap_start_time": "15:00",
+    "nap_end_time": "16:30",
+    "evening_activities": "Playing with toys",
+    "dinner_time": "19:00",
+    "sleep_time": "21:00"
+  },
+
+  "health": {
+    "height_cm": 85.5,
+    "weight_kg": 12.0,
+    "has_vaccinations": "yes",
+    "medical_conditions": "",
+    "takes_medication": false,
+    "medication_list": "",
+    "seen_pediatrician": true,
+    "seen_psychiatrist": false,
+    "seen_speech_therapist": false,
+    "seen_occupational_therapist": false,
+    "seen_psychologist": false,
+    "seen_special_educator": false,
+    "seen_neurologist": false,
+    "seen_traditional_healer": false,
+    "seen_none": false
+  },
+
+  "medical_history": {
+    "pregnancy_infection": false,
+    "pregnancy_infection_desc": "",
+    "birth_complications": false,
+    "birth_complications_desc": "",
+    "brain_injury_first_year": false,
+    "brain_injury_desc": "",
+    "family_autism_history": false
+  }
+}
 ```
 
-### Medical History (A1-A4)
+**Field Options:**
+| Field | Values |
+|-------|--------|
+| gender | `"male"` `"female"` `"other"` |
+| school_type | `"government"` `"private"` `"special"` |
+| transport_mode | `"walk"` `"bus"` `"private_vehicle"` `"other"` |
+| has_vaccinations | `"yes"` `"no"` `"not_sure"` |
+| Time fields | `"HH:MM"` format (24-hour) |
+
+---
+
+### Child Additional Info (for updating individual sections)
 ```
-POST   /api/children/{id}/medical-history/    # Submit A1-A4
-GET    /api/children/{id}/medical-history/
+POST   /api/children/{id}/education/          # Create/Update Section 5
+POST   /api/children/{id}/health/             # Create/Update Section 6
+POST   /api/children/{id}/medical-history/    # Create/Update A1-A4
 ```
+
+---
 
 ### M-CHAT Assessment
 ```
-POST   /api/children/{id}/mchat/              # Submit M-CHAT (20 questions)
-       Body: { q1: bool, q2: bool, ..., q20: bool }
-       → Auto-calculates score and risk_level
-GET    /api/children/{id}/mchat/              # Get M-CHAT results
+POST   /api/children/{id}/mchat/     # Submit screening
+GET    /api/children/{id}/mchat/     # Get results
 ```
+
+#### POST /api/children/{id}/mchat/ - FULL EXAMPLE
+```json
+{
+  "q1": true,
+  "q2": false,
+  "q3": true,
+  "q4": true,
+  "q5": false,
+  "q6": true,
+  "q7": true,
+  "q8": true,
+  "q9": true,
+  "q10": true,
+  "q11": true,
+  "q12": false,
+  "q13": true,
+  "q14": true,
+  "q15": true,
+  "q16": true,
+  "q17": true,
+  "q18": true,
+  "q19": true,
+  "q20": true
+}
+```
+
+**Scoring:** `true` = YES, `false` = NO
+- **Reverse questions (q2, q5, q12):** YES = concerning
+- **All others:** NO = concerning
+- **Risk:** 0-2 = Low, 3-7 = Medium, 8-20 = High
+
+---
 
 ### Video Upload
 ```
-POST   /api/children/{id}/videos/             # Upload assessment video
-       Body: { video_type, video_file, description }
-GET    /api/children/{id}/videos/             # List videos
+POST   /api/children/{id}/videos/    # Upload video
+GET    /api/children/{id}/videos/    # List videos
 DELETE /api/children/{id}/videos/{vid_id}/
 ```
 
+#### POST /api/children/{id}/videos/ - EXAMPLE
+```json
+{
+  "video_type": "walking",
+  "video_url": "https://cloudflare-stream-url.com/video123",
+  "description": "Child walking in living room"
+}
+```
+
+**video_type options:** `"walking"` `"eating"` `"speaking"` `"behavior"` `"playing"` `"other"`
+
+---
+
 ### Assessment Submission
 ```
-POST   /api/children/{id}/assessment/submit/  # Final submit with confirmation
-       Body: { parent_confirmed: true }
-GET    /api/children/{id}/assessment/status/  # Check status
+POST   /api/children/{id}/assessment/submit/   # Final submit
+GET    /api/children/{id}/assessment/status/   # Check status
 ```
+
+#### POST /api/children/{id}/assessment/submit/ - EXAMPLE
+```json
+{
+  "parent_confirmed": true
+}
+```
+
+**Status values:** `"pending"` → `"in_review"` → `"accepted"` → `"completed"`
+
+---
 
 ### Doctor Dashboard
 ```
@@ -1271,6 +1388,12 @@ GET    /api/children/{id}/reports/                  # Parent view
    - POST /api/children/{id}/education/
    - POST /api/children/{id}/health/
    - POST /api/children/{id}/medical-history/
+
+✅ 2.7 Combined Child Registration Endpoint (RECOMMENDED)
+   - POST /api/children/register/
+   - Accepts child info + education + health + medical_history in ONE call
+   - Frontend collects all form data, submits at the end
+   - Returns complete child profile with all sections
 ```
 
 #### Mobile Tasks
@@ -1320,6 +1443,12 @@ GET    /api/children/{id}/reports/                  # Parent view
    - Consent checkboxes
    - Declaration checkbox
    - Submit all data
+
+□ 2.15 Submit Child Registration
+   - Collect all form data from Sections 1, 5, 6, A1-A4
+   - Call POST /api/children/register/ with combined payload
+   - Show success message with child ID
+   - Navigate to M-CHAT screening
 ```
 
 ---
@@ -2020,6 +2149,21 @@ When access token expires (after 60 min), use refresh token:
 | 8 | PUT | `/api/parent/profile/` | ✅ Yes | Update parent |
 | 9 | GET | `/api/parent/household/` | ✅ Yes | Get household |
 | 10 | POST | `/api/parent/household/` | ✅ Yes | Create/update household |
+| 11 | POST | `/api/children/register/` | ✅ Yes | **Register child (all sections at once)** |
+| 12 | POST | `/api/children/` | ✅ Yes | Add child (basic info only) |
+| 13 | GET | `/api/children/` | ✅ Yes | List my children |
+| 14 | GET | `/api/children/{id}/` | ✅ Yes | Get child details |
+| 15 | PUT | `/api/children/{id}/` | ✅ Yes | Update child info |
+| 16 | POST | `/api/children/{id}/education/` | ✅ Yes | Create/update education |
+| 17 | POST | `/api/children/{id}/health/` | ✅ Yes | Create/update health |
+| 18 | POST | `/api/children/{id}/medical-history/` | ✅ Yes | Create/update medical history |
+| 19 | POST | `/api/children/{id}/mchat/` | ✅ Yes | Submit M-CHAT screening |
+| 20 | GET | `/api/children/{id}/mchat/` | ✅ Yes | Get M-CHAT results |
+| 21 | POST | `/api/children/{id}/videos/` | ✅ Yes | Upload assessment video |
+| 22 | GET | `/api/children/{id}/videos/` | ✅ Yes | List videos |
+| 23 | DELETE | `/api/children/{id}/videos/{vid}/` | ✅ Yes | Delete video |
+| 24 | POST | `/api/children/{id}/assessment/submit/` | ✅ Yes | Submit final assessment |
+| 25 | GET | `/api/children/{id}/assessment/status/` | ✅ Yes | Get assessment status |
 
 ---
 
@@ -2059,6 +2203,48 @@ When access token expires (after 60 min), use refresh token:
 **Household:**
 ```json
 {"has_mother":true,"has_father":true,"siblings_count":1,"has_maternal_grandparents":true,"has_paternal_grandparents":false,"has_uncle_aunt":false,"has_other_relatives":false,"has_helper":false}
+```
+
+**Child Full Registration (RECOMMENDED - all sections at once):**
+```json
+{
+  "full_name": "Aarav Sharma",
+  "date_of_birth": "2022-03-15",
+  "age_years": 2,
+  "age_months": 8,
+  "gender": "male",
+  "education": {
+    "goes_to_school": true,
+    "school_name": "Little Stars School",
+    "grade_class": "Nursery",
+    "school_type": "private",
+    "transport_mode": "private_vehicle"
+  },
+  "health": {
+    "height_cm": 85,
+    "weight_kg": 12,
+    "has_vaccinations": "yes",
+    "takes_medication": false,
+    "seen_pediatrician": true,
+    "seen_none": false
+  },
+  "medical_history": {
+    "pregnancy_infection": false,
+    "birth_complications": false,
+    "brain_injury_first_year": false,
+    "family_autism_history": false
+  }
+}
+```
+
+**Child Basic Only (minimal):**
+```json
+{"full_name":"Aarav Sharma","date_of_birth":"2022-03-15","age_years":2,"age_months":8,"gender":"male"}
+```
+
+**M-CHAT Screening (all 20 questions):**
+```json
+{"q1":true,"q2":false,"q3":true,"q4":true,"q5":false,"q6":true,"q7":true,"q8":true,"q9":true,"q10":true,"q11":true,"q12":false,"q13":true,"q14":true,"q15":true,"q16":true,"q17":true,"q18":true,"q19":true,"q20":true}
 ```
 
 ---
