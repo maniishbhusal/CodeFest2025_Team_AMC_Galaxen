@@ -6,12 +6,13 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import date
 
-from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview
+from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview, DiagnosisReport
 from .serializers import (
     CurriculumSerializer, CurriculumDetailSerializer, CurriculumTaskSerializer,
     ChildCurriculumSerializer, AssignCurriculumSerializer,
     DailyProgressSerializer, ProgressSubmitSerializer, TodayTaskSerializer,
-    DoctorReviewSerializer, CreateReviewSerializer
+    DoctorReviewSerializer, CreateReviewSerializer,
+    DiagnosisReportSerializer, CreateDiagnosisReportSerializer
 )
 from children.models import Child
 from assessments.models import ChildAssessment
@@ -534,4 +535,112 @@ class ChildCurriculumStatusView(APIView):
             'child_id': child.id,
             'child_name': child.full_name,
             'curricula': ChildCurriculumSerializer(curricula, many=True).data,
+        })
+
+
+# ============== DIAGNOSIS REPORT ENDPOINTS ==============
+
+class DoctorCreateDiagnosisView(APIView):
+    """Doctor creates a diagnosis report for a child"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, child_id):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        child = get_object_or_404(Child, pk=child_id)
+        doctor = request.user.doctor_profile
+
+        # Verify doctor has accepted this patient
+        assessment = ChildAssessment.objects.filter(
+            child=child,
+            assigned_doctor=doctor,
+            status__in=['accepted', 'completed']
+        ).first()
+
+        if not assessment:
+            return Response({'error': 'You are not assigned to this patient'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = CreateDiagnosisReportSerializer(data=request.data)
+        if serializer.is_valid():
+            report = DiagnosisReport.objects.create(
+                child=child,
+                doctor=doctor,
+                has_autism=serializer.validated_data['has_autism'],
+                spectrum_type=serializer.validated_data['spectrum_type'],
+                detailed_report=serializer.validated_data['detailed_report'],
+                next_steps=serializer.validated_data['next_steps'],
+                shared_with_parent=serializer.validated_data.get('shared_with_parent', False),
+            )
+
+            # Mark assessment as completed
+            assessment.status = 'completed'
+            assessment.save()
+
+            return Response({
+                'message': 'Diagnosis report created successfully',
+                'report_id': report.id,
+                'has_autism': report.has_autism,
+                'spectrum_type': report.get_spectrum_type_display(),
+            }, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChildDiagnosisReportsView(APIView):
+    """Get diagnosis reports for a child (parent or doctor)"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, child_id):
+        child = get_object_or_404(Child, pk=child_id)
+
+        # Check access
+        if request.user.role == 'parent':
+            if child.parent != request.user:
+                return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
+            # Parents can only see shared reports
+            reports = DiagnosisReport.objects.filter(child=child, shared_with_parent=True)
+        elif request.user.role == 'doctor':
+            # Doctors can see all reports for their patients
+            doctor = request.user.doctor_profile
+            # Verify doctor is assigned to this patient
+            assessment = ChildAssessment.objects.filter(
+                child=child,
+                assigned_doctor=doctor
+            ).first()
+            if assessment:
+                reports = DiagnosisReport.objects.filter(child=child)
+            else:
+                return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        return Response({
+            'child_id': child.id,
+            'child_name': child.full_name,
+            'reports': DiagnosisReportSerializer(reports, many=True).data,
+        })
+
+
+class DoctorToggleReportShareView(APIView):
+    """Toggle whether a diagnosis report is shared with parent"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, report_id):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        report = get_object_or_404(DiagnosisReport, pk=report_id)
+
+        # Verify doctor owns this report
+        if report.doctor != request.user.doctor_profile:
+            return Response({'error': 'You can only modify your own reports'}, status=status.HTTP_403_FORBIDDEN)
+
+        report.shared_with_parent = not report.shared_with_parent
+        report.save()
+
+        return Response({
+            'message': f'Report {"shared with" if report.shared_with_parent else "hidden from"} parent',
+            'report_id': report.id,
+            'shared_with_parent': report.shared_with_parent,
         })

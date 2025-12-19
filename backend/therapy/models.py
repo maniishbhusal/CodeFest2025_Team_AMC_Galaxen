@@ -165,3 +165,49 @@ class DoctorReview(models.Model):
 
     def __str__(self):
         return f"Review for {self.child_curriculum.child.full_name} - Day {self.review_period}"
+
+
+class DiagnosisReport(models.Model):
+    """
+    Formal diagnosis report created by doctor for a child.
+    Contains autism diagnosis status, spectrum type, and detailed findings.
+    """
+    SPECTRUM_CHOICES = [
+        ('none', 'No Autism Detected'),
+        ('mild', 'Mild (Level 1 - Requiring Support)'),
+        ('moderate', 'Moderate (Level 2 - Requiring Substantial Support)'),
+        ('severe', 'Severe (Level 3 - Requiring Very Substantial Support)'),
+    ]
+
+    child = models.ForeignKey(
+        Child,
+        on_delete=models.CASCADE,
+        related_name='diagnosis_reports'
+    )
+    doctor = models.ForeignKey(
+        'accounts.Doctor',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='diagnosis_reports'
+    )
+    has_autism = models.BooleanField(help_text="Diagnosis result: has autism or not")
+    spectrum_type = models.CharField(
+        max_length=20,
+        choices=SPECTRUM_CHOICES,
+        default='none',
+        help_text="Autism spectrum severity level"
+    )
+    detailed_report = models.TextField(help_text="Detailed findings and observations")
+    next_steps = models.TextField(help_text="Recommended next steps and interventions")
+    shared_with_parent = models.BooleanField(
+        default=False,
+        help_text="Whether this report is visible to parents"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Diagnosis Report for {self.child.full_name} - {self.get_spectrum_type_display()}"

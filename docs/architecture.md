@@ -1244,11 +1244,25 @@ GET    /api/therapy/child/{id}/curriculum/    # Curriculum status
 
 ---
 
-### Reports
+### Diagnosis Reports (Therapy App)
 ```
-POST   /api/doctor/patients/{child_id}/diagnosis/   # Create report
-GET    /api/children/{id}/reports/                  # Parent view
+POST   /api/therapy/doctor/patient/{child_id}/diagnosis/   # Create diagnosis report
+GET    /api/therapy/child/{id}/reports/                    # View diagnosis reports
+POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with parent
 ```
+
+#### POST /api/therapy/doctor/patient/{id}/diagnosis/ - EXAMPLE
+```json
+{
+  "has_autism": true,
+  "spectrum_type": "mild",
+  "detailed_report": "Based on M-CHAT screening and behavioral observations, the child shows signs consistent with mild autism spectrum disorder...",
+  "next_steps": "1. Enroll in speech therapy program\n2. Start 15-day introductory curriculum\n3. Schedule follow-up in 2 weeks",
+  "shared_with_parent": true
+}
+```
+
+**spectrum_type options:** `"none"` `"mild"` `"moderate"` `"severe"`
 
 ---
 
@@ -1773,22 +1787,23 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 6.1 DiagnosisReport Model
+✅ 6.1 DiagnosisReport Model
    - has_autism boolean
-   - spectrum_type
+   - spectrum_type (none/mild/moderate/severe)
    - detailed_report, next_steps
+   - shared_with_parent boolean
 
-□ 6.2 DoctorReview Model
+✅ 6.2 DoctorReview Model (Done in Phase 5)
    - review_period, observations
    - spectrum_identified, recommendations
 
-□ 6.3 Report Endpoints
-   - POST /api/doctor/patients/{child_id}/diagnosis/
-   - GET /api/children/{id}/reports/
+✅ 6.3 Report Endpoints
+   - POST /api/therapy/doctor/patient/{child_id}/diagnosis/
+   - GET /api/therapy/child/{id}/reports/
+   - POST /api/therapy/doctor/report/{id}/toggle-share/
 
-□ 6.4 Review Endpoints
-   - POST /api/doctor/patients/{child_id}/review/
-   - GET /api/doctor/patients/{child_id}/reviews/
+✅ 6.4 Review Endpoints (Done in Phase 5)
+   - POST /api/therapy/doctor/patient/{child_id}/review/
 ```
 
 #### Mobile Tasks
@@ -2217,12 +2232,15 @@ When access token expires (after 60 min), use refresh token:
 | 32 | POST | `/api/therapy/doctor/patient/{id}/assign/` | ✅ Doctor | Assign curriculum |
 | 33 | GET | `/api/therapy/doctor/patient/{id}/progress/` | ✅ Doctor | View progress |
 | 34 | POST | `/api/therapy/doctor/patient/{id}/review/` | ✅ Doctor | Create review |
+| 35 | POST | `/api/therapy/doctor/patient/{id}/diagnosis/` | ✅ Doctor | Create diagnosis report |
+| 36 | POST | `/api/therapy/doctor/report/{id}/toggle-share/` | ✅ Doctor | Toggle report sharing |
 | **Therapy - Parent Progress** |
-| 35 | GET | `/api/therapy/child/{id}/today/` | ✅ Parent | Today's tasks |
-| 36 | POST | `/api/therapy/child/{id}/submit/` | ✅ Parent | Submit progress |
-| 37 | POST | `/api/therapy/child/{id}/advance/` | ✅ Parent | Advance day |
-| 38 | GET | `/api/therapy/child/{id}/history/` | ✅ Yes | Progress history |
-| 39 | GET | `/api/therapy/child/{id}/curriculum/` | ✅ Yes | Curriculum status |
+| 37 | GET | `/api/therapy/child/{id}/today/` | ✅ Parent | Today's tasks |
+| 38 | POST | `/api/therapy/child/{id}/submit/` | ✅ Parent | Submit progress |
+| 39 | POST | `/api/therapy/child/{id}/advance/` | ✅ Parent | Advance day |
+| 40 | GET | `/api/therapy/child/{id}/history/` | ✅ Yes | Progress history |
+| 41 | GET | `/api/therapy/child/{id}/curriculum/` | ✅ Yes | Curriculum status |
+| 42 | GET | `/api/therapy/child/{id}/reports/` | ✅ Yes | View diagnosis reports |
 
 ---
 

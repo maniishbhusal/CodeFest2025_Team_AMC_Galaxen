@@ -14,6 +14,10 @@ urlpatterns = [
     path('doctor/patient/<int:child_id>/assign/', views.DoctorAssignCurriculumView.as_view(), name='doctor-assign'),
     path('doctor/patient/<int:child_id>/progress/', views.DoctorPatientProgressView.as_view(), name='doctor-progress'),
     path('doctor/patient/<int:child_id>/review/', views.DoctorCreateReviewView.as_view(), name='doctor-review'),
+    path('doctor/patient/<int:child_id>/diagnosis/', views.DoctorCreateDiagnosisView.as_view(), name='doctor-diagnosis'),
+
+    # Doctor report management
+    path('doctor/report/<int:report_id>/toggle-share/', views.DoctorToggleReportShareView.as_view(), name='toggle-report-share'),
 
     # Parent endpoints
     path('child/<int:child_id>/today/', views.TodayTasksView.as_view(), name='today-tasks'),
@@ -21,4 +25,5 @@ urlpatterns = [
     path('child/<int:child_id>/advance/', views.AdvanceDayView.as_view(), name='advance-day'),
     path('child/<int:child_id>/history/', views.ProgressHistoryView.as_view(), name='progress-history'),
     path('child/<int:child_id>/curriculum/', views.ChildCurriculumStatusView.as_view(), name='curriculum-status'),
+    path('child/<int:child_id>/reports/', views.ChildDiagnosisReportsView.as_view(), name='child-reports'),
 ]

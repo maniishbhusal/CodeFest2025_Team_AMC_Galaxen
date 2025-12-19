@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from datetime import timedelta
-from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview
+from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview, DiagnosisReport
 
 
 class CurriculumTaskSerializer(serializers.ModelSerializer):
@@ -135,3 +135,36 @@ class CreateReviewSerializer(serializers.Serializer):
     observations = serializers.CharField()
     spectrum_identified = serializers.CharField(required=False, allow_blank=True)
     recommendations = serializers.CharField()
+
+
+class DiagnosisReportSerializer(serializers.ModelSerializer):
+    """Serializer for viewing diagnosis reports"""
+    doctor_name = serializers.SerializerMethodField()
+    child_name = serializers.CharField(source='child.full_name', read_only=True)
+    spectrum_type_display = serializers.CharField(source='get_spectrum_type_display', read_only=True)
+
+    class Meta:
+        model = DiagnosisReport
+        fields = [
+            'id', 'child', 'child_name', 'doctor_name', 'has_autism',
+            'spectrum_type', 'spectrum_type_display', 'detailed_report',
+            'next_steps', 'shared_with_parent', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_doctor_name(self, obj):
+        if obj.doctor:
+            return obj.doctor.user.full_name
+        return None
+
+
+class CreateDiagnosisReportSerializer(serializers.Serializer):
+    """Serializer for doctor to create a diagnosis report"""
+    has_autism = serializers.BooleanField()
+    spectrum_type = serializers.ChoiceField(
+        choices=['none', 'mild', 'moderate', 'severe'],
+        default='none'
+    )
+    detailed_report = serializers.CharField()
+    next_steps = serializers.CharField()
+    shared_with_parent = serializers.BooleanField(default=False)
