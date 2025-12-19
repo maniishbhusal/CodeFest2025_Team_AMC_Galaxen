@@ -1,15 +1,19 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { AppColors } from "@/constants/theme";
 
 export default function Index() {
   const router = useRouter();
+  const { i18n } = useTranslation();
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.5);
 
@@ -18,9 +22,17 @@ export default function Index() {
     opacity.value = withTiming(1, { duration: 1000 });
     scale.value = withSpring(1);
 
-    // Navigate to login after 3 seconds
-    const timer = setTimeout(() => {
-      router.replace("/auth/login");
+    // Always show language selection after splash
+    const timer = setTimeout(async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem("appLanguage");
+        if (savedLanguage) {
+          await i18n.changeLanguage(savedLanguage);
+        }
+      } catch (error) {
+        console.error("Error loading language:", error);
+      }
+      router.replace("/language-select");
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -48,7 +60,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1e40af",
+    backgroundColor: AppColors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -64,12 +76,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: "bold",
-    color: "#ffffff",
+    color: AppColors.white,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: "#dbeafe",
+    color: AppColors.secondaryLight,
     textAlign: "center",
   },
 });
