@@ -134,6 +134,16 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF Settings for ngrok tunneling
+# Add your ngrok URL here when you start the tunnel
+# Example: CSRF_TRUSTED_ORIGINS = ['https://abc123.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:*',
+    'http://127.0.0.1:*',
+    'https://*.ngrok-free.app',
+    'https://*.ngrok.io',
+]
+
 # Swagger Settings - JWT Bearer Token
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
