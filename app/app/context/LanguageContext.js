@@ -47,3 +47,8 @@ export const useLanguage = () => {
   }
   return context;
 };
+
+// Default export for Expo Router
+export default function LanguageContextScreen() {
+  return null;
+}

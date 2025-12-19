@@ -7,25 +7,78 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // TODO: Add authentication logic
+  const handleLogin = async () => {
+    // Validation
     if (!email || !password) {
-      alert("Please fill all fields");
+      Alert.alert("Error", "Please fill all fields");
       return;
     }
 
-    // Navigate to questionnaire after login
-    router.replace("/questionnaire/welcome");
+    if (password.length < 1) {
+      Alert.alert("Error", "Password is required");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post(`${BASE_URL}/api/auth/login/`, {
+        email: email.toLowerCase().trim(),
+        password: password,
+      });
+
+      const data = response.data;
+
+      // Save authentication token or user data
+      if (data.token) {
+        await AsyncStorage.setItem("authToken", data.token);
+      }
+      if (data.user) {
+        await AsyncStorage.setItem("userData", JSON.stringify(data.user));
+      }
+
+      // Navigate to questionnaire after successful login
+      router.replace("/questionnaire/welcome");
+    } catch (error: any) {
+      console.error("Login error:", error);
+
+      if (error.response) {
+        // Server responded with error
+        const errorMessage =
+          error.response.data?.message ||
+          error.response.data?.error ||
+          "Invalid email or password";
+        Alert.alert("Login Failed", errorMessage);
+      } else if (error.request) {
+        // Request made but no response
+        Alert.alert(
+          "Error",
+          "Unable to connect to server. Please check your internet connection."
+        );
+      } else {
+        // Something else happened
+        Alert.alert("Error", "An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,8 +122,16 @@ export default function LoginScreen() {
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -158,6 +219,9 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     marginBottom: 20,
+  },
+  buttonDisabled: {
+    backgroundColor: "#94a3b8",
   },
   buttonText: {
     color: "#ffffff",

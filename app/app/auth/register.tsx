@@ -7,10 +7,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import axios from "axios";
+
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -19,23 +24,121 @@ export default function RegisterScreen() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [age, setAge] = useState("");
-  const [guardian, setGuardian] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
-    // TODO: Add validation
-    if (!fullName || !email || !password || !confirmPassword) {
-      alert("Please fill all required fields");
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleRegister = async () => {
+    // Validation
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill all required fields");
+      return;
+    }
+
+    if (fullName.length > 255) {
+      Alert.alert("Error", "Full name must be less than 255 characters");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
+    if (email.length > 254) {
+      Alert.alert("Error", "Email must be less than 254 characters");
+      return;
+    }
+
+    if (phone.length > 20) {
+      Alert.alert("Error", "Phone number must be less than 20 characters");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      Alert.alert("Error", "Passwords do not match");
       return;
     }
 
-    // Navigate to login after successful registration
-    router.push("/auth/login");
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/api/auth/register/parent/`,
+        {
+          full_name: fullName,
+          email: email.toLowerCase().trim(),
+          phone: phone.trim(),
+          password: password,
+        }
+      );
+
+      const data = response.data;
+
+      Alert.alert(
+        "Success",
+        "Registration successful! Please login to continue.",
+        [
+          {
+            text: "OK",
+            onPress: () => router.push("/auth/login"),
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+
+      if (error.response) {
+        // Server responded with error
+        const errorData = error.response.data;
+        let errorMessage = "Registration failed";
+
+        // Check for different error formats
+        if (typeof errorData === "string") {
+          errorMessage = errorData;
+        } else if (errorData?.message) {
+          errorMessage = errorData.message;
+        } else if (errorData?.error) {
+          errorMessage = errorData.error;
+        } else if (errorData?.detail) {
+          errorMessage = errorData.detail;
+        } else if (errorData) {
+          // If it's an object with field-specific errors
+          const fieldErrors = Object.entries(errorData)
+            .map(([field, errors]) => {
+              if (Array.isArray(errors)) {
+                return `${field}: ${errors.join(", ")}`;
+              }
+              return `${field}: ${errors}`;
+            })
+            .join("\n");
+          errorMessage = fieldErrors || "Registration failed";
+        }
+
+        Alert.alert("Registration Failed", errorMessage);
+      } else if (error.request) {
+        // Request made but no response
+        Alert.alert(
+          "Error",
+          "Unable to connect to server. Please check your internet connection."
+        );
+      } else {
+        // Something else happened
+        Alert.alert("Error", "An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,7 +179,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Phone Number</Text>
+            <Text style={styles.label}>Phone Number *</Text>
             <TextInput
               style={styles.input}
               placeholder="Enter your phone number"
@@ -87,7 +190,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password *</Text>
+            <Text style={styles.label}>Password * (min 6 characters)</Text>
             <TextInput
               style={styles.input}
               placeholder="Create a password"
@@ -108,8 +211,16 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.buttonText}>Create Account</Text>
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.buttonText}>Create Account</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -189,6 +300,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
     marginBottom: 20,
+  },
+  buttonDisabled: {
+    backgroundColor: "#94a3b8",
   },
   buttonText: {
     color: "#ffffff",
