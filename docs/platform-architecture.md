@@ -1,4 +1,4 @@
-# NeuroCare Nepal - Platform Architecture
+# AutiSahara Nepal - Platform Architecture
 
 > **Therapy that fits your child's world**
 > Where every Nepali parent can give their autistic child the daily therapy they need - with expert guidance right on their phone.
@@ -18,7 +18,7 @@
 
 ## Overview
 
-NeuroCare Nepal bridges the gap between professional autism therapy and Nepali families by:
+AutiSahara Nepal bridges the gap between professional autism therapy and Nepali families by:
 
 - **Mobile-First Design**: Therapy plans accessible anywhere, anytime
 - **Parent-Led Therapy**: Training parents to become the primary catalyst for change
