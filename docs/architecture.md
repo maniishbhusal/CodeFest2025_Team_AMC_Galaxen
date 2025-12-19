@@ -1116,7 +1116,7 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 1.1 Django Project Setup
+✅ 1.1 Django Project Setup
    cd backend
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
@@ -1126,38 +1126,38 @@ GET    /api/children/{id}/reports/                  # Parent view
    python manage.py startapp children
    python manage.py startapp assessments
 
-□ 1.2 Configure Settings
+✅ 1.2 Configure Settings
    - Add apps to INSTALLED_APPS
    - Configure REST_FRAMEWORK with JWT
    - Configure CORS for localhost:3000 and mobile
    - Set AUTH_USER_MODEL
 
-□ 1.3 User Model (accounts/models.py)
+✅ 1.3 User Model (accounts/models.py)
    - Custom User with email login (no username)
    - Add role field (parent/doctor/admin)
    - Add full_name, phone fields
 
-□ 1.4 Doctor Model
+✅ 1.4 Doctor Model
    - OneToOne to User
    - license_number, certificate_url, specialization
    - is_approved (default True for hackathon)
 
-□ 1.5 Auth Endpoints (accounts/views.py)
+✅ 1.5 Auth Endpoints (accounts/views.py)
    - POST /api/auth/register/parent/
    - POST /api/auth/register/doctor/
    - POST /api/auth/login/
    - GET /api/auth/me/
    - No email verification needed
 
-□ 1.6 Parent Details Model
+✅ 1.6 Parent Details Model
    - All fields from Section 2, 3, 7
    - ForeignKey to User
 
-□ 1.7 Household Model
+✅ 1.7 Household Model
    - All checkbox fields from Section 4
    - ForeignKey to User
 
-□ 1.8 Run Migrations
+✅ 1.8 Run Migrations
    python manage.py makemigrations
    python manage.py migrate
 ```
@@ -1765,6 +1765,291 @@ export const API_URL = 'http://YOUR_IP:8000/api';
 6. **Focus on happy path** - Minimal error handling
 7. **Mobile-first demo** - Dashboard is secondary
 8. **M-CHAT risk level** - Show prominently to doctors
+
+---
+
+## API Testing Guide (Swagger)
+
+### Step 0: Start the Server
+
+```bash
+cd backend
+python manage.py runserver
+```
+
+Open: `http://localhost:8000/swagger/`
+
+---
+
+### Step 1: Register a Parent
+
+**Endpoint**: `POST /api/auth/register/parent/`
+
+1. Find "Authentication" section in Swagger
+2. Click on `POST /api/auth/register/parent/`
+3. Click "Try it out"
+4. Enter this JSON body:
+
+```json
+{
+  "email": "parent@test.com",
+  "password": "test123",
+  "full_name": "Ram Sharma",
+  "phone": "9841234567"
+}
+```
+
+5. Click "Execute"
+6. **Copy the `access` token** from the response:
+
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "parent@test.com",
+    "full_name": "Ram Sharma",
+    "phone": "9841234567",
+    "role": "parent"
+  },
+  "tokens": {
+    "refresh": "eyJ...",
+    "access": "eyJhbGciOiJIUzI1NiIs..."  ← COPY THIS
+  }
+}
+```
+
+---
+
+### Step 2: Authorize Swagger with Token
+
+1. Click the **"Authorize"** button (top right, lock icon)
+2. In the popup, enter:
+   ```
+   Bearer eyJhbGciOiJIUzI1NiIs...your_access_token
+   ```
+   ⚠️ **Important**: Include the word `Bearer` followed by a space, then the token
+3. Click "Authorize"
+4. Click "Close"
+
+Now all authenticated endpoints will work!
+
+---
+
+### Step 3: Test Get Current User
+
+**Endpoint**: `GET /api/auth/me/`
+
+1. Find "User Profile" section
+2. Click on `GET /api/auth/me/`
+3. Click "Try it out"
+4. Click "Execute"
+5. You should see your user data:
+
+```json
+{
+  "id": 1,
+  "email": "parent@test.com",
+  "full_name": "Ram Sharma",
+  "phone": "9841234567",
+  "role": "parent",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+---
+
+### Step 4: Create Parent Profile (Sections 2, 3, 7)
+
+**Endpoint**: `POST /api/parent/profile/`
+
+1. Find "Parent Profile" section
+2. Click on `POST /api/parent/profile/`
+3. Click "Try it out"
+4. Enter this JSON body:
+
+```json
+{
+  "mother_name": "Sita Sharma",
+  "mother_age": 32,
+  "mother_occupation": "Teacher",
+  "father_name": "Ram Sharma",
+  "father_age": 35,
+  "father_occupation": "Engineer",
+  "primary_caregiver": "mother",
+  "home_address": "Kathmandu-10, Baneshwor",
+  "municipality": "Kathmandu",
+  "district": "Kathmandu",
+  "province": "bagmati",
+  "primary_phone": "9841234567",
+  "has_whatsapp": true,
+  "smartphone_comfort": "very_comfortable",
+  "consent_followup": true,
+  "consent_research": true
+}
+```
+
+5. Click "Execute"
+6. Response: 201 Created with parent details
+
+---
+
+### Step 5: Get Parent Profile
+
+**Endpoint**: `GET /api/parent/profile/`
+
+1. Click on `GET /api/parent/profile/`
+2. Click "Try it out"
+3. Click "Execute"
+4. See saved parent details
+
+---
+
+### Step 6: Create Household Info (Section 4)
+
+**Endpoint**: `POST /api/parent/household/`
+
+1. Click on `POST /api/parent/household/`
+2. Click "Try it out"
+3. Enter this JSON body:
+
+```json
+{
+  "has_mother": true,
+  "has_father": true,
+  "siblings_count": 1,
+  "has_maternal_grandparents": true,
+  "has_paternal_grandparents": false,
+  "has_uncle_aunt": false,
+  "has_other_relatives": false,
+  "has_helper": false
+}
+```
+
+4. Click "Execute"
+5. Response: 201 Created with household info
+
+---
+
+### Step 7: Register a Doctor
+
+**Endpoint**: `POST /api/auth/register/doctor/`
+
+1. First, **Logout** (click Authorize → Logout)
+2. Click on `POST /api/auth/register/doctor/`
+3. Click "Try it out"
+4. Enter this JSON body:
+
+```json
+{
+  "email": "doctor@test.com",
+  "password": "test123",
+  "full_name": "Dr. Sita Thapa",
+  "phone": "9851234567",
+  "license_number": "NMC-12345",
+  "specialization": "Child Psychiatry"
+}
+```
+
+5. Click "Execute"
+6. Copy the new access token and Authorize again
+
+---
+
+### Step 8: Test Login
+
+**Endpoint**: `POST /api/auth/login/`
+
+1. Click on `POST /api/auth/login/`
+2. Click "Try it out"
+3. Enter:
+
+```json
+{
+  "email": "parent@test.com",
+  "password": "test123"
+}
+```
+
+4. Click "Execute"
+5. Get new tokens (useful when token expires)
+
+---
+
+### Step 9: Refresh Token
+
+**Endpoint**: `POST /api/auth/refresh/`
+
+When access token expires (after 60 min), use refresh token:
+
+1. Click on `POST /api/auth/refresh/`
+2. Click "Try it out"
+3. Enter:
+
+```json
+{
+  "refresh": "eyJ...your_refresh_token..."
+}
+```
+
+4. Click "Execute"
+5. Get new access token
+
+---
+
+### Quick Reference: All Current Endpoints
+
+| # | Method | Endpoint | Auth Required | Purpose |
+|---|--------|----------|---------------|---------|
+| 1 | POST | `/api/auth/register/parent/` | ❌ No | Register parent |
+| 2 | POST | `/api/auth/register/doctor/` | ❌ No | Register doctor |
+| 3 | POST | `/api/auth/login/` | ❌ No | Login |
+| 4 | POST | `/api/auth/refresh/` | ❌ No | Refresh token |
+| 5 | GET | `/api/auth/me/` | ✅ Yes | Get current user |
+| 6 | GET | `/api/parent/profile/` | ✅ Yes | Get parent details |
+| 7 | POST | `/api/parent/profile/` | ✅ Yes | Create/update parent |
+| 8 | PUT | `/api/parent/profile/` | ✅ Yes | Update parent |
+| 9 | GET | `/api/parent/household/` | ✅ Yes | Get household |
+| 10 | POST | `/api/parent/household/` | ✅ Yes | Create/update household |
+
+---
+
+### Common Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| 401 Unauthorized | No token or expired | Login again, copy new token |
+| 403 Forbidden | Wrong role | Use correct user (parent vs doctor) |
+| 400 Bad Request | Invalid data | Check JSON format and required fields |
+| 404 Not Found | Resource missing | Create the resource first |
+
+---
+
+### Test Data for Copy-Paste
+
+**Parent Registration:**
+```json
+{"email":"parent@test.com","password":"test123","full_name":"Ram Sharma","phone":"9841234567"}
+```
+
+**Doctor Registration:**
+```json
+{"email":"doctor@test.com","password":"test123","full_name":"Dr. Sita Thapa","phone":"9851234567","license_number":"NMC-12345","specialization":"Child Psychiatry"}
+```
+
+**Login:**
+```json
+{"email":"parent@test.com","password":"test123"}
+```
+
+**Parent Profile:**
+```json
+{"mother_name":"Sita Sharma","mother_age":32,"mother_occupation":"Teacher","father_name":"Ram Sharma","father_age":35,"father_occupation":"Engineer","primary_caregiver":"mother","home_address":"Kathmandu-10","municipality":"Kathmandu","district":"Kathmandu","province":"bagmati","primary_phone":"9841234567","has_whatsapp":true,"smartphone_comfort":"very_comfortable","consent_followup":true,"consent_research":true}
+```
+
+**Household:**
+```json
+{"has_mother":true,"has_father":true,"siblings_count":1,"has_maternal_grandparents":true,"has_paternal_grandparents":false,"has_uncle_aunt":false,"has_other_relatives":false,"has_helper":false}
+```
 
 ---
 

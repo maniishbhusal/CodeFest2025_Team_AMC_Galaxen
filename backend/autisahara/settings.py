@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "drf_yasg",
 
     # Local apps
     "accounts",
@@ -132,3 +133,16 @@ SIMPLE_JWT = {
 # CORS Settings - Allow all for hackathon
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+# Swagger Settings - JWT Bearer Token
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT token. Format: Bearer <token>'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+}
