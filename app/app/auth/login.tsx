@@ -38,7 +38,7 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.logo}>🧠</Text>
-          <Text style={styles.title}>NeuroCare</Text>
+          <Text style={styles.title}>AutiSahara</Text>
           <Text style={styles.subtitle}>
             {isSignUp ? "Create your account" : "Welcome back"}
           </Text>

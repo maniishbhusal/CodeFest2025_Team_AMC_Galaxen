@@ -9,7 +9,7 @@ const steps = [
     title: "Quick Registration",
     subtitle: "Set up in 5 minutes",
     description:
-      "Download the NeuroCare app, enter your child's basic details, and select their specific challenges. We support both English and Nepali languages for your comfort.",
+      "Download the AutiSahara app, enter your child's basic details, and select their specific challenges. We support both English and Nepali languages for your comfort.",
     checkpoints: ["Basic Profile Setup", "Language Selection", "Goal Setting"],
     color: "text-orange-600",
     bgColor: "bg-orange-50",
@@ -79,7 +79,7 @@ const steps = [
     title: "AI Adaption & Learning",
     subtitle: "Personalized Growth",
     description:
-      "Our intelligent AI learns from your child's responses and progress patterns. It automatically adjusts game difficulty, recommends personalized activities, and predicts optimal intervention timing. Each interaction makes NeuroCare smarter and more effective for your child's unique needs.",
+      "Our intelligent AI learns from your child's responses and progress patterns. It automatically adjusts game difficulty, recommends personalized activities, and predicts optimal intervention timing. Each interaction makes AutiSahara smarter and more effective for your child's unique needs.",
     checkpoints: ["Adaptive Difficulty Scaling", "Personalized Recommendations", "Predictive Insights", "Real-time Optimization"],
     color: "text-violet-600",
     bgColor: "bg-violet-50",
@@ -154,7 +154,7 @@ const steps = [
           >
             Your Journey with{" "}
             <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent">
-              NeuroCare
+              AutiSahara
             </span>
           </motion.h2>
           
