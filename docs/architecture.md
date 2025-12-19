@@ -1635,28 +1635,28 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Mobile Tasks
 
 ```
-□ 4.6 Video Upload Screen
+✅ 4.6 Video Upload Screen (app/app/videos/upload.tsx)
    - Select video type: Walking, Eating, Speaking, Behavior, Playing, Other
    - "Choose from Gallery" button (pick existing video from device)
    - Preview selected video
    - Add description text field
-   - Upload to Cloudflare Stream
+   - Upload to Cloudflare Stream (with fallback to local URI)
    - Show upload progress bar
    - Submit button → POST /api/children/{id}/videos/
 
-□ 4.7 Video List Screen
+✅ 4.7 Video List Screen (app/app/videos/list.tsx)
    - Show all uploaded videos
    - Video thumbnail, type label, date
    - Play video option
    - Delete option → DELETE /api/children/{id}/videos/{vid_id}/
    - "Add Another Video" button
 
-□ 4.8 Confirmation Screen
+✅ 4.8 Confirmation Screen (app/app/videos/confirmation.tsx)
    - Summary of all submitted info (child, M-CHAT score, videos count)
    - Declaration checkbox: "I confirm this information is accurate"
    - Final submit button → POST /api/children/{id}/assessment/submit/
 
-□ 4.9 Success Screen
+✅ 4.9 Success Screen (app/app/videos/success.tsx)
    - "Assessment submitted!"
    - "A doctor will review soon"
    - Show assessment status

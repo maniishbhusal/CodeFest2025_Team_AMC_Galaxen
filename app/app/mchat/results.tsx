@@ -201,6 +201,15 @@ export default function MChatResultsScreen() {
       {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity
+          style={styles.uploadVideosButton}
+          onPress={handleUploadVideos}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.uploadVideosButtonText}>
+            📹 भिडियो अपलोड गर्नुहोस्
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.continueButton}
           onPress={handleContinue}
           activeOpacity={0.8}
@@ -392,15 +401,29 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.white,
     borderTopWidth: 1,
     borderTopColor: AppColors.border,
+    gap: 12,
   },
-  continueButton: {
-    backgroundColor: AppColors.secondary,
+  uploadVideosButton: {
+    backgroundColor: AppColors.primary,
     borderRadius: 12,
     padding: 18,
     alignItems: "center",
   },
-  continueButtonText: {
+  uploadVideosButtonText: {
     color: AppColors.white,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  continueButton: {
+    backgroundColor: AppColors.white,
+    borderRadius: 12,
+    padding: 18,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: AppColors.border,
+  },
+  continueButtonText: {
+    color: AppColors.textPrimary,
     fontSize: 16,
     fontWeight: "bold",
   },

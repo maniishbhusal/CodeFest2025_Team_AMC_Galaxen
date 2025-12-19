@@ -47,6 +47,23 @@ export default function RootLayout() {
           name="mchat/results"
           options={{ headerShown: false }}
         />
+        {/* Video Upload & Assessment Screens */}
+        <Stack.Screen
+          name="videos/upload"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="videos/list"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="videos/confirmation"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="videos/success"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
