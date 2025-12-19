@@ -1244,32 +1244,33 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 2.1 Child Model (children/models.py)
+✅ 2.1 Child Model (children/models.py)
    - Section 1 fields: full_name, dob, age_years, age_months, gender
    - ForeignKey to Parent
 
-□ 2.2 ChildEducation Model
+✅ 2.2 ChildEducation Model
    - All Section 5 fields
    - ForeignKey to Child
 
-□ 2.3 ChildHealth Model
+✅ 2.3 ChildHealth Model
    - All Section 6 fields
    - ForeignKey to Child
 
-□ 2.4 Child Endpoints
+✅ 2.4 Child Endpoints
    - POST /api/children/
    - GET /api/children/
    - GET /api/children/{id}/
    - PUT /api/children/{id}/
 
-□ 2.5 Parent Profile Endpoints
+✅ 2.5 Parent Profile Endpoints (Done in Phase 1)
    - POST /api/parent/profile/
    - GET /api/parent/profile/
    - POST /api/parent/household/
 
-□ 2.6 Child Education & Health Endpoints
+✅ 2.6 Child Education & Health Endpoints
    - POST /api/children/{id}/education/
    - POST /api/children/{id}/health/
+   - POST /api/children/{id}/medical-history/
 ```
 
 #### Mobile Tasks
