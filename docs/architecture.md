@@ -1,0 +1,1771 @@
+# NeuroCare Nepal - Development Architecture
+
+> **48-Hour Hackathon Build Guide**
+> Step-by-step development tasks for the team.
+
+---
+
+## Quick Reference
+
+| Component | Technology | Database |
+|-----------|------------|----------|
+| Mobile App | React Native | - |
+| Web Dashboard | React | - |
+| Backend API | Django REST Framework | SQLite (dev) |
+| Video Storage | Cloudflare Stream | - |
+| Auth | Email + Password (No verification) | JWT |
+
+---
+
+## Project Structure
+
+```
+neurocare-nepal/
+├── backend/                    # Django REST Framework
+│   ├── neurocare/             # Project settings
+│   ├── accounts/              # User auth (parents, doctors)
+│   ├── children/              # Child profiles & medical history
+│   ├── assessments/           # M-CHAT & video submissions
+│   ├── curriculum/            # General & specialized tasks
+│   ├── progress/              # Daily progress tracking
+│   └── reports/               # Doctor reports
+│
+├── dashboard/                  # React (Doctor Portal)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/          # API calls
+│   │   └── context/           # Auth state
+│   └── package.json
+│
+├── mobile/                     # React Native (Parent App)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── screens/
+│   │   ├── services/          # API calls
+│   │   └── context/           # Auth state
+│   └── package.json
+│
+└── docs/                       # Documentation
+```
+
+---
+
+## Database Schema (SQLite)
+
+### Core Models
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                           USERS                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  email           VARCHAR UNIQUE                                 │
+│  password        VARCHAR (hashed)                               │
+│  role            ENUM ('parent', 'doctor', 'admin')             │
+│  full_name       VARCHAR                                        │
+│  phone           VARCHAR                                        │
+│  created_at      DATETIME                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                          DOCTORS                                │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  user_id         FK → Users                                     │
+│  license_number  VARCHAR                                        │
+│  certificate_url VARCHAR (Cloudflare URL)                       │
+│  specialization  VARCHAR                                        │
+│  is_approved     BOOLEAN (default: true for hackathon)          │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                          CHILDREN                               │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  parent_id       FK → Users                                     │
+│                                                                 │
+│  # Section 1: Child's Basic Information                         │
+│  full_name       VARCHAR                                        │
+│  date_of_birth   DATE                                           │
+│  age_years       INTEGER                                        │
+│  age_months      INTEGER                                        │
+│  gender          ENUM ('male', 'female', 'other')               │
+│                                                                 │
+│  created_at      DATETIME                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                     PARENT_DETAILS                              │
+├─────────────────────────────────────────────────────────────────┤
+│  id                    INTEGER PRIMARY KEY                      │
+│  user_id               FK → Users                               │
+│                                                                 │
+│  # Section 2: Parent/Guardian Information                       │
+│  mother_name           VARCHAR                                  │
+│  mother_age            INTEGER                                  │
+│  mother_occupation     VARCHAR                                  │
+│  father_name           VARCHAR                                  │
+│  father_age            INTEGER                                  │
+│  father_occupation     VARCHAR                                  │
+│  primary_caregiver     ENUM ('mother', 'father',                │
+│                              'grandparent', 'other')            │
+│  primary_caregiver_other VARCHAR (nullable)                     │
+│                                                                 │
+│  # Section 3: Contact Information                               │
+│  home_address          VARCHAR                                  │
+│  municipality          VARCHAR                                  │
+│  district              VARCHAR                                  │
+│  province              ENUM ('1', '2', 'bagmati', 'gandaki',    │
+│                              'lumbini', 'karnali', 'sudurpaschim')│
+│  primary_phone         VARCHAR                                  │
+│  has_whatsapp          BOOLEAN                                  │
+│  secondary_phone       VARCHAR (nullable)                       │
+│  email                 VARCHAR (nullable)                       │
+│                                                                 │
+│  # Section 7: Technology Access                                 │
+│  smartphone_comfort    ENUM ('very_comfortable',                │
+│                              'somewhat_comfortable',            │
+│                              'need_help', 'not_comfortable')    │
+│  consent_followup      BOOLEAN                                  │
+│  consent_research      BOOLEAN                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      HOUSEHOLD                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  parent_id       FK → Users                                     │
+│                                                                 │
+│  # Section 4: Household & Family                                │
+│  has_mother              BOOLEAN                                │
+│  has_father              BOOLEAN                                │
+│  siblings_count          INTEGER (default: 0)                   │
+│  has_maternal_grandparents BOOLEAN                              │
+│  has_paternal_grandparents BOOLEAN                              │
+│  has_uncle_aunt          BOOLEAN                                │
+│  has_other_relatives     BOOLEAN                                │
+│  has_helper              BOOLEAN                                │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    CHILD_EDUCATION                              │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  child_id        FK → Children                                  │
+│                                                                 │
+│  # Section 5: Education & Daily Routine                         │
+│  is_in_school        BOOLEAN                                    │
+│  school_name         VARCHAR (nullable)                         │
+│  grade_class         VARCHAR (nullable)                         │
+│  school_type         ENUM ('government', 'private',             │
+│                            'special_school') (nullable)         │
+│  transport_to_school ENUM ('walk', 'bus',                       │
+│                            'private_vehicle', 'other') (nullable)│
+│                                                                 │
+│  # Daily Routine (store as TIME)                                │
+│  wake_up_time        TIME                                       │
+│  breakfast_time      TIME                                       │
+│  school_start_time   TIME (nullable)                            │
+│  school_end_time     TIME (nullable)                            │
+│  lunch_time          TIME                                       │
+│  nap_start_time      TIME (nullable)                            │
+│  nap_end_time        TIME (nullable)                            │
+│  evening_activities  VARCHAR                                    │
+│  dinner_time         TIME                                       │
+│  sleep_time          TIME                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                     CHILD_HEALTH                                │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  child_id        FK → Children                                  │
+│                                                                 │
+│  # Section 6: Health Information                                │
+│  height           VARCHAR (can be cm or ft)                     │
+│  weight           VARCHAR (can be kg or lbs)                    │
+│  has_vaccinations ENUM ('yes', 'no', 'not_sure')                │
+│  medical_conditions TEXT (nullable)                             │
+│  taking_medication BOOLEAN                                      │
+│  medication_list  TEXT (nullable)                               │
+│                                                                 │
+│  # Professionals seen (store as JSON array or separate flags)   │
+│  seen_pediatrician        BOOLEAN                               │
+│  seen_child_psychiatrist  BOOLEAN                               │
+│  seen_speech_therapist    BOOLEAN                               │
+│  seen_occupational_therapist BOOLEAN                            │
+│  seen_psychologist        BOOLEAN                               │
+│  seen_special_educator    BOOLEAN                               │
+│  seen_neurologist         BOOLEAN                               │
+│  seen_traditional_healer  BOOLEAN                               │
+│  seen_none               BOOLEAN                                │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                   MEDICAL_HISTORY                               │
+├─────────────────────────────────────────────────────────────────┤
+│  id                        INTEGER PRIMARY KEY                  │
+│  child_id                  FK → Children                        │
+│                                                                 │
+│  # Medical History Background (A1-A4)                           │
+│  pregnancy_infection       BOOLEAN  # A1                        │
+│  pregnancy_infection_desc  TEXT (nullable)                      │
+│  birth_complications       BOOLEAN  # A2                        │
+│  birth_complications_desc  TEXT (nullable)                      │
+│  brain_injury_first_year   BOOLEAN  # A3                        │
+│  brain_injury_desc         TEXT (nullable)                      │
+│  family_autism_history     BOOLEAN  # A4                        │
+│                                                                 │
+│  # Auto-flag                                                    │
+│  requires_specialist       BOOLEAN (auto-set if any YES)        │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                       MCHAT_RESPONSE                            │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  child_id        FK → Children                                  │
+│                                                                 │
+│  # 20 M-CHAT Questions (YES=true, NO=false)                     │
+│  q1              BOOLEAN                                        │
+│  q2              BOOLEAN                                        │
+│  q3              BOOLEAN                                        │
+│  q4              BOOLEAN                                        │
+│  q5              BOOLEAN                                        │
+│  q6              BOOLEAN                                        │
+│  q7              BOOLEAN                                        │
+│  q8              BOOLEAN                                        │
+│  q9              BOOLEAN                                        │
+│  q10             BOOLEAN                                        │
+│  q11             BOOLEAN                                        │
+│  q12             BOOLEAN                                        │
+│  q13             BOOLEAN                                        │
+│  q14             BOOLEAN                                        │
+│  q15             BOOLEAN                                        │
+│  q16             BOOLEAN                                        │
+│  q17             BOOLEAN                                        │
+│  q18             BOOLEAN                                        │
+│  q19             BOOLEAN                                        │
+│  q20             BOOLEAN                                        │
+│                                                                 │
+│  total_score     INTEGER (0-20, calculated)                     │
+│  risk_level      ENUM ('low', 'medium', 'high')                 │
+│  created_at      DATETIME                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    ASSESSMENT_VIDEOS                            │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  child_id        FK → Children                                  │
+│  video_type      ENUM ('walking', 'eating', 'speaking',         │
+│                        'behavior', 'other')                     │
+│  video_url       VARCHAR (Cloudflare Stream URL)                │
+│  description     TEXT                                           │
+│  uploaded_at     DATETIME                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    CHILD_ASSESSMENT                             │
+├─────────────────────────────────────────────────────────────────┤
+│  id                  INTEGER PRIMARY KEY                        │
+│  child_id            FK → Children                              │
+│  assigned_doctor_id  FK → Doctors (nullable)                    │
+│  status              ENUM ('pending', 'in_review',              │
+│                            'accepted', 'completed')             │
+│  parent_confirmed    BOOLEAN (confirmation checkbox)            │
+│  submitted_at        DATETIME                                   │
+│  reviewed_at         DATETIME (nullable)                        │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                       CURRICULUM                                │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  title           VARCHAR                                        │
+│  description     TEXT                                           │
+│  duration_days   INTEGER (15, 30, or 45)                        │
+│  type            ENUM ('general', 'specialized')                │
+│  spectrum_type   VARCHAR (nullable, for specialized)            │
+│  created_by      FK → Doctors                                   │
+│  created_at      DATETIME                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                     CURRICULUM_TASK                             │
+├─────────────────────────────────────────────────────────────────┤
+│  id                INTEGER PRIMARY KEY                          │
+│  curriculum_id     FK → Curriculum                              │
+│  day_number        INTEGER (1-45)                               │
+│  title             VARCHAR                                      │
+│  why_description   TEXT (why this task matters)                 │
+│  instructions      TEXT (step-by-step)                          │
+│  demo_video_url    VARCHAR (Cloudflare URL)                     │
+│  order_index       INTEGER                                      │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                   CHILD_CURRICULUM                              │
+├─────────────────────────────────────────────────────────────────┤
+│  id              INTEGER PRIMARY KEY                            │
+│  child_id        FK → Children                                  │
+│  curriculum_id   FK → Curriculum                                │
+│  assigned_by     FK → Doctors                                   │
+│  start_date      DATE                                           │
+│  end_date        DATE                                           │
+│  status          ENUM ('active', 'completed', 'paused')         │
+│  current_day     INTEGER                                        │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                   DAILY_PROGRESS                                │
+├─────────────────────────────────────────────────────────────────┤
+│  id                  INTEGER PRIMARY KEY                        │
+│  child_curriculum_id FK → ChildCurriculum                       │
+│  task_id             FK → CurriculumTask                        │
+│  day_number          INTEGER                                    │
+│  date                DATE                                       │
+│  status              ENUM ('not_done', 'done_with_help',        │
+│                            'done_without_help')                 │
+│  video_url           VARCHAR (Cloudflare URL, nullable)         │
+│  parent_notes        TEXT (nullable)                            │
+│  submitted_at        DATETIME                                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    DOCTOR_REVIEW                                │
+├─────────────────────────────────────────────────────────────────┤
+│  id                  INTEGER PRIMARY KEY                        │
+│  child_curriculum_id FK → ChildCurriculum                       │
+│  doctor_id           FK → Doctors                               │
+│  review_period       INTEGER (day 15, 30, or 45)                │
+│  observations        TEXT                                       │
+│  spectrum_identified VARCHAR (nullable)                         │
+│  recommendations     TEXT                                       │
+│  reviewed_at         DATETIME                                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    DIAGNOSIS_REPORT                             │
+├─────────────────────────────────────────────────────────────────┤
+│  id                  INTEGER PRIMARY KEY                        │
+│  child_id            FK → Children                              │
+│  doctor_id           FK → Doctors                               │
+│  has_autism          BOOLEAN                                    │
+│  spectrum_type       VARCHAR (nullable)                         │
+│  detailed_report     TEXT                                       │
+│  next_steps          TEXT                                       │
+│  created_at          DATETIME                                   │
+│  shared_with_parent  BOOLEAN                                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Complete Form Sections (For Mobile App)
+
+### SECTION 1: Child's Basic Information
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Note: All information will be kept strictly confidential       │
+│  and used only to better support your child.                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Child's Full Name (बच्चाको पुरा नाम)                          │
+│     [_______________________________________________]           │
+│                                                                 │
+│  2. Date of Birth (जन्म मिति)                                     │
+│     [DD] / [MM] / [YYYY]                                        │
+│                                                                 │
+│  3. Age (उमेर)                                                   │
+│     [____] Years  [____] Months                                 │
+│                                                                 │
+│  4. Gender (लिङ्ग)                                                │
+│     ○ Male   ○ Female   ○ Other                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### SECTION 2: Parent/Guardian Information
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  PARENT/GUARDIAN INFORMATION                                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Mother's Name (आमाको नाम)                                    │
+│     [_______________________________________________]           │
+│                                                                 │
+│  2. Mother's Age (आमाको उमेर)                                    │
+│     [____] Years                                                │
+│                                                                 │
+│  3. Mother's Occupation (आमाको पेशा)                             │
+│     [_______________________________________________]           │
+│                                                                 │
+│  4. Father's Name (बाबुको नाम)                                   │
+│     [_______________________________________________]           │
+│                                                                 │
+│  5. Father's Age (बाबुको उमेर)                                   │
+│     [____] Years                                                │
+│                                                                 │
+│  6. Father's Occupation (बाबुको पेशा)                            │
+│     [_______________________________________________]           │
+│                                                                 │
+│  7. Primary Caregiver (बच्चाको हेरचाह गर्ने मुख्य व्यक्ति)            │
+│     ○ Mother  ○ Father  ○ Grandparent  ○ Other: [______]        │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### SECTION 3: Contact Information
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  CONTACT INFORMATION                                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Home Address (ठेगाना)                                        │
+│     [_______________________________________________]           │
+│                                                                 │
+│  2. Municipality/Village (नगरपालिका/गाउँ)                         │
+│     [_______________________________________________]           │
+│                                                                 │
+│  3. District (जिल्ला)                                            │
+│     [_______________________________________________]           │
+│                                                                 │
+│  4. Province (प्रदेश)                                            │
+│     ○ 1  ○ 2  ○ Bagmati  ○ Gandaki                              │
+│     ○ Lumbini  ○ Karnali  ○ Sudurpaschim                        │
+│                                                                 │
+│  5. Primary Phone Number (मुख्य फोन नम्बर) *                      │
+│     [_______________________________________________]           │
+│                                                                 │
+│  6. WhatsApp Available? (व्हाट्सएप छ?) *                          │
+│     ○ Yes  ○ No                                                 │
+│                                                                 │
+│  7. Secondary Phone Number (अर्को फोन नम्बर)                      │
+│     [_______________________________________________]           │
+│                                                                 │
+│  8. Email Address (इमेल ठेगाना)                                   │
+│     [_______________________________________________]           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### SECTION 4: Household & Family
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  HOUSEHOLD & FAMILY                                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Who lives in your home? (Check all that apply)                 │
+│                                                                 │
+│  □ Mother                                                       │
+│  □ Father                                                       │
+│  □ Child's siblings → How many? [____]                          │
+│  □ Maternal grandparents                                        │
+│  □ Paternal grandparents                                        │
+│  □ Uncle/Aunt                                                   │
+│  □ Other relatives                                              │
+│  □ Help/maid                                                    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### SECTION 5: Education & Daily Routine
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  EDUCATION & DAILY ROUTINE                                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Is your child currently going to school? (बच्चा स्कूल जान्छ?) │
+│     ○ Yes  ○ No                                                 │
+│                                                                 │
+│  If YES:                                                        │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  School Name: [_________________________________]       │    │
+│  │  Grade/Class: [_________________________________]       │    │
+│  │  Type of School:                                        │    │
+│  │    ○ Government  ○ Private  ○ Special School            │    │
+│  │  How does child get to school?                          │    │
+│  │    ○ Walk  ○ Bus  ○ Private vehicle  ○ Other            │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                 │
+│  2. Child's Daily Routine (Approximate times)                   │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  Wakes up:        [____] AM                             │    │
+│  │  Breakfast:       [____] AM                             │    │
+│  │  School/Play:     [____] AM to [____] PM                │    │
+│  │  Lunch:           [____] PM                             │    │
+│  │  Nap:             [____] PM to [____] PM                │    │
+│  │  Evening activities: [_________________________]        │    │
+│  │  Dinner:          [____] PM                             │    │
+│  │  Sleep time:      [____] PM                             │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### SECTION 6: Health Information
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  HEALTH INFORMATION                                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Child's current height (उचाइ)                               │
+│     [______] cm/ft                                              │
+│                                                                 │
+│  2. Child's current weight (तौल)                                │
+│     [______] kg/lbs                                             │
+│                                                                 │
+│  3. Has your child had routine vaccinations? (नियमित खोप?)       │
+│     ○ Yes  ○ No  ○ Not sure                                     │
+│                                                                 │
+│  4. Any current medical conditions?                             │
+│     (e.g., asthma, epilepsy, allergies)                         │
+│     [_______________________________________________]           │
+│                                                                 │
+│  5. Is your child currently taking any medication?              │
+│     ○ Yes  ○ No                                                 │
+│     If YES, please list:                                        │
+│     [_______________________________________________]           │
+│                                                                 │
+│  6. Has your child seen any of these professionals?             │
+│     (Check all that apply)                                      │
+│                                                                 │
+│     □ Pediatrician                                              │
+│     □ Child psychiatrist                                        │
+│     □ Speech therapist                                          │
+│     □ Occupational therapist                                    │
+│     □ Psychologist                                              │
+│     □ Special educator                                          │
+│     □ Neurologist                                               │
+│     □ Traditional healer                                        │
+│     □ None of the above                                         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### SECTION 7: Technology Access & Consent
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  TECHNOLOGY ACCESS                                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. How comfortable are you with using smartphone apps?         │
+│     ○ Very comfortable                                          │
+│     ○ Somewhat comfortable                                      │
+│     ○ Need help to use apps                                     │
+│     ○ Not comfortable                                           │
+│                                                                 │
+│  2. May we contact you for follow-up?                           │
+│     (हामी तपाईंलाई सम्पर्क गर्न सक्छौं?)                             │
+│     ○ Yes  ○ No                                                 │
+│                                                                 │
+│  3. May we use anonymous information for research               │
+│     to help other children?                                     │
+│     (अन्य बच्चाहरूलाई मद्दत गर्न अनामी जानकारी प्रयोग गर्न सक्छौं?)     │
+│     ○ Yes  ○ No                                                 │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  DECLARATION                                                    │
+│                                                                 │
+│  □ I confirm that the information provided above is accurate    │
+│    to the best of my knowledge.                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Medical History Background (A1-A4)
+
+> **Note**: This section appears AFTER basic info, BEFORE M-CHAT.
+> If ANY answer is YES → Auto-flag for specialist attention.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  MEDICAL HISTORY BACKGROUND                                     │
+│  Please answer these questions about your child's health        │
+│  history. Please choose Yes or No for every question.           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  A1. During your pregnancy with this child, did you have a      │
+│      serious infection that required hospital treatment?        │
+│      (For example, high fever with illness, German              │
+│      measles/rubella, or other infection that worried           │
+│      your doctor)                                               │
+│                                                                 │
+│      ○ YES  ○ NO                                                │
+│                                                                 │
+│      If YES, please describe:                                   │
+│      [_______________________________________________]          │
+│                                                                 │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                 │
+│  A2. Was your child's birth complicated by an emergency or      │
+│      did your baby need special care right after birth?         │
+│      (For example, emergency cesarean section, baby needed      │
+│      oxygen, baby stayed in NICU for more than a week, or       │
+│      baby weighed less than 1.5 kg at birth)                    │
+│                                                                 │
+│      ○ YES  ○ NO                                                │
+│                                                                 │
+│      If YES, please describe:                                   │
+│      [_______________________________________________]          │
+│                                                                 │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                 │
+│  A3. During your child's first year, did they have a serious    │
+│      brain infection or significant head injury?                │
+│      (For example, meningitis, encephalitis, or a serious       │
+│      fall/accident that caused a head injury and required       │
+│      hospital visit)                                            │
+│                                                                 │
+│      ○ YES  ○ NO                                                │
+│                                                                 │
+│      If YES, please describe:                                   │
+│      [_______________________________________________]          │
+│                                                                 │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                 │
+│  A4. Does your child have an older brother, sister, or cousin   │
+│      who has been diagnosed with autism or serious              │
+│      developmental delay?                                       │
+│                                                                 │
+│      ○ YES  ○ NO                                                │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️  AUTO-FLAG LOGIC                                            │
+├─────────────────────────────────────────────────────────────────┤
+│  If ANY of A1, A2, A3, A4 = YES:                                │
+│    → Set requires_specialist = true                             │
+│    → Show warning banner to doctor                              │
+│    → Recommend official doctor consultation                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## M-CHAT-R/F Questions (1-20)
+
+> **Instructions for Parents**:
+> Please answer these questions about your child. Keep in mind how your child
+> **usually** behaves. If you have seen your child do the behavior a few times,
+> but he or she does not usually do it, then please answer **NO**.
+
+### M-CHAT Scoring System
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    M-CHAT SCORING RULES                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  SCORING:                                                       │
+│  • Most questions: NO = 1 point, YES = 0 points                 │
+│  • Reverse questions (Q2, Q5, Q12): YES = 1 point, NO = 0 points│
+│                                                                 │
+│  RISK LEVELS:                                                   │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  Total Score    │  Risk Level  │  Action                │    │
+│  ├─────────────────┼──────────────┼────────────────────────┤    │
+│  │  0-2 points     │  LOW         │  No immediate concern  │    │
+│  │  3-7 points     │  MEDIUM      │  Recommend follow-up   │    │
+│  │  8-20 points    │  HIGH        │  Priority for doctor   │    │
+│  └─────────────────┴──────────────┴────────────────────────┘    │
+│                                                                 │
+│  → Risk level is sent to doctors to save their time             │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Complete M-CHAT Questions with Scoring
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  M-CHAT-R/F SCREENING QUESTIONNAIRE                             │
+│  Target: Children aged 16-30 months                             │
+├─────────────────────────────────────────────────────────────────┤
+
+Q1. If you point at something across the room, does your child
+    look at it?
+    (For example, if you point at a toy or an animal, does your
+    child look at the toy or animal?)
+
+    ○ YES → 0 points
+    ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q2. Have you ever wondered if your child might be deaf?
+    ⚠️ REVERSE SCORED
+
+    ○ YES → 1 point  (concerning)
+    ○ NO  → 0 points
+
+────────────────────────────────────────────────────────────────
+
+Q3. Does your child play pretend or make-believe?
+    (For example, pretend to drink from an empty cup, pretend
+    to talk on a phone, or pretend to feed a doll or stuffed
+    animal?)
+
+    ○ YES → 0 points
+    ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q4. Does your child like climbing on things?
+    (For example, furniture, playground equipment, or stairs)
+
+    ○ YES → 0 points
+    ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q5. Does your child make unusual finger movements near his or
+    her eyes?
+    (For example, does your child wiggle his or her fingers
+    close to his or her eyes?)
+    ⚠️ REVERSE SCORED
+
+    ○ YES → 1 point  (concerning)
+    ○ NO  → 0 points
+
+────────────────────────────────────────────────────────────────
+
+Q6. Does your child point with one finger to ask for something
+    or to get help?
+    (For example, pointing to a snack or toy that is out of reach)
+
+    ○ YES → 0 points
+    ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q7. Does your child point with one finger to show you something
+    interesting?
+    (For example, pointing to an airplane in the sky or a big
+    truck in the road)
+
+    ○ YES → 0 points
+    ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q8. Is your child interested in other children?
+    (For example, does your child watch other children, smile
+    at them, or go to them?)
+
+    ○ YES → 0 points
+    ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q9. Does your child show you things by bringing them to you or
+    holding them up for you to see – not to get help, but just
+    to share?
+    (For example, showing you a flower, a stuffed animal, or
+    a toy truck)
+
+    ○ YES → 0 points
+    ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q10. Does your child respond when you call his or her name?
+     (For example, does he or she look up, talk or babble, or
+     stop what he or she is doing when you call his or her name?)
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q11. When you smile at your child, does he or she smile back
+     at you?
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q12. Does your child get upset by everyday noises?
+     (For example, does your child scream or cry to noise such
+     as a vacuum cleaner or loud music?)
+     ⚠️ REVERSE SCORED
+
+     ○ YES → 1 point  (concerning)
+     ○ NO  → 0 points
+
+────────────────────────────────────────────────────────────────
+
+Q13. Does your child walk?
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q14. Does your child look you in the eye when you are talking
+     to him or her, playing with him or her, or dressing him
+     or her?
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q15. Does your child try to copy what you do?
+     (For example, wave bye-bye, clap, or make a funny noise
+     when you do)
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q16. If you turn your head to look at something, does your child
+     look around to see what you are looking at?
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q17. Does your child try to get you to watch him or her?
+     (For example, does your child look at you for praise, or
+     say "look" or "watch me"?)
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q18. Does your child understand when you tell him or her to do
+     something?
+     (For example, if you don't point, can your child understand
+     "put the book on the chair" or "bring me the blanket"?)
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q19. If something new happens, does your child look at your face
+     to see how you feel about it?
+     (For example, if he or she hears a strange or funny noise,
+     or sees a new toy, will he or she look at your face?)
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+────────────────────────────────────────────────────────────────
+
+Q20. Does your child like movement activities?
+     (For example, being swung or bounced on your knee)
+
+     ○ YES → 0 points
+     ○ NO  → 1 point
+
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### M-CHAT Scoring Algorithm (Backend)
+
+```python
+def calculate_mchat_score(responses: dict) -> tuple[int, str]:
+    """
+    Calculate M-CHAT score from responses.
+
+    Args:
+        responses: dict with keys 'q1' to 'q20', values are boolean
+                   True = YES, False = NO
+
+    Returns:
+        (total_score, risk_level)
+    """
+    # Questions where YES = concerning (1 point)
+    # These are REVERSE scored
+    REVERSE_QUESTIONS = [2, 5, 12]
+
+    total_score = 0
+
+    for q_num in range(1, 21):
+        answer = responses.get(f'q{q_num}')
+
+        if q_num in REVERSE_QUESTIONS:
+            # YES = 1 point (concerning), NO = 0 points
+            if answer == True:
+                total_score += 1
+        else:
+            # NO = 1 point (concerning), YES = 0 points
+            if answer == False:
+                total_score += 1
+
+    # Determine risk level
+    if total_score <= 2:
+        risk_level = 'low'
+    elif total_score <= 7:
+        risk_level = 'medium'
+    else:  # 8-20
+        risk_level = 'high'
+
+    return total_score, risk_level
+
+
+# Example usage:
+responses = {
+    'q1': True,   # YES - looks at what you point to
+    'q2': False,  # NO - never wondered if deaf
+    'q3': True,   # YES - plays pretend
+    'q4': True,   # YES - likes climbing
+    'q5': False,  # NO - no unusual finger movements
+    'q6': True,   # YES - points to ask
+    'q7': True,   # YES - points to show
+    'q8': True,   # YES - interested in children
+    'q9': True,   # YES - shows things
+    'q10': True,  # YES - responds to name
+    'q11': True,  # YES - smiles back
+    'q12': False, # NO - not upset by noises
+    'q13': True,  # YES - walks
+    'q14': True,  # YES - eye contact
+    'q15': True,  # YES - copies actions
+    'q16': True,  # YES - follows gaze
+    'q17': True,  # YES - seeks attention
+    'q18': True,  # YES - understands commands
+    'q19': True,  # YES - checks reactions
+    'q20': True,  # YES - likes movement
+}
+
+score, risk = calculate_mchat_score(responses)
+# Result: score=0, risk='low'
+```
+
+### M-CHAT Quick Reference Table
+
+| Q# | Question Summary | Concerning Answer | Score If Concerning |
+|----|-----------------|-------------------|---------------------|
+| 1 | Points & looks | NO | +1 |
+| 2 | Wondered if deaf | **YES** | +1 |
+| 3 | Pretend play | NO | +1 |
+| 4 | Likes climbing | NO | +1 |
+| 5 | Unusual finger movements | **YES** | +1 |
+| 6 | Points to ask | NO | +1 |
+| 7 | Points to show | NO | +1 |
+| 8 | Interested in children | NO | +1 |
+| 9 | Shows things | NO | +1 |
+| 10 | Responds to name | NO | +1 |
+| 11 | Smiles back | NO | +1 |
+| 12 | Upset by noises | **YES** | +1 |
+| 13 | Walks | NO | +1 |
+| 14 | Eye contact | NO | +1 |
+| 15 | Copies actions | NO | +1 |
+| 16 | Follows gaze | NO | +1 |
+| 17 | Seeks attention | NO | +1 |
+| 18 | Understands commands | NO | +1 |
+| 19 | Checks reactions | NO | +1 |
+| 20 | Likes movement | NO | +1 |
+
+**Bold = Reverse scored questions (2, 5, 12)**
+
+---
+
+## API Endpoints
+
+### Authentication (Simple - No Email Verification)
+
+```
+POST   /api/auth/register/parent/
+       Body: { email, password, full_name, phone }
+       → Creates user with role='parent'
+       → Returns JWT tokens immediately
+
+POST   /api/auth/register/doctor/
+       Body: { email, password, full_name, phone, license_number, specialization }
+       → Creates user with role='doctor'
+       → Auto-approves for hackathon (is_approved=true)
+       → Returns JWT tokens immediately
+
+POST   /api/auth/login/
+       Body: { email, password }
+       → Returns { access_token, refresh_token, user }
+
+POST   /api/auth/refresh/
+       Body: { refresh_token }
+       → Returns new access_token
+
+GET    /api/auth/me/
+       → Returns current user profile
+```
+
+### Parent Profile & Details
+```
+GET    /api/parent/profile/                   # Get parent details
+POST   /api/parent/profile/                   # Create/update parent details
+PUT    /api/parent/profile/                   # Update parent details
+POST   /api/parent/household/                 # Submit household info
+```
+
+### Child Management
+```
+POST   /api/children/                         # Add child (Section 1)
+GET    /api/children/                         # List my children
+GET    /api/children/{id}/                    # Child details
+PUT    /api/children/{id}/                    # Update child info
+```
+
+### Child Additional Info
+```
+POST   /api/children/{id}/education/          # Submit Section 5
+GET    /api/children/{id}/education/
+POST   /api/children/{id}/health/             # Submit Section 6
+GET    /api/children/{id}/health/
+```
+
+### Medical History (A1-A4)
+```
+POST   /api/children/{id}/medical-history/    # Submit A1-A4
+GET    /api/children/{id}/medical-history/
+```
+
+### M-CHAT Assessment
+```
+POST   /api/children/{id}/mchat/              # Submit M-CHAT (20 questions)
+       Body: { q1: bool, q2: bool, ..., q20: bool }
+       → Auto-calculates score and risk_level
+GET    /api/children/{id}/mchat/              # Get M-CHAT results
+```
+
+### Video Upload
+```
+POST   /api/children/{id}/videos/             # Upload assessment video
+       Body: { video_type, video_file, description }
+GET    /api/children/{id}/videos/             # List videos
+DELETE /api/children/{id}/videos/{vid_id}/
+```
+
+### Assessment Submission
+```
+POST   /api/children/{id}/assessment/submit/  # Final submit with confirmation
+       Body: { parent_confirmed: true }
+GET    /api/children/{id}/assessment/status/  # Check status
+```
+
+### Doctor Dashboard
+```
+GET    /api/doctor/patients/pending/          # Pending assessments
+       → Returns list with M-CHAT risk_level for prioritization
+GET    /api/doctor/patients/{child_id}/       # Full child profile
+POST   /api/doctor/patients/{child_id}/accept/ # Accept patient
+GET    /api/doctor/patients/active/           # My active patients
+```
+
+### Curriculum Management
+```
+GET    /api/curriculum/                       # List all curriculum
+GET    /api/curriculum/{id}/                  # Details + tasks
+POST   /api/curriculum/                       # Create (doctor only)
+POST   /api/curriculum/{id}/tasks/            # Add task
+```
+
+### Assign Curriculum
+```
+POST   /api/doctor/patients/{child_id}/assign-curriculum/
+       Body: { curriculum_id, start_date }
+GET    /api/doctor/patients/{child_id}/curriculum/
+```
+
+### Daily Progress (Parent)
+```
+GET    /api/children/{id}/today/              # Today's tasks
+POST   /api/children/{id}/progress/           # Submit progress
+       Body: { task_id, status, video_url?, notes? }
+GET    /api/children/{id}/progress/history/
+```
+
+### Doctor Review
+```
+GET    /api/doctor/patients/{child_id}/progress/    # All progress
+POST   /api/doctor/patients/{child_id}/review/      # Submit review
+GET    /api/doctor/patients/{child_id}/reviews/     # All reviews
+```
+
+### Reports
+```
+POST   /api/doctor/patients/{child_id}/diagnosis/   # Create report
+GET    /api/children/{id}/reports/                  # Parent view
+```
+
+---
+
+## Development Phases (48 Hours)
+
+### PHASE 1: Foundation (Hours 0-8)
+
+**Goal**: Project setup + Auth + Basic models
+
+#### Backend Tasks
+
+```
+□ 1.1 Django Project Setup
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   pip install django djangorestframework djangorestframework-simplejwt django-cors-headers
+   django-admin startproject neurocare .
+   python manage.py startapp accounts
+   python manage.py startapp children
+   python manage.py startapp assessments
+
+□ 1.2 Configure Settings
+   - Add apps to INSTALLED_APPS
+   - Configure REST_FRAMEWORK with JWT
+   - Configure CORS for localhost:3000 and mobile
+   - Set AUTH_USER_MODEL
+
+□ 1.3 User Model (accounts/models.py)
+   - Custom User with email login (no username)
+   - Add role field (parent/doctor/admin)
+   - Add full_name, phone fields
+
+□ 1.4 Doctor Model
+   - OneToOne to User
+   - license_number, certificate_url, specialization
+   - is_approved (default True for hackathon)
+
+□ 1.5 Auth Endpoints (accounts/views.py)
+   - POST /api/auth/register/parent/
+   - POST /api/auth/register/doctor/
+   - POST /api/auth/login/
+   - GET /api/auth/me/
+   - No email verification needed
+
+□ 1.6 Parent Details Model
+   - All fields from Section 2, 3, 7
+   - ForeignKey to User
+
+□ 1.7 Household Model
+   - All checkbox fields from Section 4
+   - ForeignKey to User
+
+□ 1.8 Run Migrations
+   python manage.py makemigrations
+   python manage.py migrate
+```
+
+#### Dashboard Tasks
+
+```
+□ 1.9 React Project Setup
+   cd dashboard
+   npm create vite@latest . -- --template react
+   npm install react-router-dom axios tailwindcss postcss autoprefixer
+   npx tailwindcss init -p
+
+□ 1.10 Configure Tailwind
+   - Update tailwind.config.js
+   - Add Tailwind to index.css
+
+□ 1.11 Setup Routing
+   - Create pages folder
+   - Setup React Router
+   - Create: Login, Register, Dashboard pages
+
+□ 1.12 Auth Context
+   - Create AuthContext
+   - Store JWT in localStorage
+   - Create useAuth hook
+
+□ 1.13 API Service
+   - Create axios instance with baseURL
+   - Add JWT interceptor
+   - Create auth service functions
+
+□ 1.14 Login Page
+   - Email + Password form
+   - Call login API
+   - Redirect to dashboard on success
+
+□ 1.15 Doctor Register Page
+   - Email, Password, Name, Phone
+   - License Number, Specialization
+   - Submit and auto-login
+```
+
+#### Mobile Tasks
+
+```
+□ 1.16 React Native Setup
+   cd mobile
+   npx create-expo-app . --template blank
+   npm install @react-navigation/native @react-navigation/stack
+   npm install react-native-screens react-native-safe-area-context
+   npm install axios @react-native-async-storage/async-storage
+
+□ 1.17 Setup Navigation
+   - Create navigation container
+   - Create Auth stack (Login, Register)
+   - Create Main stack (placeholder)
+
+□ 1.18 Auth Context
+   - Create AuthContext
+   - Store JWT in AsyncStorage
+   - Create useAuth hook
+
+□ 1.19 API Service
+   - Create axios instance
+   - Add JWT interceptor
+
+□ 1.20 Login Screen
+   - Email + Password inputs
+   - Login button
+   - Link to Register
+
+□ 1.21 Parent Register Screen
+   - Email, Password, Name, Phone
+   - Submit and auto-login
+```
+
+---
+
+### PHASE 2: Child Registration & Forms (Hours 8-18)
+
+**Goal**: Complete registration flow (Sections 1-7)
+
+#### Backend Tasks
+
+```
+□ 2.1 Child Model (children/models.py)
+   - Section 1 fields: full_name, dob, age_years, age_months, gender
+   - ForeignKey to Parent
+
+□ 2.2 ChildEducation Model
+   - All Section 5 fields
+   - ForeignKey to Child
+
+□ 2.3 ChildHealth Model
+   - All Section 6 fields
+   - ForeignKey to Child
+
+□ 2.4 Child Endpoints
+   - POST /api/children/
+   - GET /api/children/
+   - GET /api/children/{id}/
+   - PUT /api/children/{id}/
+
+□ 2.5 Parent Profile Endpoints
+   - POST /api/parent/profile/
+   - GET /api/parent/profile/
+   - POST /api/parent/household/
+
+□ 2.6 Child Education & Health Endpoints
+   - POST /api/children/{id}/education/
+   - POST /api/children/{id}/health/
+```
+
+#### Mobile Tasks
+
+```
+□ 2.7 Create Form Navigation
+   - Step indicator component
+   - Progress bar
+
+□ 2.8 Section 1 Screen: Child Basic Info
+   - Full name input
+   - Date of birth picker
+   - Age inputs (years, months)
+   - Gender selection
+   - Nepali labels
+
+□ 2.9 Section 2 Screen: Parent Info
+   - Mother: name, age, occupation
+   - Father: name, age, occupation
+   - Primary caregiver selector
+
+□ 2.10 Section 3 Screen: Contact Info
+   - Address, municipality, district
+   - Province selector (7 provinces)
+   - Phone numbers
+   - WhatsApp checkbox
+   - Email (optional)
+
+□ 2.11 Section 4 Screen: Household
+   - Multi-select checkboxes
+   - Siblings count input
+
+□ 2.12 Section 5 Screen: Education & Routine
+   - School yes/no toggle
+   - Conditional school fields
+   - Time pickers for routine
+
+□ 2.13 Section 6 Screen: Health
+   - Height, weight inputs
+   - Vaccination status
+   - Medical conditions text
+   - Medication fields
+   - Professionals seen checkboxes
+
+□ 2.14 Section 7 Screen: Technology & Consent
+   - Smartphone comfort level
+   - Consent checkboxes
+   - Declaration checkbox
+   - Submit all data
+```
+
+---
+
+### PHASE 3: Medical History & M-CHAT (Hours 18-28)
+
+**Goal**: A1-A4 questions + M-CHAT with scoring
+
+#### Backend Tasks
+
+```
+□ 3.1 MedicalHistory Model (assessments/models.py)
+   - A1-A4 boolean fields
+   - Description fields for each
+   - requires_specialist auto-flag
+
+□ 3.2 MChatResponse Model
+   - q1-q20 boolean fields
+   - total_score integer
+   - risk_level enum
+
+□ 3.3 M-CHAT Scoring Logic
+   - Implement calculate_mchat_score()
+   - Handle reverse questions (2, 5, 12)
+   - Calculate risk level
+
+□ 3.4 Medical History Endpoints
+   - POST /api/children/{id}/medical-history/
+   - GET /api/children/{id}/medical-history/
+
+□ 3.5 M-CHAT Endpoints
+   - POST /api/children/{id}/mchat/
+     → Auto-calculate and save score
+   - GET /api/children/{id}/mchat/
+```
+
+#### Mobile Tasks
+
+```
+□ 3.6 Medical History Screen (A1-A4)
+   - 4 questions with Yes/No
+   - Description field when Yes
+   - Warning banner if any Yes
+   - Nepali translations
+
+□ 3.7 M-CHAT Instructions Screen
+   - Explain the questionnaire
+   - Age requirement note
+   - "Keep in mind usual behavior" instruction
+
+□ 3.8 M-CHAT Questions Screen
+   - 20 questions (can be paginated or scrollable)
+   - Yes/No selection for each
+   - Question number indicator
+   - Examples shown under each question
+
+□ 3.9 M-CHAT Submit & Results
+   - Submit all 20 answers
+   - Show calculated score
+   - Show risk level (color coded)
+   - Low = green, Medium = yellow, High = red
+
+□ 3.10 Risk Level Result Screen
+   - Display score (X/20)
+   - Display risk level with explanation
+   - "Next: Upload Videos" button
+```
+
+#### Dashboard Tasks
+
+```
+□ 3.11 Pending Patients List
+   - Show all pending assessments
+   - Display child name, age, M-CHAT risk level
+   - Color code by risk (high priority = red)
+   - Click to view details
+
+□ 3.12 Patient Detail View
+   - All Section 1-7 info
+   - Medical history (A1-A4) with flags
+   - M-CHAT results and score
+```
+
+---
+
+### PHASE 4: Video Upload & Submission (Hours 28-36)
+
+**Goal**: Video recording/upload + Final submission
+
+#### Backend Tasks
+
+```
+□ 4.1 Cloudflare Stream Integration
+   - Create cloudflare.py service
+   - Upload video function
+   - Get video URL function
+
+□ 4.2 AssessmentVideo Model
+   - video_type enum
+   - video_url, description
+   - ForeignKey to Child
+
+□ 4.3 ChildAssessment Model
+   - status enum (pending, in_review, accepted, completed)
+   - parent_confirmed boolean
+   - assigned_doctor ForeignKey
+
+□ 4.4 Video Endpoints
+   - POST /api/children/{id}/videos/
+   - GET /api/children/{id}/videos/
+   - DELETE /api/children/{id}/videos/{vid_id}/
+
+□ 4.5 Assessment Submit Endpoint
+   - POST /api/children/{id}/assessment/submit/
+   - GET /api/children/{id}/assessment/status/
+```
+
+#### Mobile Tasks
+
+```
+□ 4.6 Video Type Selection Screen
+   - Walking, Eating, Speaking, Behavior, Other
+   - Description for each type
+
+□ 4.7 Video Recording Screen
+   - Camera preview
+   - Record button
+   - Stop button
+   - Preview recorded video
+
+□ 4.8 Video Upload Screen
+   - Show selected video
+   - Add description
+   - Upload progress bar
+   - Submit button
+
+□ 4.9 Video List Screen
+   - Show all uploaded videos
+   - Video type, thumbnail, date
+   - Delete option
+
+□ 4.10 Confirmation Screen
+   - Summary of all submitted info
+   - Declaration checkbox
+   - Final submit button
+
+□ 4.11 Success Screen
+   - "Assessment submitted!"
+   - "A doctor will review soon"
+   - Status tracking info
+```
+
+#### Dashboard Tasks
+
+```
+□ 4.12 Patient Videos View
+   - List all videos for patient
+   - Video player
+   - Video type labels
+
+□ 4.13 Accept Patient Flow
+   - "Accept this patient" button
+   - Confirmation popup
+   - Update status to 'accepted'
+```
+
+---
+
+### PHASE 5: Curriculum & Progress (Hours 36-44)
+
+**Goal**: Daily tasks + Progress submission + Doctor review
+
+#### Backend Tasks
+
+```
+□ 5.1 Curriculum Model
+   - title, description, duration_days
+   - type (general/specialized)
+   - spectrum_type (for specialized)
+
+□ 5.2 CurriculumTask Model
+   - day_number, title
+   - why_description, instructions
+   - demo_video_url
+
+□ 5.3 ChildCurriculum Model
+   - Assigns curriculum to child
+   - start_date, end_date, current_day
+
+□ 5.4 DailyProgress Model
+   - task_id, day_number, date
+   - status enum (not_done, done_with_help, done_without_help)
+   - video_url, notes
+
+□ 5.5 Seed Sample Curriculum
+   - Create 15-day general curriculum
+   - Add 5-10 sample tasks
+
+□ 5.6 Curriculum Endpoints
+   - GET /api/curriculum/
+   - GET /api/curriculum/{id}/
+   - POST /api/doctor/patients/{child_id}/assign-curriculum/
+
+□ 5.7 Progress Endpoints
+   - GET /api/children/{id}/today/
+   - POST /api/children/{id}/progress/
+   - GET /api/children/{id}/progress/history/
+```
+
+#### Mobile Tasks
+
+```
+□ 5.8 Curriculum Overview Screen
+   - Show assigned curriculum
+   - Duration, start date, current day
+   - Progress indicator
+
+□ 5.9 Today's Tasks Screen
+   - List today's tasks
+   - Task card with title
+
+□ 5.10 Task Detail Screen
+   - WHY section (highlighted)
+   - Video player for demo
+   - Text instructions
+
+□ 5.11 Progress Submit Screen
+   - Three options:
+     ○ Not Done
+     ○ Done with Help
+     ○ Done without Help
+   - Video recording option
+   - Notes field
+   - Submit button
+
+□ 5.12 Progress History Screen
+   - Calendar or list view
+   - Show status for each day
+   - Color coded
+```
+
+#### Dashboard Tasks
+
+```
+□ 5.13 Assign Curriculum Page
+   - Select patient
+   - Select curriculum
+   - Set start date
+   - Assign button
+
+□ 5.14 Progress Review Table
+   - Rows: Tasks
+   - Columns: Days (1-15)
+   - Cells: Status + Video link
+   - Color coded status
+
+□ 5.15 Review Form
+   - Select review period (15/30/45)
+   - Observations text
+   - Spectrum identified (optional)
+   - Recommendations
+   - Submit review
+```
+
+---
+
+### PHASE 6: Reports & Polish (Hours 44-48)
+
+**Goal**: Diagnosis reports + Final testing + Demo prep
+
+#### Backend Tasks
+
+```
+□ 6.1 DiagnosisReport Model
+   - has_autism boolean
+   - spectrum_type
+   - detailed_report, next_steps
+
+□ 6.2 DoctorReview Model
+   - review_period, observations
+   - spectrum_identified, recommendations
+
+□ 6.3 Report Endpoints
+   - POST /api/doctor/patients/{child_id}/diagnosis/
+   - GET /api/children/{id}/reports/
+
+□ 6.4 Review Endpoints
+   - POST /api/doctor/patients/{child_id}/review/
+   - GET /api/doctor/patients/{child_id}/reviews/
+```
+
+#### Mobile Tasks
+
+```
+□ 6.5 Reports List Screen
+   - Show all reports for child
+   - Date, doctor name
+
+□ 6.6 Report Detail Screen
+   - Autism status
+   - Spectrum type
+   - Detailed report
+   - Next steps
+
+□ 6.7 UI Polish
+   - Loading spinners
+   - Error messages
+   - Empty states
+   - Pull to refresh
+```
+
+#### Dashboard Tasks
+
+```
+□ 6.8 Diagnosis Report Form
+   - Has autism: Yes/No
+   - Spectrum type dropdown
+   - Detailed report textarea
+   - Next steps textarea
+   - Share with parent checkbox
+   - Submit
+
+□ 6.9 UI Polish
+   - Loading states
+   - Error handling
+   - Responsive design
+```
+
+#### Final Tasks
+
+```
+□ 6.10 End-to-End Testing
+   - Complete parent registration flow
+   - Submit M-CHAT
+   - Upload videos
+   - Doctor review flow
+
+□ 6.11 Demo Data Setup
+   - Create test doctor account
+   - Create test parent with child
+   - Fill sample M-CHAT (medium risk)
+   - Upload sample video
+   - Create sample progress
+
+□ 6.12 Demo Preparation
+   - Write demo script
+   - Practice flow
+   - Backup screenshots
+```
+
+---
+
+## Quick Start Commands
+
+### Backend
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install django djangorestframework djangorestframework-simplejwt django-cors-headers pillow
+django-admin startproject neurocare .
+python manage.py startapp accounts
+python manage.py startapp children
+python manage.py startapp assessments
+python manage.py startapp curriculum
+python manage.py startapp progress
+python manage.py startapp reports
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+### Dashboard
+```bash
+cd dashboard
+npm create vite@latest . -- --template react
+npm install react-router-dom axios tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+npm run dev
+```
+
+### Mobile
+```bash
+cd mobile
+npx create-expo-app . --template blank
+npm install @react-navigation/native @react-navigation/native-stack
+npm install react-native-screens react-native-safe-area-context
+npm install axios @react-native-async-storage/async-storage
+npm install expo-camera expo-av expo-image-picker
+npx expo start
+```
+
+---
+
+## Environment Variables
+
+### Backend (.env)
+```env
+SECRET_KEY=your-django-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Cloudflare Stream
+CLOUDFLARE_ACCOUNT_ID=your-account-id
+CLOUDFLARE_API_TOKEN=your-api-token
+
+# JWT (in minutes)
+ACCESS_TOKEN_LIFETIME=60
+REFRESH_TOKEN_LIFETIME=1440
+```
+
+### Dashboard (.env)
+```env
+VITE_API_URL=http://localhost:8000/api
+```
+
+### Mobile (.env or constants.js)
+```javascript
+export const API_URL = 'http://YOUR_IP:8000/api';
+// Use your computer's IP, not localhost, for mobile
+```
+
+---
+
+## Team Assignment
+
+| Role | Tasks | Priority |
+|------|-------|----------|
+| **Backend Dev** | Auth, Models, APIs, Cloudflare | Phase 1-4 |
+| **Mobile Dev** | RN Setup, Forms, M-CHAT, Videos | Phase 1-4 |
+| **Dashboard Dev** | React Setup, Patient Queue, Reviews | Phase 1, 3-5 |
+| **All** | Testing, Demo Prep | Phase 6 |
+
+---
+
+## Hackathon Tips
+
+1. **SQLite is fine** - No need for PostgreSQL setup
+2. **Skip email verification** - Login immediately after register
+3. **Auto-approve doctors** - `is_approved=True` by default
+4. **Pre-seed curriculum** - Don't build curriculum creator UI
+5. **Short videos** - Test with 5-10 second clips
+6. **Focus on happy path** - Minimal error handling
+7. **Mobile-first demo** - Dashboard is secondary
+8. **M-CHAT risk level** - Show prominently to doctors
+
+---
+
+*Last updated: Hackathon Day 1*
