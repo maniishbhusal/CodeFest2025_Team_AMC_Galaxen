@@ -1739,33 +1739,38 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Mobile Tasks
 
 ```
-□ 5.8 Curriculum Overview Screen
+✅ 5.8 Curriculum Overview Screen (app/therapy/curriculum.tsx)
    - Show assigned curriculum
    - Duration, start date, current day
    - Progress indicator
+   - Links to today's tasks and history
 
-□ 5.9 Today's Tasks Screen
-   - List today's tasks
-   - Task card with title
+✅ 5.9 Today's Tasks Screen (app/therapy/today.tsx)
+   - List today's tasks with completion status
+   - Task card with title and description
+   - Progress summary at top
+   - Advance to next day button
 
-□ 5.10 Task Detail Screen
-   - WHY section (highlighted)
+✅ 5.10 Task Detail Screen (app/therapy/task-detail.tsx)
+   - WHY section (highlighted in blue)
    - Video player for demo
-   - Text instructions
+   - Numbered text instructions
+   - Submit progress button
 
-□ 5.11 Progress Submit Screen
+✅ 5.11 Progress Submit Screen (app/therapy/submit-progress.tsx)
    - Three options:
      ○ Not Done
      ○ Done with Help
      ○ Done without Help
-   - Video recording option
+   - Video recording/upload option
    - Notes field
    - Submit button
 
-□ 5.12 Progress History Screen
-   - Calendar or list view
-   - Show status for each day
-   - Color coded
+✅ 5.12 Progress History Screen (app/therapy/history.tsx)
+   - Calendar grid view with color coding
+   - Day-by-day progress details
+   - Status summary stats
+   - Legend for color indicators
 ```
 
 #### Dashboard Tasks

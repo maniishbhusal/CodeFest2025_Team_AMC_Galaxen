@@ -64,6 +64,27 @@ export default function RootLayout() {
           name="videos/success"
           options={{ headerShown: false }}
         />
+        {/* Therapy & Curriculum Screens */}
+        <Stack.Screen
+          name="therapy/curriculum"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/today"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/task-detail"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/submit-progress"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/history"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"

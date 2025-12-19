@@ -104,7 +104,7 @@ class ProgressSubmitSerializer(serializers.Serializer):
     """Serializer for submitting daily progress"""
     task_id = serializers.IntegerField()
     status = serializers.ChoiceField(choices=['not_done', 'done_with_help', 'done_without_help'])
-    video_url = serializers.URLField(required=False, allow_blank=True)
+    video_url = serializers.CharField(required=False, allow_blank=True)  # Accept local file paths
     notes = serializers.CharField(required=False, allow_blank=True)
 
 

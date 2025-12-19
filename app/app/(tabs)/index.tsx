@@ -17,6 +17,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const [children, setChildren] = useState<any[]>([]);
   const [mchatResults, setMchatResults] = useState<{ [key: number]: any }>({});
+  const [therapyData, setTherapyData] = useState<{ [key: number]: any }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,6 +51,34 @@ export default function HomeScreen() {
         }
       }
       setMchatResults(results);
+
+      // Fetch therapy curriculum data for each child
+      const therapy: { [key: number]: any } = {};
+      for (const child of childrenData) {
+        try {
+          const therapyResponse = await axios.get(
+            `${BASE_URL}/api/therapy/child/${child.id}/curriculum/`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          // API returns { curricula: [...] } - get the active one
+          const curricula = therapyResponse.data?.curricula || [];
+          const activeCurriculum = curricula.find((c: any) => c.status === "active");
+          if (activeCurriculum) {
+            therapy[child.id] = {
+              curriculum: {
+                name: activeCurriculum.curriculum_title,
+                id: activeCurriculum.curriculum,
+              },
+              current_day: activeCurriculum.current_day,
+              total_days: activeCurriculum.curriculum_duration,
+              status: activeCurriculum.status,
+            };
+          }
+        } catch (err) {
+          // No therapy curriculum assigned yet for this child
+        }
+      }
+      setTherapyData(therapy);
     } catch (error) {
       console.log("Error loading children:", error);
     } finally {
@@ -102,6 +131,20 @@ export default function HomeScreen() {
       default:
         return "#1565C0";
     }
+  };
+
+  const handleTherapyPress = (child: any) => {
+    router.push({
+      pathname: "/therapy/curriculum",
+      params: { childId: child.id.toString() },
+    });
+  };
+
+  const handleTodayTasksPress = (child: any) => {
+    router.push({
+      pathname: "/therapy/today",
+      params: { childId: child.id.toString() },
+    });
   };
 
   return (
@@ -222,6 +265,58 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               );
             })}
+          </View>
+        )}
+
+        {/* Therapy Section - Show only for children with assigned curriculum */}
+        {children.filter((child) => therapyData[child.id]).length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>थेरापी पाठ्यक्रम</Text>
+            <Text style={styles.sectionSubtitle}>
+              तपाईंको बच्चाको दैनिक थेरापी कार्यहरू
+            </Text>
+            {children
+              .filter((child) => therapyData[child.id])
+              .map((child) => {
+                const therapy = therapyData[child.id];
+                const progressPercent = therapy.total_days > 0
+                  ? Math.round((therapy.current_day / therapy.total_days) * 100)
+                  : 0;
+                return (
+                  <View key={child.id} style={styles.therapyCard}>
+                    <View style={styles.therapyHeader}>
+                      <View style={styles.therapyIcon}>
+                        <Text style={styles.therapyEmoji}>📚</Text>
+                      </View>
+                      <View style={styles.therapyInfo}>
+                        <Text style={styles.therapyChildName}>{child.full_name}</Text>
+                        <Text style={styles.therapyCurriculumName}>
+                          {therapy.curriculum?.name || "थेरापी पाठ्यक्रम"}
+                        </Text>
+                        <Text style={styles.therapyProgress}>
+                          दिन {therapy.current_day}/{therapy.total_days} • {progressPercent}% पूरा
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.therapyActions}>
+                      <TouchableOpacity
+                        style={styles.therapyActionButton}
+                        onPress={() => handleTodayTasksPress(child)}
+                      >
+                        <Text style={styles.therapyActionEmoji}>📋</Text>
+                        <Text style={styles.therapyActionText}>आजका कार्य</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.therapyActionButton, styles.therapyActionSecondary]}
+                        onPress={() => handleTherapyPress(child)}
+                      >
+                        <Text style={styles.therapyActionEmoji}>📊</Text>
+                        <Text style={styles.therapyActionText}>विवरण</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              })}
           </View>
         )}
 
@@ -441,5 +536,73 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#666",
     fontStyle: "italic",
+  },
+  therapyCard: {
+    backgroundColor: "#F3E5F5",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: "#CE93D8",
+  },
+  therapyHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  therapyIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#E1BEE7",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  therapyEmoji: {
+    fontSize: 24,
+  },
+  therapyInfo: {
+    flex: 1,
+  },
+  therapyChildName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1e293b",
+    marginBottom: 2,
+  },
+  therapyCurriculumName: {
+    fontSize: 14,
+    color: "#7B1FA2",
+    marginBottom: 2,
+  },
+  therapyProgress: {
+    fontSize: 13,
+    color: "#64748b",
+  },
+  therapyActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  therapyActionButton: {
+    flex: 1,
+    backgroundColor: "#7B1FA2",
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  therapyActionSecondary: {
+    backgroundColor: "#9C27B0",
+  },
+  therapyActionEmoji: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  therapyActionText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#ffffff",
   },
 });
