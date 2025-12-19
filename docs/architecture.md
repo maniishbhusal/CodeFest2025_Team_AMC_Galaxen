@@ -1331,29 +1331,38 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 3.1 MedicalHistory Model (assessments/models.py)
+✅ 3.1 MedicalHistory Model (Done in Phase 2 - children/models.py)
    - A1-A4 boolean fields
    - Description fields for each
    - requires_specialist auto-flag
 
-□ 3.2 MChatResponse Model
+✅ 3.2 MChatResponse Model (assessments/models.py)
    - q1-q20 boolean fields
    - total_score integer
    - risk_level enum
 
-□ 3.3 M-CHAT Scoring Logic
+✅ 3.3 M-CHAT Scoring Logic
    - Implement calculate_mchat_score()
    - Handle reverse questions (2, 5, 12)
    - Calculate risk level
 
-□ 3.4 Medical History Endpoints
+✅ 3.4 Medical History Endpoints (Done in Phase 2)
    - POST /api/children/{id}/medical-history/
    - GET /api/children/{id}/medical-history/
 
-□ 3.5 M-CHAT Endpoints
+✅ 3.5 M-CHAT Endpoints
    - POST /api/children/{id}/mchat/
      → Auto-calculate and save score
    - GET /api/children/{id}/mchat/
+
+✅ 3.6 Assessment Video Endpoints (Bonus)
+   - POST /api/children/{id}/videos/
+   - GET /api/children/{id}/videos/
+   - DELETE /api/children/{id}/videos/{vid_id}/
+
+✅ 3.7 Assessment Submit Endpoints (Bonus)
+   - POST /api/children/{id}/assessment/submit/
+   - GET /api/children/{id}/assessment/status/
 ```
 
 #### Mobile Tasks
