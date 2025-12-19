@@ -22,13 +22,11 @@
 ```
 AutiSahara-nepal/
 ├── backend/                    # Django REST Framework
-│   ├── AutiSahara/             # Project settings
+│   ├── autisahara/            # Project settings
 │   ├── accounts/              # User auth (parents, doctors)
 │   ├── children/              # Child profiles & medical history
 │   ├── assessments/           # M-CHAT & video submissions
-│   ├── curriculum/            # General & specialized tasks
-│   ├── progress/              # Daily progress tracking
-│   └── reports/               # Doctor reports
+│   └── therapy/               # Curriculum, progress, reviews
 │
 ├── dashboard/                  # React (Doctor Portal)
 │   ├── src/
@@ -1186,35 +1184,65 @@ POST   /api/doctor/patients/{child_id}/accept/ # Accept patient
 GET    /api/doctor/patients/active/           # My active patients
 ```
 
-### Curriculum Management
+### Curriculum Management (Therapy App)
 ```
-GET    /api/curriculum/                       # List all curriculum
-GET    /api/curriculum/{id}/                  # Details + tasks
-POST   /api/curriculum/                       # Create (doctor only)
-POST   /api/curriculum/{id}/tasks/            # Add task
+GET    /api/therapy/curricula/                # List all curricula
+GET    /api/therapy/curricula/{id}/           # Details + tasks
 ```
 
-### Assign Curriculum
+### Doctor Dashboard (Therapy App)
 ```
-POST   /api/doctor/patients/{child_id}/assign-curriculum/
-       Body: { curriculum_id, start_date }
-GET    /api/doctor/patients/{child_id}/curriculum/
-```
-
-### Daily Progress (Parent)
-```
-GET    /api/children/{id}/today/              # Today's tasks
-POST   /api/children/{id}/progress/           # Submit progress
-       Body: { task_id, status, video_url?, notes? }
-GET    /api/children/{id}/progress/history/
+GET    /api/therapy/doctor/pending/           # Pending patients for review
+GET    /api/therapy/doctor/patients/          # Accepted patients
+GET    /api/therapy/doctor/patient/{id}/      # Full patient details
+POST   /api/therapy/doctor/patient/{id}/accept/     # Accept patient
+POST   /api/therapy/doctor/patient/{id}/assign/     # Assign curriculum
+GET    /api/therapy/doctor/patient/{id}/progress/   # View progress
+POST   /api/therapy/doctor/patient/{id}/review/     # Create review
 ```
 
-### Doctor Review
+#### POST /api/therapy/doctor/patient/{id}/assign/ - EXAMPLE
+```json
+{
+  "curriculum_id": 1,
+  "start_date": "2024-01-20"
+}
 ```
-GET    /api/doctor/patients/{child_id}/progress/    # All progress
-POST   /api/doctor/patients/{child_id}/review/      # Submit review
-GET    /api/doctor/patients/{child_id}/reviews/     # All reviews
+
+#### POST /api/therapy/doctor/patient/{id}/review/ - EXAMPLE
+```json
+{
+  "review_period": 15,
+  "observations": "Child shows good progress with eye contact tasks...",
+  "spectrum_identified": "mild",
+  "recommendations": "Continue with current curriculum, increase social tasks"
+}
 ```
+
+---
+
+### Parent Progress (Therapy App)
+```
+GET    /api/therapy/child/{id}/today/         # Today's tasks
+POST   /api/therapy/child/{id}/submit/        # Submit progress
+POST   /api/therapy/child/{id}/advance/       # Advance to next day
+GET    /api/therapy/child/{id}/history/       # Progress history
+GET    /api/therapy/child/{id}/curriculum/    # Curriculum status
+```
+
+#### POST /api/therapy/child/{id}/submit/ - EXAMPLE
+```json
+{
+  "task_id": 1,
+  "status": "done_with_help",
+  "video_url": "https://cloudflare-stream-url.com/progress123",
+  "notes": "Child completed task with assistance"
+}
+```
+
+**status options:** `"not_done"` `"done_with_help"` `"done_without_help"`
+
+---
 
 ### Reports
 ```
@@ -1484,15 +1512,17 @@ GET    /api/children/{id}/reports/                  # Parent view
      → Auto-calculate and save score
    - GET /api/children/{id}/mchat/
 
-✅ 3.6 Assessment Video Endpoints (Bonus)
+✅ 3.6 Assessment Video Endpoints (Phase 4 - done early)
    - POST /api/children/{id}/videos/
    - GET /api/children/{id}/videos/
    - DELETE /api/children/{id}/videos/{vid_id}/
 
-✅ 3.7 Assessment Submit Endpoints (Bonus)
+✅ 3.7 Assessment Submit Endpoints (Phase 4 - done early)
    - POST /api/children/{id}/assessment/submit/
    - GET /api/children/{id}/assessment/status/
 ```
+
+**Note for Frontend:** Video & Assessment endpoints are ready. See Phase 4 Mobile Tasks for UI implementation.
 
 #### Mobile Tasks
 
@@ -1550,27 +1580,27 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 4.1 Cloudflare Stream Integration
-   - Create cloudflare.py service
-   - Upload video function
-   - Get video URL function
+⏭️ 4.1 Cloudflare Stream Integration (SKIPPED - Frontend handles upload)
+   - Frontend uploads video directly to Cloudflare Stream
+   - Frontend sends video_url to backend
+   - No backend upload service needed for hackathon
 
-□ 4.2 AssessmentVideo Model
+✅ 4.2 AssessmentVideo Model (Done in Phase 3)
    - video_type enum
    - video_url, description
    - ForeignKey to Child
 
-□ 4.3 ChildAssessment Model
+✅ 4.3 ChildAssessment Model (Done in Phase 3)
    - status enum (pending, in_review, accepted, completed)
    - parent_confirmed boolean
    - assigned_doctor ForeignKey
 
-□ 4.4 Video Endpoints
+✅ 4.4 Video Endpoints (Done in Phase 3)
    - POST /api/children/{id}/videos/
    - GET /api/children/{id}/videos/
    - DELETE /api/children/{id}/videos/{vid_id}/
 
-□ 4.5 Assessment Submit Endpoint
+✅ 4.5 Assessment Submit Endpoint (Done in Phase 3)
    - POST /api/children/{id}/assessment/submit/
    - GET /api/children/{id}/assessment/status/
 ```
@@ -1578,36 +1608,32 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Mobile Tasks
 
 ```
-□ 4.6 Video Type Selection Screen
-   - Walking, Eating, Speaking, Behavior, Other
-   - Description for each type
+□ 4.6 Video Upload Screen
+   - Select video type: Walking, Eating, Speaking, Behavior, Playing, Other
+   - "Choose from Gallery" button (pick existing video from device)
+   - Preview selected video
+   - Add description text field
+   - Upload to Cloudflare Stream
+   - Show upload progress bar
+   - Submit button → POST /api/children/{id}/videos/
 
-□ 4.7 Video Recording Screen
-   - Camera preview
-   - Record button
-   - Stop button
-   - Preview recorded video
-
-□ 4.8 Video Upload Screen
-   - Show selected video
-   - Add description
-   - Upload progress bar
-   - Submit button
-
-□ 4.9 Video List Screen
+□ 4.7 Video List Screen
    - Show all uploaded videos
-   - Video type, thumbnail, date
-   - Delete option
+   - Video thumbnail, type label, date
+   - Play video option
+   - Delete option → DELETE /api/children/{id}/videos/{vid_id}/
+   - "Add Another Video" button
 
-□ 4.10 Confirmation Screen
-   - Summary of all submitted info
-   - Declaration checkbox
-   - Final submit button
+□ 4.8 Confirmation Screen
+   - Summary of all submitted info (child, M-CHAT score, videos count)
+   - Declaration checkbox: "I confirm this information is accurate"
+   - Final submit button → POST /api/children/{id}/assessment/submit/
 
-□ 4.11 Success Screen
+□ 4.9 Success Screen
    - "Assessment submitted!"
    - "A doctor will review soon"
-   - Status tracking info
+   - Show assessment status
+   - "View Status" button → GET /api/children/{id}/assessment/status/
 ```
 
 #### Dashboard Tasks
@@ -1633,38 +1659,54 @@ GET    /api/children/{id}/reports/                  # Parent view
 #### Backend Tasks
 
 ```
-□ 5.1 Curriculum Model
+✅ 5.1 Curriculum Model (therapy/models.py)
    - title, description, duration_days
    - type (general/specialized)
    - spectrum_type (for specialized)
+   - created_by (FK to Doctor)
 
-□ 5.2 CurriculumTask Model
+✅ 5.2 CurriculumTask Model
    - day_number, title
    - why_description, instructions
-   - demo_video_url
+   - demo_video_url, order_index
 
-□ 5.3 ChildCurriculum Model
+✅ 5.3 ChildCurriculum Model
    - Assigns curriculum to child
    - start_date, end_date, current_day
+   - status (active/paused/completed)
 
-□ 5.4 DailyProgress Model
+✅ 5.4 DailyProgress Model
    - task_id, day_number, date
    - status enum (not_done, done_with_help, done_without_help)
-   - video_url, notes
+   - video_url, parent_notes
 
-□ 5.5 Seed Sample Curriculum
+✅ 5.5 DoctorReview Model
+   - review_period (15, 30, 45)
+   - observations, spectrum_identified, recommendations
+
+□ 5.6 Seed Sample Curriculum
    - Create 15-day general curriculum
    - Add 5-10 sample tasks
 
-□ 5.6 Curriculum Endpoints
-   - GET /api/curriculum/
-   - GET /api/curriculum/{id}/
-   - POST /api/doctor/patients/{child_id}/assign-curriculum/
+✅ 5.7 Curriculum Endpoints (GET /api/therapy/curricula/)
+   - GET /api/therapy/curricula/
+   - GET /api/therapy/curricula/{id}/
 
-□ 5.7 Progress Endpoints
-   - GET /api/children/{id}/today/
-   - POST /api/children/{id}/progress/
-   - GET /api/children/{id}/progress/history/
+✅ 5.8 Doctor Dashboard Endpoints
+   - GET /api/therapy/doctor/pending/
+   - GET /api/therapy/doctor/patients/
+   - GET /api/therapy/doctor/patient/{child_id}/
+   - POST /api/therapy/doctor/patient/{child_id}/accept/
+   - POST /api/therapy/doctor/patient/{child_id}/assign/
+   - GET /api/therapy/doctor/patient/{child_id}/progress/
+   - POST /api/therapy/doctor/patient/{child_id}/review/
+
+✅ 5.9 Parent Progress Endpoints
+   - GET /api/therapy/child/{id}/today/
+   - POST /api/therapy/child/{id}/submit/
+   - POST /api/therapy/child/{id}/advance/
+   - GET /api/therapy/child/{id}/history/
+   - GET /api/therapy/child/{id}/curriculum/
 ```
 
 #### Mobile Tasks
@@ -2164,6 +2206,23 @@ When access token expires (after 60 min), use refresh token:
 | 23 | DELETE | `/api/children/{id}/videos/{vid}/` | ✅ Yes | Delete video |
 | 24 | POST | `/api/children/{id}/assessment/submit/` | ✅ Yes | Submit final assessment |
 | 25 | GET | `/api/children/{id}/assessment/status/` | ✅ Yes | Get assessment status |
+| **Therapy - Curriculum** |
+| 26 | GET | `/api/therapy/curricula/` | ✅ Yes | List all curricula |
+| 27 | GET | `/api/therapy/curricula/{id}/` | ✅ Yes | Get curriculum details |
+| **Therapy - Doctor Dashboard** |
+| 28 | GET | `/api/therapy/doctor/pending/` | ✅ Doctor | Pending patients |
+| 29 | GET | `/api/therapy/doctor/patients/` | ✅ Doctor | Accepted patients |
+| 30 | GET | `/api/therapy/doctor/patient/{id}/` | ✅ Doctor | Patient details |
+| 31 | POST | `/api/therapy/doctor/patient/{id}/accept/` | ✅ Doctor | Accept patient |
+| 32 | POST | `/api/therapy/doctor/patient/{id}/assign/` | ✅ Doctor | Assign curriculum |
+| 33 | GET | `/api/therapy/doctor/patient/{id}/progress/` | ✅ Doctor | View progress |
+| 34 | POST | `/api/therapy/doctor/patient/{id}/review/` | ✅ Doctor | Create review |
+| **Therapy - Parent Progress** |
+| 35 | GET | `/api/therapy/child/{id}/today/` | ✅ Parent | Today's tasks |
+| 36 | POST | `/api/therapy/child/{id}/submit/` | ✅ Parent | Submit progress |
+| 37 | POST | `/api/therapy/child/{id}/advance/` | ✅ Parent | Advance day |
+| 38 | GET | `/api/therapy/child/{id}/history/` | ✅ Yes | Progress history |
+| 39 | GET | `/api/therapy/child/{id}/curriculum/` | ✅ Yes | Curriculum status |
 
 ---
 
