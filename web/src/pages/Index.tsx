@@ -22,14 +22,14 @@ const Index = () => {
       {/* <Doctors /> */}
       <HowItWorks />
       {/* <AppShowcase /> */}
-     
+      {/*      
       <Pricing />
       
       <FutureVision />
        <TechStack />
      
       <Personalities />
-       <Team />
+       <Team /> */}
       <Footer />
     </main>
   );
