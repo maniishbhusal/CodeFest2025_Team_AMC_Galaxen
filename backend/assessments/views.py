@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from datetime import date, timedelta
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -267,6 +268,24 @@ class AssessmentSubmitView(APIView):
                     'submitted_at': timezone.now()
                 }
             )
+
+            # Auto-assign pre-assessment curriculum
+            from therapy.models import Curriculum, ChildCurriculum
+            pre_curriculum = Curriculum.objects.filter(type='assessment').first()
+
+            if pre_curriculum:
+                # Check if child doesn't already have an active curriculum
+                if not ChildCurriculum.objects.filter(child=child, status='active').exists():
+                    ChildCurriculum.objects.create(
+                        child=child,
+                        curriculum=pre_curriculum,
+                        assigned_by=None,  # System-assigned, no doctor
+                        start_date=date.today(),
+                        end_date=date.today() + timedelta(days=pre_curriculum.duration_days),
+                        current_day=1,
+                        status='active'
+                    )
+
             return Response(
                 ChildAssessmentSerializer(assessment).data,
                 status=status.HTTP_201_CREATED

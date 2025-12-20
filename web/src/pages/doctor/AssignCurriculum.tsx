@@ -53,7 +53,8 @@ export default function AssignCurriculumPage() {
         getCurricula(),
       ]);
       setPatient(patientData);
-      setCurricula(curriculaData);
+      // Filter out 'general' type curricula - only show assessment and specialized
+      setCurricula(curriculaData.filter((c: Curriculum) => c.type !== 'general'));
     } catch (err) {
       console.error(err);
       setError("Failed to load data");

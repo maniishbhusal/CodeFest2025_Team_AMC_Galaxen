@@ -20,6 +20,7 @@ import {
   Play,
   BookOpen,
   BarChart3,
+  ClipboardList,
 } from "lucide-react";
 import { getPatientDetail, acceptPatient, type PatientDetail } from "@/lib/api";
 
@@ -388,6 +389,184 @@ export default function PatientDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Pre-Assessment Task Results - Hardcoded for Hackathon */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-indigo-100 rounded-xl">
+                  <ClipboardList className="w-5 h-5 text-indigo-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  15-Day Pre-Assessment Results
+                </h3>
+                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                  Completed
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Day</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Task</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Category</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-600">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Observation</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {/* Day 1 Tasks */}
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">1</td>
+                      <td className="py-3 px-4 text-gray-700">Morning Face Time</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">Social Engagement</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Child made eye contact for 2 seconds, smiled back</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">1</td>
+                      <td className="py-3 px-4 text-gray-700">Point to Treat</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Joint Attention</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
+                      <td className="py-3 px-4 text-gray-600">Needed physical prompt to follow point</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">1</td>
+                      <td className="py-3 px-4 text-gray-700">Choice Making</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Communication</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Reached for preferred toy independently</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">1</td>
+                      <td className="py-3 px-4 text-gray-700">Car Fun</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Play Skills</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"><AlertTriangle className="w-3 h-3" />Not Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Only spun wheels, no functional play</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">1</td>
+                      <td className="py-3 px-4 text-gray-700">In/Out Game</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">Cognitive</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
+                      <td className="py-3 px-4 text-gray-600">Imitated action after demonstration</td>
+                    </tr>
+                    {/* Day 2 Tasks */}
+                    <tr className="hover:bg-gray-50 bg-gray-25">
+                      <td className="py-3 px-4 font-medium text-gray-900">2</td>
+                      <td className="py-3 px-4 text-gray-700">Mirror Play</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">Social Engagement</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Smiled at reflection, touched mirror</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 bg-gray-25">
+                      <td className="py-3 px-4 font-medium text-gray-900">2</td>
+                      <td className="py-3 px-4 text-gray-700">Surprise Bag</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Joint Attention</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Watched bag intently, reached for item</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 bg-gray-25">
+                      <td className="py-3 px-4 font-medium text-gray-900">2</td>
+                      <td className="py-3 px-4 text-gray-700">Animal Sounds</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Communication</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
+                      <td className="py-3 px-4 text-gray-600">Made sound attempt after 3 demonstrations</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 bg-gray-25">
+                      <td className="py-3 px-4 font-medium text-gray-900">2</td>
+                      <td className="py-3 px-4 text-gray-700">Block Stacking</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Play Skills</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Stacked 2 blocks, knocked down with joy</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 bg-gray-25">
+                      <td className="py-3 px-4 font-medium text-gray-900">2</td>
+                      <td className="py-3 px-4 text-gray-700">Big & Small</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">Cognitive</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"><AlertTriangle className="w-3 h-3" />Not Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Did not differentiate between sizes</td>
+                    </tr>
+                    {/* Day 3 Tasks */}
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">3</td>
+                      <td className="py-3 px-4 text-gray-700">Tickle Countdown</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">Social Engagement</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Showed anticipation, laughed during tickle</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">3</td>
+                      <td className="py-3 px-4 text-gray-700">Window Watching</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Joint Attention</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
+                      <td className="py-3 px-4 text-gray-600">Looked where pointed after verbal cue</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">3</td>
+                      <td className="py-3 px-4 text-gray-700">Gesture for 'More'</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Communication</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"><AlertTriangle className="w-3 h-3" />Not Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">No gesture imitation observed</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">3</td>
+                      <td className="py-3 px-4 text-gray-700">Simple Puzzle</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Play Skills</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
+                      <td className="py-3 px-4 text-gray-600">Needed hand-over-hand guidance</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium text-gray-900">3</td>
+                      <td className="py-3 px-4 text-gray-700">Follow Simple Command</td>
+                      <td className="py-3 px-4"><span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">Cognitive</span></td>
+                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
+                      <td className="py-3 px-4 text-gray-600">Followed "come here" with gesture</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="grid grid-cols-4 gap-4 text-center">
+                  <div className="bg-green-50 rounded-xl p-3">
+                    <p className="text-2xl font-bold text-green-700">6</p>
+                    <p className="text-xs text-green-600">Done Independently</p>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-3">
+                    <p className="text-2xl font-bold text-amber-700">5</p>
+                    <p className="text-xs text-amber-600">Done with Help</p>
+                  </div>
+                  <div className="bg-red-50 rounded-xl p-3">
+                    <p className="text-2xl font-bold text-red-700">4</p>
+                    <p className="text-xs text-red-600">Not Done</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-xl p-3">
+                    <p className="text-2xl font-bold text-blue-700">73%</p>
+                    <p className="text-xs text-blue-600">Completion Rate</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Observations Summary */}
+              <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800">Key Observations</p>
+                    <ul className="text-sm text-amber-700 mt-2 space-y-1">
+                      <li>• <strong>Joint Attention:</strong> Requires physical/verbal prompts to follow points</li>
+                      <li>• <strong>Play Skills:</strong> Limited functional play, prefers repetitive actions (spinning wheels)</li>
+                      <li>• <strong>Communication:</strong> Gesture imitation is weak, needs more practice</li>
+                      <li>• <strong>Social:</strong> Good eye contact and social smiling observed</li>
+                      <li>• <strong>Cognitive:</strong> Following simple commands but size concepts unclear</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Assessment Videos */}
             {patient.videos && patient.videos.length > 0 && (
