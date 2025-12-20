@@ -19,9 +19,12 @@ const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 const MCHAT_QUESTIONS = [
   {
     id: 1,
-    nepali: "यदि तपाईंले कोठामा केहि तिर औंल्याउनुभयो भने, के तपाईंको बच्चाले त्यो हेर्छ?",
-    english: "If you point at something across the room, does your child look at it?",
-    example: "(उदाहरण: तपाईंले खेलौना वा जनावर तिर औंल्याउनुभयो भने, के बच्चाले त्यो हेर्छ?)",
+    nepali:
+      "यदि तपाईंले कोठामा केहि तिर औंल्याउनुभयो भने, के तपाईंको बच्चाले त्यो हेर्छ?",
+    english:
+      "If you point at something across the room, does your child look at it?",
+    example:
+      "(उदाहरण: तपाईंले खेलौना वा जनावर तिर औंल्याउनुभयो भने, के बच्चाले त्यो हेर्छ?)",
     reverse: false,
   },
   {
@@ -48,21 +51,25 @@ const MCHAT_QUESTIONS = [
   {
     id: 5,
     nepali: "के तपाईंको बच्चाले आफ्नो आँखाको नजिक असामान्य औंला चालहरू गर्छ?",
-    english: "Does your child make unusual finger movements near his or her eyes?",
+    english:
+      "Does your child make unusual finger movements near his or her eyes?",
     example: "(उदाहरण: आँखाको नजिक औंलाहरू हल्लाउने)",
     reverse: true, // YES = concerning
   },
   {
     id: 6,
     nepali: "के तपाईंको बच्चाले केहि माग्न वा मद्दत लिन एउटा औंलाले औंल्याउँछ?",
-    english: "Does your child point with one finger to ask for something or to get help?",
+    english:
+      "Does your child point with one finger to ask for something or to get help?",
     example: "(उदाहरण: पुग्न नसक्ने खाजा वा खेलौनातिर औंल्याउने)",
     reverse: false,
   },
   {
     id: 7,
-    nepali: "के तपाईंको बच्चाले तपाईंलाई केहि रोचक कुरा देखाउन एउटा औंलाले औंल्याउँछ?",
-    english: "Does your child point with one finger to show you something interesting?",
+    nepali:
+      "के तपाईंको बच्चाले तपाईंलाई केहि रोचक कुरा देखाउन एउटा औंलाले औंल्याउँछ?",
+    english:
+      "Does your child point with one finger to show you something interesting?",
     example: "(उदाहरण: आकाशमा हवाईजहाज वा बाटोमा ठूलो ट्रक देखाउने)",
     reverse: false,
   },
@@ -70,13 +77,15 @@ const MCHAT_QUESTIONS = [
     id: 8,
     nepali: "के तपाईंको बच्चालाई अन्य बच्चाहरूमा चासो छ?",
     english: "Is your child interested in other children?",
-    example: "(उदाहरण: अन्य बच्चाहरूलाई हेर्छ, मुस्कुराउँछ, वा तिनीहरूकहाँ जान्छ?)",
+    example:
+      "(उदाहरण: अन्य बच्चाहरूलाई हेर्छ, मुस्कुराउँछ, वा तिनीहरूकहाँ जान्छ?)",
     reverse: false,
   },
   {
     id: 9,
     nepali: "के तपाईंको बच्चाले तपाईंलाई चीजहरू ल्याएर वा देखाउँछ?",
-    english: "Does your child show you things by bringing them to you or holding them up for you to see?",
+    english:
+      "Does your child show you things by bringing them to you or holding them up for you to see?",
     example: "(उदाहरण: फूल, खेलौना देखाउने - मद्दतका लागि होइन, साझा गर्न)",
     reverse: false,
   },
@@ -89,7 +98,8 @@ const MCHAT_QUESTIONS = [
   },
   {
     id: 11,
-    nepali: "जब तपाईं आफ्नो बच्चालाई मुस्कुराउनुहुन्छ, के उसले तपाईंलाई फिर्ता मुस्कुराउँछ?",
+    nepali:
+      "जब तपाईं आफ्नो बच्चालाई मुस्कुराउनुहुन्छ, के उसले तपाईंलाई फिर्ता मुस्कुराउँछ?",
     english: "When you smile at your child, does he or she smile back at you?",
     example: "",
     reverse: false,
@@ -110,8 +120,10 @@ const MCHAT_QUESTIONS = [
   },
   {
     id: 14,
-    nepali: "जब तपाईं बच्चासँग कुरा गर्दै हुनुहुन्छ, खेल्दै हुनुहुन्छ, वा लुगा लगाउँदै हुनुहुन्छ, के उसले तपाईंको आँखामा हेर्छ?",
-    english: "Does your child look you in the eye when you are talking to him or her, playing with him or her, or dressing him or her?",
+    nepali:
+      "जब तपाईं बच्चासँग कुरा गर्दै हुनुहुन्छ, खेल्दै हुनुहुन्छ, वा लुगा लगाउँदै हुनुहुन्छ, के उसले तपाईंको आँखामा हेर्छ?",
+    english:
+      "Does your child look you in the eye when you are talking to him or her, playing with him or her, or dressing him or her?",
     example: "",
     reverse: false,
   },
@@ -124,8 +136,10 @@ const MCHAT_QUESTIONS = [
   },
   {
     id: 16,
-    nepali: "यदि तपाईंले टाउको घुमाएर केहि हेर्नुभयो भने, के तपाईंको बच्चाले तपाईं के हेर्दै हुनुहुन्छ भनेर हेर्छ?",
-    english: "If you turn your head to look at something, does your child look around to see what you are looking at?",
+    nepali:
+      "यदि तपाईंले टाउको घुमाएर केहि हेर्नुभयो भने, के तपाईंको बच्चाले तपाईं के हेर्दै हुनुहुन्छ भनेर हेर्छ?",
+    english:
+      "If you turn your head to look at something, does your child look around to see what you are looking at?",
     example: "",
     reverse: false,
   },
@@ -139,15 +153,20 @@ const MCHAT_QUESTIONS = [
   {
     id: 18,
     nepali: "जब तपाईंले बच्चालाई केहि गर्न भन्नुहुन्छ, के उसले बुझ्छ?",
-    english: "Does your child understand when you tell him or her to do something?",
-    example: "(उदाहरण: औंल्याउने बिना 'किताब कुर्सीमा राख' वा 'कम्बल ल्याइदे' बुझ्छ?)",
+    english:
+      "Does your child understand when you tell him or her to do something?",
+    example:
+      "(उदाहरण: औंल्याउने बिना 'किताब कुर्सीमा राख' वा 'कम्बल ल्याइदे' बुझ्छ?)",
     reverse: false,
   },
   {
     id: 19,
-    nepali: "यदि केहि नयाँ कुरा हुन्छ भने, के तपाईंको बच्चाले तपाईंको अनुहार हेर्छ कि तपाईंलाई त्यसको बारेमा कस्तो लाग्छ?",
-    english: "If something new happens, does your child look at your face to see how you feel about it?",
-    example: "(उदाहरण: अनौठो आवाज सुन्दा वा नयाँ खेलौना देख्दा तपाईंको अनुहार हेर्छ?)",
+    nepali:
+      "यदि केहि नयाँ कुरा हुन्छ भने, के तपाईंको बच्चाले तपाईंको अनुहार हेर्छ कि तपाईंलाई त्यसको बारेमा कस्तो लाग्छ?",
+    english:
+      "If something new happens, does your child look at your face to see how you feel about it?",
+    example:
+      "(उदाहरण: अनौठो आवाज सुन्दा वा नयाँ खेलौना देख्दा तपाईंको अनुहार हेर्छ?)",
     reverse: false,
   },
   {
@@ -240,13 +259,15 @@ export default function MChatQuestionsScreen() {
       });
     } catch (error: any) {
       console.error("Error submitting M-CHAT:", error);
+      console.log("API Error Response:", error.response?.data);
+      console.log("API Error Status:", error.response?.status);
 
       // Calculate score locally if API fails
       const { score, riskLevel } = calculateScoreLocally(answers);
 
       Alert.alert(
         "नोट",
-        "अफलाइन मोडमा स्कोर गणना गरिएको छ। इन्टरनेट उपलब्ध हुँदा डाटा सिंक हुनेछ।",
+        "M-CHAT परिणाम स्थानीय रूपमा गणना गरियो। तपाईंको जवाफ सुरक्षित छन्।",
         [
           {
             text: "ठिक छ",
@@ -268,7 +289,9 @@ export default function MChatQuestionsScreen() {
     }
   };
 
-  const calculateScoreLocally = (responses: { [key: string]: boolean | null }) => {
+  const calculateScoreLocally = (responses: {
+    [key: string]: boolean | null;
+  }) => {
     const REVERSE_QUESTIONS = [2, 5, 12];
     let score = 0;
 
@@ -404,7 +427,10 @@ export default function MChatQuestionsScreen() {
       {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.navButton, currentQuestion === 0 && styles.navButtonDisabled]}
+          style={[
+            styles.navButton,
+            currentQuestion === 0 && styles.navButtonDisabled,
+          ]}
           onPress={handlePrevious}
           disabled={currentQuestion === 0}
         >
@@ -420,7 +446,10 @@ export default function MChatQuestionsScreen() {
 
         {isLastQuestion && currentAnswer !== null ? (
           <TouchableOpacity
-            style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              loading && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={loading}
           >

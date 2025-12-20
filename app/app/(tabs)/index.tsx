@@ -157,50 +157,56 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* 2. M-CHAT Assessment Card */}
-        {children.length > 0 && (
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>M-CHAT Assessment</Text>
-              {/* पहिलो बच्चाको result चेक गर्ने */}
-              {mchatResults[children[0].id] && (
-                <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
-              )}
-            </View>
+        {/* 2. M-CHAT Assessment Card - First Child Only */}
+        {children.length > 0 &&
+          (() => {
+            const child = children[0]; // पहिलो child मात्र
+            const result = mchatResults[child.id];
+            return (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>M-CHAT Assessment</Text>
+                  {result && (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={22}
+                      color="#4CAF50"
+                    />
+                  )}
+                </View>
 
-            <Text style={styles.cardSub}>
-              {mchatResults[children[0].id]
-                ? `Completed on Oct 24`
-                : `Assessment for ${children[0].full_name}`}
-            </Text>
-
-            <View style={styles.insightBox}>
-              <MaterialCommunityIcons
-                name="chart-timeline-variant"
-                size={20}
-                color="#03A9F4"
-              />
-              <View style={{ marginLeft: 10 }}>
-                <Text style={styles.insightTitle}>Insights Available</Text>
-                <Text style={styles.insightSub}>
-                  We've analyzed the responses.
+                <Text style={styles.cardSub}>
+                  {result
+                    ? `Completed on Oct 24`
+                    : `Assessment for ${child.full_name}`}
                 </Text>
-              </View>
-            </View>
 
-            <TouchableOpacity
-              style={styles.pinkBtn}
-              onPress={() => handleMChatPress(children[0])}
-            >
-              <Text style={styles.pinkBtnText}>
-                {mchatResults[children[0].id]
-                  ? "View Full Report"
-                  : "Start Screening"}
-              </Text>
-              <Ionicons name="arrow-forward" size={18} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        )}
+                <View style={styles.insightBox}>
+                  <MaterialCommunityIcons
+                    name="chart-timeline-variant"
+                    size={20}
+                    color="#03A9F4"
+                  />
+                  <View style={{ marginLeft: 10 }}>
+                    <Text style={styles.insightTitle}>Insights Available</Text>
+                    <Text style={styles.insightSub}>
+                      We've analyzed the responses.
+                    </Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.pinkBtn}
+                  onPress={() => handleMChatPress(child)}
+                >
+                  <Text style={styles.pinkBtnText}>
+                    {result ? "View Full Report" : "Start Screening"}
+                  </Text>
+                  <Ionicons name="arrow-forward" size={18} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            );
+          })()}
         {/* 3. Feedback Section */}
         <View style={styles.secHeader}>
           <Text style={styles.secTitle}>Doctor's Feedback</Text>
@@ -241,7 +247,15 @@ export default function HomeScreen() {
         </View>
 
         {/* Task Placeholder Items */}
-        <TouchableOpacity style={styles.taskItem}>
+        <TouchableOpacity
+          style={styles.taskItem}
+          onPress={() =>
+            router.push({
+              pathname: "/videos/upload",
+              params: { childId: children[0]?.id.toString() },
+            })
+          }
+        >
           <View style={[styles.taskIcon, { backgroundColor: "#FFF3E0" }]}>
             <Ionicons name="videocam" size={20} color="#FF9800" />
           </View>
@@ -252,7 +266,15 @@ export default function HomeScreen() {
           <Ionicons name="play-circle" size={26} color="#D1D5DB" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.taskItem}>
+        <TouchableOpacity
+          style={styles.taskItem}
+          onPress={() =>
+            router.push({
+              pathname: "/videos/upload",
+              params: { childId: children[0]?.id.toString() },
+            })
+          }
+        >
           <View style={[styles.taskIcon, { backgroundColor: "#F3E5F5" }]}>
             <Ionicons name="car" size={20} color="#9C27B0" />
           </View>
