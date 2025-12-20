@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const navItems = [
-  { name: 'Home', href: '/' },
-  { name: 'How It Works', href: '#how-it-works' },
-  { name: 'For Parents', href: '#for-parents' },
-  { name: 'For Doctors', href: '#for-doctors' },
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'About', href: '#about' },
+  { name: "Home", href: "/" },
+  { name: "How It Works", href: "#how-it-works" },
+  { name: "For Parents", href: "#for-parents" },
+  { name: "For Doctors", href: "/doctor" },
+  { name: "Pricing", href: "#pricing" },
+  { name: "About", href: "#about" },
 ];
 
 const Navbar = () => {
@@ -20,8 +21,8 @@ const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
@@ -29,14 +30,13 @@ const Navbar = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 font-sans ${
-        scrolled 
-          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-orange-100' 
-          : 'bg-transparent'
+        scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-orange-100"
+          : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
-          
           {/* --- Logo --- */}
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -44,7 +44,11 @@ const Navbar = () => {
           >
             <div className="flex-shrink-0">
               {/* Ensure your logo fits the warm theme, or use a placeholder */}
-              <img src="/logo.png" alt="AutiSahara Logo" className="w-10 h-10 object-contain"/>
+              <img
+                src="/logo.png"
+                alt="AutiSahara Logo"
+                className="w-10 h-10 object-contain"
+              />
             </div>
             <span className="text-2xl font-black hidden sm:block text-slate-900 tracking-tight">
               AutiSahara
@@ -53,20 +57,35 @@ const Navbar = () => {
 
           {/* --- Desktop Navigation --- */}
           <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item, index) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-slate-600 hover:text-orange-600 font-medium transition-colors duration-300 relative group text-sm tracking-wide"
-              >
-                {item.name}
-                {/* Underline Effect (Solid Orange) */}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
-              </motion.a>
-            ))}
+            {navItems.map((item, index) =>
+              item.href.startsWith("#") ? (
+                <motion.a
+                  key={item.name}
+                  href={item.href}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-slate-600 hover:text-orange-600 font-medium transition-colors duration-300 relative group text-sm tracking-wide"
+                >
+                  {item.name}
+                  {/* Underline Effect (Solid Orange) */}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+                </motion.a>
+              ) : (
+                <Link key={item.name} to={item.href}>
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="text-slate-600 hover:text-orange-600 font-medium transition-colors duration-300 relative group text-sm tracking-wide"
+                  >
+                    {item.name}
+                    {/* Underline Effect (Solid Orange) */}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+                  </motion.div>
+                </Link>
+              )
+            )}
           </div>
 
           {/* --- Desktop CTA Buttons --- */}
@@ -78,11 +97,9 @@ const Navbar = () => {
             >
               Sign In
             </Button>
-            
+
             {/* Solid Button (No Gradient, Solid Warm Orange) */}
-            <Button 
-              className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 shadow-md shadow-orange-500/20 transition-all duration-300"
-            >
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 shadow-md shadow-orange-500/20 transition-all duration-300">
               Get Started
             </Button>
           </div>
@@ -101,25 +118,42 @@ const Navbar = () => {
           {isOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden bg-white border-t border-orange-100 overflow-hidden shadow-xl rounded-b-2xl"
             >
               <div className="px-4 py-6 space-y-4">
-                {navItems.map((item, index) => (
-                  <motion.a
-                    key={item.name}
-                    href={item.href}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => setIsOpen(false)}
-                    className="block px-4 py-3 text-slate-600 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200 font-medium"
-                  >
-                    {item.name}
-                  </motion.a>
-                ))}
-                
+                {navItems.map((item, index) =>
+                  item.href.startsWith("#") ? (
+                    <motion.a
+                      key={item.name}
+                      href={item.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 text-slate-600 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200 font-medium"
+                    >
+                      {item.name}
+                    </motion.a>
+                  ) : (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="block px-4 py-3 text-slate-600 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200 font-medium"
+                      >
+                        {item.name}
+                      </motion.div>
+                    </Link>
+                  )
+                )}
+
                 {/* Mobile Buttons */}
                 <div className="pt-4 flex flex-col gap-3 border-t border-orange-100/50 mt-2">
                   <Button
