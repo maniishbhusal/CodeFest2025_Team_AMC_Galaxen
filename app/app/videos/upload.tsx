@@ -120,47 +120,25 @@ export default function VideoUploadScreen() {
         return;
       }
 
-      // Get user data for user_id
-      const userDataStr = await AsyncStorage.getItem("userData");
-      let userId = null;
-      if (userDataStr) {
-        const userData = JSON.parse(userDataStr);
-        userId = userData.id;
-      }
-
       setUploadProgress(30);
 
-      // Create FormData for file upload
-      const formData = new FormData();
-
-      // Extract filename from URI
-      const filename = videoUri.split("/").pop() || "video.mp4";
-      const fileType = filename.split(".").pop();
-
-      // Append video file
-      formData.append("video_file", {
-        uri: videoUri,
-        type: `video/${fileType}`,
-        name: filename,
-      } as any);
-
-      formData.append("video_type", selectedType);
-      formData.append("description", description || "");
-
-      // Add user_id if available
-      if (userId) {
-        formData.append("user", userId.toString());
-      }
+      // Send video metadata with local URI as video_url
+      // For hackathon: storing local URI; in production would upload to Cloudflare Stream first
+      const videoData = {
+        video_type: selectedType,
+        video_url: videoUri, // Store local URI for now
+        description: description || "",
+      };
 
       setUploadProgress(50);
 
       await axios.post(
         `${BASE_URL}/api/children/${childId}/videos/`,
-        formData,
+        videoData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
@@ -186,9 +164,12 @@ export default function VideoUploadScreen() {
       }, 500);
     } catch (error: any) {
       setUploading(false);
-      console.error("Video upload error:", error);
+      console.error("Video upload error:", error.response?.data || error);
       const errorMsg =
-        error.response?.data?.message || error.message || "अपलोड असफल भयो।";
+        error.response?.data?.error ||
+        error.response?.data?.video_url?.[0] ||
+        error.message ||
+        "अपलोड असफल भयो।";
       Alert.alert("त्रुटि", errorMsg);
     }
   };

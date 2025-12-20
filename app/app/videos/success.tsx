@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -51,112 +52,40 @@ export default function SuccessScreen() {
     }
   };
 
-  const getStatusText = (statusValue: string) => {
-    switch (statusValue) {
-      case "pending":
-        return "समीक्षाको प्रतीक्षामा";
-      case "in_review":
-        return "समीक्षा हुँदैछ";
-      case "accepted":
-        return "स्वीकृत भयो";
-      case "completed":
-        return "पूरा भयो";
-      default:
-        return statusValue;
-    }
-  };
-
-  const getStatusColor = (statusValue: string) => {
-    switch (statusValue) {
-      case "pending":
-        return "#FF9800";
-      case "in_review":
-        return "#2196F3";
-      case "accepted":
-        return "#4CAF50";
-      case "completed":
-        return "#4CAF50";
-      default:
-        return AppColors.primary;
-    }
-  };
-
   const handleGoHome = () => {
     router.replace("/(tabs)");
   };
 
-  const handleViewStatus = () => {
-    loadStatus();
+  const handleStartTasks = () => {
+    router.push({
+      pathname: "/therapy/today",
+      params: { childId },
+    });
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Success Animation */}
       <View style={styles.successContainer}>
         <View style={styles.successCircle}>
           <Text style={styles.successIcon}>✓</Text>
         </View>
-        <Text style={styles.successTitle}>सफलतापूर्वक पेश भयो!</Text>
+        <Text style={styles.successTitle}>तयार छ!</Text>
         <Text style={styles.successSubtitle}>
-          तपाईंको बच्चाको मूल्यांकन पेश गरियो
+          तपाईंको बच्चाको १५-दिने मूल्यांकन कार्यक्रम सुरु गर्न सक्नुहुन्छ
         </Text>
       </View>
 
-      {/* Status Card */}
-      <View style={styles.statusCard}>
-        <Text style={styles.statusCardTitle}>📋 मूल्यांकन स्थिति</Text>
-
-        {loading ? (
-          <ActivityIndicator
-            size="small"
-            color={AppColors.primary}
-            style={{ marginVertical: 20 }}
-          />
-        ) : status ? (
-          <View style={styles.statusContent}>
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>स्थिति:</Text>
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: getStatusColor(status.status) },
-                ]}
-              >
-                <Text style={styles.statusBadgeText}>
-                  {getStatusText(status.status)}
-                </Text>
-              </View>
-            </View>
-
-            {status.assigned_doctor && (
-              <View style={styles.statusRow}>
-                <Text style={styles.statusLabel}>तोकिएका डाक्टर:</Text>
-                <Text style={styles.statusValue}>{status.assigned_doctor}</Text>
-              </View>
-            )}
-          </View>
-        ) : (
-          <Text style={styles.noStatus}>स्थिति उपलब्ध छैन</Text>
-        )}
-
-        <TouchableOpacity
-          style={styles.refreshButton}
-          onPress={handleViewStatus}
-        >
-          <Text style={styles.refreshButtonText}>🔄 स्थिति जाँच गर्नुहोस्</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Next Steps */}
+      {/* What's Next Card */}
       <View style={styles.nextStepsCard}>
-        <Text style={styles.nextStepsTitle}>📌 अर्को के हुन्छ?</Text>
+        <Text style={styles.nextStepsTitle}>🎯 अर्को के गर्ने?</Text>
 
         <View style={styles.stepItem}>
           <View style={styles.stepNumber}>
             <Text style={styles.stepNumberText}>1</Text>
           </View>
           <Text style={styles.stepText}>
-            डाक्टरले तपाईंको बच्चाको मूल्यांकन समीक्षा गर्नेछन्
+            हरेक दिन ५ वटा सरल कार्यहरू गर्नुहोस्
           </Text>
         </View>
 
@@ -165,7 +94,7 @@ export default function SuccessScreen() {
             <Text style={styles.stepNumberText}>2</Text>
           </View>
           <Text style={styles.stepText}>
-            तपाईंलाई अपडेट सूचना प्राप्त हुनेछ
+            बच्चाले कसरी गर्यो भनेर रेकर्ड गर्नुहोस्
           </Text>
         </View>
 
@@ -174,26 +103,55 @@ export default function SuccessScreen() {
             <Text style={styles.stepNumberText}>3</Text>
           </View>
           <Text style={styles.stepText}>
-            स्वीकृत भएपछि थेरापी पाठ्यक्रम तोकिनेछ
+            १५ दिन पछि डाक्टरले समीक्षा गर्नेछन्
           </Text>
+        </View>
+      </View>
+
+      {/* Task Categories Info */}
+      <View style={styles.categoriesCard}>
+        <Text style={styles.categoriesTitle}>📚 दैनिक कार्य क्षेत्रहरू</Text>
+        <View style={styles.categoryRow}>
+          <Text style={styles.categoryIcon}>👋</Text>
+          <Text style={styles.categoryText}>सामाजिक संलग्नता</Text>
+        </View>
+        <View style={styles.categoryRow}>
+          <Text style={styles.categoryIcon}>👀</Text>
+          <Text style={styles.categoryText}>संयुक्त ध्यान</Text>
+        </View>
+        <View style={styles.categoryRow}>
+          <Text style={styles.categoryIcon}>🗣️</Text>
+          <Text style={styles.categoryText}>संवाद</Text>
+        </View>
+        <View style={styles.categoryRow}>
+          <Text style={styles.categoryIcon}>🎮</Text>
+          <Text style={styles.categoryText}>खेल कौशल</Text>
+        </View>
+        <View style={styles.categoryRow}>
+          <Text style={styles.categoryIcon}>🧠</Text>
+          <Text style={styles.categoryText}>संज्ञानात्मक/स्व-सहायता</Text>
         </View>
       </View>
 
       {/* Info Note */}
       <View style={styles.infoNote}>
-        <Text style={styles.infoIcon}>ℹ️</Text>
+        <Text style={styles.infoIcon}>💡</Text>
         <Text style={styles.infoText}>
-          सामान्यतया समीक्षामा २४-४८ घण्टा लाग्न सक्छ
+          हरेक कार्यमा २-५ मिनेट मात्र लाग्छ। बच्चासँग खेल्दा गर्न सक्नुहुन्छ!
         </Text>
       </View>
 
-      {/* Home Button */}
+      {/* Buttons */}
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.startButton} onPress={handleStartTasks}>
+          <Text style={styles.startButtonText}>🚀 कार्यहरू सुरु गर्नुहोस्</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.homeButton} onPress={handleGoHome}>
           <Text style={styles.homeButtonText}>🏠 गृहपृष्ठमा जानुहोस्</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -201,12 +159,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: AppColors.background,
+  },
+  content: {
     padding: 16,
+    paddingBottom: 40,
   },
   successContainer: {
     alignItems: "center",
-    paddingTop: 60,
-    paddingBottom: 40,
+    paddingTop: 40,
+    paddingBottom: 30,
   },
   successCircle: {
     width: 100,
@@ -228,7 +189,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   successTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     color: AppColors.textPrimary,
     marginBottom: 8,
@@ -237,66 +198,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: AppColors.textLight,
     textAlign: "center",
-  },
-  statusCard: {
-    backgroundColor: AppColors.white,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: AppColors.border,
-  },
-  statusCardTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: AppColors.textPrimary,
-    marginBottom: 16,
-  },
-  statusContent: {
-    marginBottom: 16,
-  },
-  statusRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  statusLabel: {
-    fontSize: 14,
-    color: AppColors.textLight,
-  },
-  statusValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: AppColors.textPrimary,
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  statusBadgeText: {
-    color: AppColors.white,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  noStatus: {
-    fontSize: 14,
-    color: AppColors.textLight,
-    fontStyle: "italic",
-    textAlign: "center",
-    paddingVertical: 16,
-  },
-  refreshButton: {
-    alignItems: "center",
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: AppColors.border,
-  },
-  refreshButtonText: {
-    fontSize: 14,
-    color: AppColors.primary,
-    fontWeight: "500",
+    paddingHorizontal: 20,
+    lineHeight: 24,
   },
   nextStepsCard: {
     backgroundColor: AppColors.white,
@@ -307,7 +210,7 @@ const styles = StyleSheet.create({
     borderColor: AppColors.border,
   },
   nextStepsTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: AppColors.textPrimary,
     marginBottom: 16,
@@ -315,7 +218,7 @@ const styles = StyleSheet.create({
   stepItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 14,
   },
   stepNumber: {
     width: 28,
@@ -333,17 +236,44 @@ const styles = StyleSheet.create({
   },
   stepText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     color: AppColors.textPrimary,
-    lineHeight: 20,
+    lineHeight: 22,
+  },
+  categoriesCard: {
+    backgroundColor: "#FFF8E1",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#FFE082",
+  },
+  categoriesTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#F57C00",
+    marginBottom: 12,
+  },
+  categoryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  categoryIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  categoryText: {
+    fontSize: 14,
+    color: "#E65100",
   },
   infoNote: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E3F2FD",
+    backgroundColor: "#E8F5E9",
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   infoIcon: {
     fontSize: 20,
@@ -351,23 +281,40 @@ const styles = StyleSheet.create({
   },
   infoText: {
     flex: 1,
-    fontSize: 13,
-    color: "#1565C0",
+    fontSize: 14,
+    color: "#2E7D32",
     lineHeight: 20,
   },
   footer: {
-    marginTop: "auto",
-    paddingBottom: 20,
+    gap: 12,
   },
-  homeButton: {
-    backgroundColor: AppColors.secondary,
+  startButton: {
+    backgroundColor: AppColors.primary,
     borderRadius: 12,
     padding: 18,
     alignItems: "center",
+    shadowColor: AppColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  startButtonText: {
+    color: AppColors.white,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  homeButton: {
+    backgroundColor: AppColors.white,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: AppColors.border,
   },
   homeButtonText: {
-    color: AppColors.white,
+    color: AppColors.textPrimary,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
 });

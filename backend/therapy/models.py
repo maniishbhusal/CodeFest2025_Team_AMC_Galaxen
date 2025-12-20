@@ -11,6 +11,7 @@ class Curriculum(models.Model):
     TYPE_CHOICES = [
         ('general', 'General'),
         ('specialized', 'Specialized'),
+        ('assessment', 'Pre-Assessment'),
     ]
 
     title = models.CharField(max_length=255)

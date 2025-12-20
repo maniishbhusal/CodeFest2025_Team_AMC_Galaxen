@@ -469,26 +469,22 @@ class AdvanceDayView(APIView):
         if not child_curriculum:
             return Response({'error': 'No active curriculum'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if all tasks for current day are done
+        # Check tasks for current day (for info, but don't block)
         current_tasks = CurriculumTask.objects.filter(
             curriculum=child_curriculum.curriculum,
             day_number=child_curriculum.current_day
         )
 
-        today = date.today()
+        # Count completed tasks (any date, not just today - for flexibility)
         completed = DailyProgress.objects.filter(
             child_curriculum=child_curriculum,
             task__in=current_tasks,
-            date=today,
+            day_number=child_curriculum.current_day,
             status__in=['done_with_help', 'done_without_help']
         ).count()
 
-        if completed < current_tasks.count():
-            return Response({
-                'error': 'Complete all tasks before advancing',
-                'completed': completed,
-                'total': current_tasks.count(),
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # For hackathon: Allow advancing even if not all tasks done
+        # The mobile app shows a warning dialog before calling this
 
         # Advance day
         if child_curriculum.current_day >= child_curriculum.curriculum.duration_days:
