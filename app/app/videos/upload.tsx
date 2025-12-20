@@ -178,7 +178,7 @@ export default function VideoUploadScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.replace("/(tabs)")}
           style={styles.backButton}
         >
           <Text style={styles.backIcon}>←</Text>

@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  RefreshControl,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
@@ -22,10 +23,17 @@ export default function HomeScreen() {
   const [mchatResults, setMchatResults] = useState<{ [key: number]: any }>({});
   const [therapyData, setTherapyData] = useState<{ [key: number]: any }>({});
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadDashboardData();
+    setRefreshing(false);
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -111,8 +119,33 @@ export default function HomeScreen() {
     }
   };
 
-  const displayName = userData?.first_name || "Parent";
-  const childName = children[0]?.full_name?.split(" ")[0] || "Leo";
+  // Get first name from full_name
+  const getFirstName = (fullName: string) => {
+    if (!fullName) return "Parent";
+    return fullName.split(" ")[0];
+  };
+
+  // Get greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
+  // Get initials for avatar
+  const getInitials = (name: string) => {
+    if (!name) return "P";
+    const parts = name.split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name[0].toUpperCase();
+  };
+
+  const displayName = getFirstName(userData?.full_name);
+  const childName = children[0]?.full_name?.split(" ")[0] || "Child";
+  const userInitials = getInitials(userData?.full_name || "");
 
   return (
     <View style={styles.container}>
@@ -121,12 +154,11 @@ export default function HomeScreen() {
       {/* 1. Header Section */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Image
-            source={{ uri: "https://i.pravatar.cc/150?u=parent" }}
-            style={styles.profilePic}
-          />
+          <View style={styles.profilePic}>
+            <Text style={styles.profileInitials}>{userInitials}</Text>
+          </View>
           <View>
-            <Text style={styles.welcomeText}>Good Morning, {displayName}</Text>
+            <Text style={styles.welcomeText}>{getGreeting()}, {displayName}</Text>
             <Text style={styles.subWelcomeText}>
               Here is {childName}'s progress today
             </Text>
@@ -140,7 +172,10 @@ export default function HomeScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent} // Padding for TabBar overlap fixed here
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#FF007F"]} />
+        }
       >
         {/* Progress & Streak Bar */}
         <View style={styles.statsRow}>
@@ -300,7 +335,19 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   headerLeft: { flexDirection: "row", alignItems: "center" },
-  profilePic: { width: 44, height: 44, borderRadius: 22 },
+  profilePic: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#FF007F",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profileInitials: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "700",
+  },
   welcomeText: { fontSize: 18, fontWeight: "700", marginLeft: 12 },
   subWelcomeText: { fontSize: 13, color: "#6B7280", marginLeft: 12 },
   notificationBtn: {
