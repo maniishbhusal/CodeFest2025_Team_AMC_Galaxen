@@ -1586,13 +1586,13 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 3.11 Pending Patients List
+✅ 3.11 Pending Patients List
    - Show all pending assessments
    - Display child name, age, M-CHAT risk level
    - Color code by risk (high priority = red)
    - Click to view details
 
-□ 3.12 Patient Detail View
+✅ 3.12 Patient Detail View
    - All Section 1-7 info
    - Medical history (A1-A4) with flags
    - M-CHAT results and score

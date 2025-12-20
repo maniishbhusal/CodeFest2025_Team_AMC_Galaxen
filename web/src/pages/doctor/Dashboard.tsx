@@ -12,6 +12,7 @@ import {
   Clock,
   ChevronRight,
 } from "lucide-react";
+import PendingPatientsList from "@/components/doctor/PendingPatientsList";
 
 interface DoctorData {
   id: number;
@@ -83,11 +84,6 @@ export default function DoctorDashboard() {
     },
   ];
 
-  const recentPatients = [
-    { name: "Aarav Sharma", age: 5, status: "Pending Review", time: "2 hours ago" },
-    { name: "Priya Thapa", age: 4, status: "In Progress", time: "5 hours ago" },
-    { name: "Rohan Gurung", age: 6, status: "Completed", time: "1 day ago" },
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -179,48 +175,9 @@ export default function DoctorDashboard() {
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Patients */}
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Patients</h2>
-                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                  View All
-                </button>
-              </div>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {recentPatients.map((patient, index) => (
-                <div
-                  key={index}
-                  className="p-4 hover:bg-gray-50 transition cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-pink-400 rounded-full flex items-center justify-center text-white font-medium">
-                      {patient.name.charAt(0)}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{patient.name}</p>
-                      <p className="text-sm text-gray-500">Age: {patient.age} years</p>
-                    </div>
-                    <div className="text-right">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                          patient.status === "Pending Review"
-                            ? "bg-amber-100 text-amber-700"
-                            : patient.status === "In Progress"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-green-100 text-green-700"
-                        }`}
-                      >
-                        {patient.status}
-                      </span>
-                      <p className="text-xs text-gray-400 mt-1">{patient.time}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* Pending Patients List */}
+          <div className="lg:col-span-2">
+            <PendingPatientsList />
           </div>
 
           {/* Quick Actions */}
