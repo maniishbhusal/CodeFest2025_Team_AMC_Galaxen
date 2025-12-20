@@ -18,6 +18,8 @@ import {
   UserCheck,
   RefreshCw,
   Play,
+  BookOpen,
+  BarChart3,
 } from "lucide-react";
 import { getPatientDetail, acceptPatient, type PatientDetail } from "@/lib/api";
 
@@ -170,6 +172,25 @@ export default function PatientDetailPage() {
                 <UserCheck className="w-4 h-4" />
                 Accept Patient
               </button>
+            )}
+
+            {(patient.status === "accepted" || patient.status === "completed") && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => navigate(`/doctor/patient/${childId}/assign`)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Assign Curriculum
+                </button>
+                <button
+                  onClick={() => navigate(`/doctor/patient/${childId}/progress`)}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  View Progress
+                </button>
+              </div>
             )}
           </div>
         </div>

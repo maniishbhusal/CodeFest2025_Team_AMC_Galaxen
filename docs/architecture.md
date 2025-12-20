@@ -1776,19 +1776,19 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 5.13 Assign Curriculum Page
+✅ 5.13 Assign Curriculum Page
    - Select patient
    - Select curriculum
    - Set start date
    - Assign button
 
-□ 5.14 Progress Review Table
+✅ 5.14 Progress Review Table
    - Rows: Tasks
    - Columns: Days (1-15)
    - Cells: Status + Video link
    - Color coded status
 
-□ 5.15 Review Form
+✅ 5.15 Review Form
    - Select review period (15/30/45)
    - Observations text
    - Spectrum identified (optional)
