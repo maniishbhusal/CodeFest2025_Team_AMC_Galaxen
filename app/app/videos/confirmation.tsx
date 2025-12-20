@@ -73,7 +73,7 @@ export default function ConfirmationScreen() {
       setVideos(videosRes.data || []);
     } catch (error) {
       console.error("Error loading data:", error);
-      Alert.alert("त्रुटि", "जानकारी लोड गर्न सकिएन।");
+      Alert.alert("Error", "Could not load information.");
     } finally {
       setLoading(false);
     }
@@ -82,11 +82,11 @@ export default function ConfirmationScreen() {
   const getRiskLevelText = (riskLevel: string) => {
     switch (riskLevel) {
       case "low":
-        return "कम जोखिम";
+        return "Low Risk";
       case "medium":
-        return "मध्यम जोखिम";
+        return "Medium Risk";
       case "high":
-        return "उच्च जोखिम";
+        return "High Risk";
       default:
         return riskLevel;
     }
@@ -108,9 +108,9 @@ export default function ConfirmationScreen() {
   const getGenderText = (gender: string) => {
     switch (gender) {
       case "male":
-        return "छोरा";
+        return "Boy";
       case "female":
-        return "छोरी";
+        return "Girl";
       default:
         return gender;
     }
@@ -118,7 +118,7 @@ export default function ConfirmationScreen() {
 
   const handleSubmit = async () => {
     if (!confirmed) {
-      Alert.alert("पुष्टि आवश्यक", "कृपया घोषणा बक्समा चिन्ह लगाउनुहोस्।");
+      Alert.alert("Confirmation Required", "Please check the declaration box.");
       return;
     }
 
@@ -145,8 +145,8 @@ export default function ConfirmationScreen() {
     } catch (error: any) {
       console.error("Submit error:", error);
       Alert.alert(
-        "त्रुटि",
-        error.response?.data?.message || "पेश गर्न सकिएन।"
+        "Error",
+        error.response?.data?.message || "Could not submit."
       );
     } finally {
       setSubmitting(false);
@@ -161,7 +161,7 @@ export default function ConfirmationScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={AppColors.primary} />
-        <Text style={styles.loadingText}>लोड हुँदैछ...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -174,17 +174,17 @@ export default function ConfirmationScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>पुष्टि गर्नुहोस्</Text>
-          <Text style={styles.headerSubtitle}>मूल्यांकन पेश गर्नुहोस्</Text>
+          <Text style={styles.headerTitle}>Confirm</Text>
+          <Text style={styles.headerSubtitle}>Submit Assessment</Text>
         </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Summary Card */}
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>📋 सारांश</Text>
+          <Text style={styles.summaryTitle}>📋 Summary</Text>
           <Text style={styles.summarySubtitle}>
-            कृपया जानकारी समीक्षा गर्नुहोस्
+            Please review the information
           </Text>
         </View>
 
@@ -193,20 +193,20 @@ export default function ConfirmationScreen() {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardIcon}>👶</Text>
-              <Text style={styles.cardTitle}>बच्चाको जानकारी</Text>
+              <Text style={styles.cardTitle}>Child Information</Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>नाम:</Text>
+              <Text style={styles.infoLabel}>Name:</Text>
               <Text style={styles.infoValue}>{child.full_name}</Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>उमेर:</Text>
+              <Text style={styles.infoLabel}>Age:</Text>
               <Text style={styles.infoValue}>
-                {child.age_years} वर्ष {child.age_months} महिना
+                {child.age_years} years {child.age_months} months
               </Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>लिङ्ग:</Text>
+              <Text style={styles.infoLabel}>Gender:</Text>
               <Text style={styles.infoValue}>{getGenderText(child.gender)}</Text>
             </View>
           </View>
@@ -216,18 +216,18 @@ export default function ConfirmationScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardIcon}>📊</Text>
-            <Text style={styles.cardTitle}>M-CHAT नतिजा</Text>
+            <Text style={styles.cardTitle}>M-CHAT Result</Text>
           </View>
           {mchatResult ? (
             <>
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>स्कोर:</Text>
+                <Text style={styles.infoLabel}>Score:</Text>
                 <Text style={styles.infoValue}>
                   {mchatResult.total_score}/20
                 </Text>
               </View>
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>जोखिम स्तर:</Text>
+                <Text style={styles.infoLabel}>Risk Level:</Text>
                 <Text
                   style={[
                     styles.riskBadge,
@@ -239,7 +239,7 @@ export default function ConfirmationScreen() {
               </View>
             </>
           ) : (
-            <Text style={styles.notCompleted}>M-CHAT पूरा भएको छैन</Text>
+            <Text style={styles.notCompleted}>M-CHAT not completed</Text>
           )}
         </View>
 
@@ -247,10 +247,10 @@ export default function ConfirmationScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardIcon}>📹</Text>
-            <Text style={styles.cardTitle}>अपलोड गरिएका भिडियो</Text>
+            <Text style={styles.cardTitle}>Uploaded Videos</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>भिडियो संख्या:</Text>
+            <Text style={styles.infoLabel}>Number of Videos:</Text>
             <Text style={styles.infoValue}>{videos.length}</Text>
           </View>
           {videos.length > 0 && (
@@ -279,8 +279,8 @@ export default function ConfirmationScreen() {
               {confirmed && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={styles.declarationText}>
-              म पुष्टि गर्छु कि यो जानकारी सही छ र मैले यो मूल्यांकन आफ्नो
-              बच्चाको लागि भरेको हो।
+              I confirm that this information is correct and I have completed
+              this assessment for my child.
             </Text>
           </TouchableOpacity>
         </View>
@@ -289,10 +289,10 @@ export default function ConfirmationScreen() {
         <View style={styles.noteCard}>
           <Text style={styles.noteIcon}>⚠️</Text>
           <View style={styles.noteContent}>
-            <Text style={styles.noteTitle}>महत्त्वपूर्ण</Text>
+            <Text style={styles.noteTitle}>Important</Text>
             <Text style={styles.noteText}>
-              पेश गरेपछि, एक डाक्टरले तपाईंको बच्चाको मूल्यांकन समीक्षा गर्नेछ।
-              तपाईंलाई सूचना प्राप्त हुनेछ।
+              After submission, a doctor will review your child's assessment.
+              You will receive a notification.
             </Text>
           </View>
         </View>
@@ -313,7 +313,7 @@ export default function ConfirmationScreen() {
           {submitting ? (
             <ActivityIndicator color={AppColors.white} />
           ) : (
-            <Text style={styles.submitButtonText}>मूल्यांकन पेश गर्नुहोस्</Text>
+            <Text style={styles.submitButtonText}>Submit Assessment</Text>
           )}
         </TouchableOpacity>
       </View>

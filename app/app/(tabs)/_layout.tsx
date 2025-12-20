@@ -13,7 +13,7 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
   // Theme Colors - Dashboard sanga match huna ko lagi
-  const activeColor = "#FF007F"; // Hot Pink
+  const activeColor = "#F97316"; // Orange 500
   const inactiveColor = "#94A3B8"; // Slate Gray
 
   return (
@@ -106,6 +106,7 @@ export default function TabLayout() {
 
       {/* Hiding Unwanted Tabs */}
       <Tabs.Screen name="chat" options={{ href: null }} />
+      <Tabs.Screen name="explore" options={{ href: null }} />
     </Tabs>
   );
 }

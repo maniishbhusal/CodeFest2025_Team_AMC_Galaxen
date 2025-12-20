@@ -18,12 +18,12 @@ import { AppColors } from "@/constants/theme";
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 const VIDEO_TYPE_LABELS: { [key: string]: { label: string; emoji: string } } = {
-  walking: { label: "हिँड्ने", emoji: "🚶" },
-  eating: { label: "खाने", emoji: "🍽️" },
-  speaking: { label: "बोल्ने", emoji: "🗣️" },
-  behavior: { label: "व्यवहार", emoji: "🧠" },
-  playing: { label: "खेल्ने", emoji: "🎮" },
-  other: { label: "अन्य", emoji: "📹" },
+  walking: { label: "Walking", emoji: "🚶" },
+  eating: { label: "Eating", emoji: "🍽️" },
+  speaking: { label: "Speaking", emoji: "🗣️" },
+  behavior: { label: "Behavior", emoji: "🧠" },
+  playing: { label: "Playing", emoji: "🎮" },
+  other: { label: "Other", emoji: "📹" },
 };
 
 interface VideoItem {
@@ -66,7 +66,7 @@ export default function VideoListScreen() {
       setVideos(response.data || []);
     } catch (error: any) {
       console.error("Error loading videos:", error);
-      Alert.alert("त्रुटि", "भिडियोहरू लोड गर्न सकिएन।");
+      Alert.alert("Error", "Could not load videos.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -80,12 +80,12 @@ export default function VideoListScreen() {
 
   const handleDelete = async (videoId: number) => {
     Alert.alert(
-      "मेटाउने?",
-      "के तपाईं यो भिडियो मेटाउन चाहनुहुन्छ?",
+      "Delete?",
+      "Are you sure you want to delete this video?",
       [
-        { text: "रद्द", style: "cancel" },
+        { text: "Cancel", style: "cancel" },
         {
-          text: "मेटाउनुहोस्",
+          text: "Delete",
           style: "destructive",
           onPress: async () => {
             setDeleting(videoId);
@@ -98,10 +98,10 @@ export default function VideoListScreen() {
                 }
               );
               setVideos(videos.filter((v) => v.id !== videoId));
-              Alert.alert("सफलता", "भिडियो मेटाइयो।");
+              Alert.alert("Success", "Video deleted.");
             } catch (error) {
               console.error("Delete error:", error);
-              Alert.alert("त्रुटि", "भिडियो मेटाउन सकिएन।");
+              Alert.alert("Error", "Could not delete video.");
             } finally {
               setDeleting(null);
             }
@@ -113,7 +113,7 @@ export default function VideoListScreen() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ne-NP", {
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -142,7 +142,7 @@ export default function VideoListScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={AppColors.primary} />
-        <Text style={styles.loadingText}>लोड हुँदैछ...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -155,9 +155,9 @@ export default function VideoListScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>भिडियो सूची</Text>
+          <Text style={styles.headerTitle}>Video List</Text>
           <Text style={styles.headerSubtitle}>
-            {videos.length} भिडियो अपलोड गरिएको
+            {videos.length} videos uploaded
           </Text>
         </View>
       </View>
@@ -172,15 +172,15 @@ export default function VideoListScreen() {
         {videos.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>📹</Text>
-            <Text style={styles.emptyTitle}>कुनै भिडियो छैन</Text>
+            <Text style={styles.emptyTitle}>No Videos</Text>
             <Text style={styles.emptySubtitle}>
-              बच्चाको भिडियो अपलोड गर्न तलको बटन थिच्नुहोस्
+              Press the button below to upload child's video
             </Text>
             <TouchableOpacity
               style={styles.addButtonEmpty}
               onPress={handleAddVideo}
             >
-              <Text style={styles.addButtonEmptyText}>+ भिडियो थप्नुहोस्</Text>
+              <Text style={styles.addButtonEmptyText}>+ Add Video</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -212,7 +212,7 @@ export default function VideoListScreen() {
                     ) : (
                       <View style={styles.thumbnailPlaceholder}>
                         <Text style={styles.playIcon}>▶️</Text>
-                        <Text style={styles.tapToPlay}>प्ले गर्नुहोस्</Text>
+                        <Text style={styles.tapToPlay}>Play</Text>
                       </View>
                     )}
                   </TouchableOpacity>
@@ -260,14 +260,14 @@ export default function VideoListScreen() {
               onPress={handleAddVideo}
             >
               <Text style={styles.addMoreIcon}>+</Text>
-              <Text style={styles.addMoreText}>थप भिडियो थप्नुहोस्</Text>
+              <Text style={styles.addMoreText}>Add More Videos</Text>
             </TouchableOpacity>
 
             {/* Minimum Videos Info */}
             <View style={styles.infoCard}>
               <Text style={styles.infoIcon}>ℹ️</Text>
               <Text style={styles.infoText}>
-                कम्तिमा २ भिडियो अपलोड गर्नुहोस् (विभिन्न प्रकारका)
+                Upload at least 2 videos (of different types)
               </Text>
             </View>
           </>
@@ -283,7 +283,7 @@ export default function VideoListScreen() {
             style={styles.continueButton}
             onPress={handleContinue}
           >
-            <Text style={styles.continueButtonText}>अगाडि बढ्नुहोस्</Text>
+            <Text style={styles.continueButtonText}>Continue</Text>
           </TouchableOpacity>
         </View>
       )}

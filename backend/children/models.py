@@ -88,9 +88,9 @@ class ChildHealth(models.Model):
     Section 6: Health Information
     """
     VACCINATION_CHOICES = [
-        ('yes', 'Yes'),
-        ('no', 'No'),
-        ('not_sure', 'Not Sure'),
+        ('complete', 'Complete'),
+        ('incomplete', 'Incomplete'),
+        ('unknown', 'Unknown'),
     ]
 
     child = models.OneToOneField(
@@ -104,7 +104,7 @@ class ChildHealth(models.Model):
     weight_kg = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
 
     # Vaccination & Medical
-    has_vaccinations = models.CharField(max_length=10, choices=VACCINATION_CHOICES, default='not_sure')
+    has_vaccinations = models.CharField(max_length=10, choices=VACCINATION_CHOICES, default='unknown')
     medical_conditions = models.TextField(blank=True, help_text="Current medical conditions")
     takes_medication = models.BooleanField(default=False)
     medication_list = models.TextField(blank=True)

@@ -34,12 +34,11 @@ export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.content, animatedStyle]}>
-        {/* Replace with your logo */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logo}>🧠</Text>
+          <Text style={styles.logo}>🧩</Text>
         </View>
         <Text style={styles.title}>AutiSahara</Text>
-        <Text style={styles.subtitle}>Mental Health Support Platform</Text>
+        <Text style={styles.subtitle}>Early Autism Screening & Therapy</Text>
       </Animated.View>
     </View>
   );
@@ -48,7 +47,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1e40af",
+    backgroundColor: "#F97316",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -56,10 +55,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 30,
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 24,
   },
   logo: {
-    fontSize: 80,
+    fontSize: 64,
   },
   title: {
     fontSize: 36,
@@ -69,7 +74,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: "#dbeafe",
+    color: "rgba(255,255,255,0.9)",
     textAlign: "center",
   },
 });

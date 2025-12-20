@@ -57,7 +57,7 @@ export default function TaskDetailScreen() {
           <Text style={styles.headerTitle} numberOfLines={1}>
             {taskTitle}
           </Text>
-          <Text style={styles.headerSubtitle}>कार्य विवरण</Text>
+          <Text style={styles.headerSubtitle}>Task Details</Text>
         </View>
       </View>
 
@@ -65,7 +65,7 @@ export default function TaskDetailScreen() {
         {/* Demo Video */}
         {taskVideoUrl && taskVideoUrl.length > 0 && (
           <View style={styles.videoSection}>
-            <Text style={styles.sectionTitle}>डेमो भिडियो</Text>
+            <Text style={styles.sectionTitle}>Demo Video</Text>
             <View style={styles.videoContainer}>
               <Video
                 ref={videoRef}
@@ -84,14 +84,14 @@ export default function TaskDetailScreen() {
         <View style={styles.whySection}>
           <View style={styles.whyHeader}>
             <Text style={styles.whyIcon}>💡</Text>
-            <Text style={styles.whyTitle}>यो किन महत्त्वपूर्ण छ?</Text>
+            <Text style={styles.whyTitle}>Why is this important?</Text>
           </View>
           <Text style={styles.whyText}>{taskWhy}</Text>
         </View>
 
         {/* Instructions Section */}
         <View style={styles.instructionsSection}>
-          <Text style={styles.sectionTitle}>निर्देशनहरू</Text>
+          <Text style={styles.sectionTitle}>Instructions</Text>
           <View style={styles.instructionsCard}>
             {parseInstructions(taskInstructions).map((instruction, index) => (
               <View key={index} style={styles.instructionItem}>
@@ -104,7 +104,7 @@ export default function TaskDetailScreen() {
 
             {parseInstructions(taskInstructions).length === 0 && (
               <Text style={styles.noInstructions}>
-                {taskInstructions || "कुनै विशेष निर्देशन छैन"}
+                {taskInstructions || "No specific instructions"}
               </Text>
             )}
           </View>
@@ -114,11 +114,11 @@ export default function TaskDetailScreen() {
         <View style={styles.tipsCard}>
           <Text style={styles.tipsIcon}>📝</Text>
           <View style={styles.tipsContent}>
-            <Text style={styles.tipsTitle}>सुझावहरू</Text>
+            <Text style={styles.tipsTitle}>Tips</Text>
             <Text style={styles.tipsText}>
-              • बच्चासँग धैर्यपूर्वक काम गर्नुहोस्{"\n"}
-              • सकारात्मक प्रोत्साहन दिनुहोस्{"\n"}
-              • यदि बच्चा थकित छ भने विश्राम दिनुहोस्
+              • Work patiently with your child{"\n"}
+              • Give positive encouragement{"\n"}
+              • Take a break if the child is tired
             </Text>
           </View>
         </View>
@@ -132,7 +132,7 @@ export default function TaskDetailScreen() {
           style={styles.submitButton}
           onPress={handleSubmitProgress}
         >
-          <Text style={styles.submitButtonText}>प्रगति पेश गर्नुहोस्</Text>
+          <Text style={styles.submitButtonText}>Submit Progress</Text>
         </TouchableOpacity>
       </View>
     </View>

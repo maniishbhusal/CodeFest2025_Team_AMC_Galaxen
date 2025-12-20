@@ -14,12 +14,12 @@ import StepIndicator from "../../components/StepIndicator";
 import { AppColors } from "@/constants/theme";
 
 const HOUSEHOLD_MEMBERS = [
-  { id: "grandparents", label: "हजुरबुबा/हजुरआमा / Grandparents" },
-  { id: "siblings", label: "दाजुभाइ/दिदीबहिनी / Siblings" },
-  { id: "uncle_aunt", label: "काका/काकी, फुपू / Uncle/Aunt" },
-  { id: "cousins", label: "भतिज/भतिजी / Cousins" },
-  { id: "domestic_help", label: "घरेलु कामदार / Domestic Help" },
-  { id: "other_relatives", label: "अन्य आफन्तहरू / Other Relatives" },
+  { id: "grandparents", label: "Grandparents" },
+  { id: "siblings", label: "Siblings" },
+  { id: "uncle_aunt", label: "Uncle/Aunt" },
+  { id: "cousins", label: "Cousins" },
+  { id: "domestic_help", label: "Domestic Help" },
+  { id: "other_relatives", label: "Other Relatives" },
 ];
 
 export default function Section4() {
@@ -45,7 +45,7 @@ export default function Section4() {
       router.push("/form/section-5");
     } catch (error) {
       console.error("Error saving section 4 data:", error);
-      Alert.alert("त्रुटि", "डाटा सुरक्षित गर्न असफल भयो");
+      Alert.alert("Error", "Failed to save data");
     }
   };
 
@@ -58,16 +58,16 @@ export default function Section4() {
       <StepIndicator currentStep={4} totalSteps={7} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>घरपरिवारको जानकारी</Text>
-        <Text style={styles.subtitle}>Household Information</Text>
+        <Text style={styles.title}>Household Information</Text>
+        <Text style={styles.subtitle}>Please provide details about your household</Text>
 
         {/* Household Members */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            घरमा बस्ने अन्य सदस्यहरू / Other Household Members
+            Other Household Members
           </Text>
           <Text style={styles.sectionSubtitle}>
-            (बहुवैकल्पिक / Multiple selection allowed)
+            (Multiple selection allowed)
           </Text>
 
           {HOUSEHOLD_MEMBERS.map((member) => (
@@ -93,27 +93,23 @@ export default function Section4() {
 
         {/* Siblings Count */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>दाजुभाइ/दिदीबहिनीको संख्या</Text>
-          <Text style={styles.labelEn}>Number of Siblings</Text>
+          <Text style={styles.label}>Number of Siblings</Text>
           <TextInput
             style={styles.input}
             value={siblingsCount}
             onChangeText={setSiblingsCount}
-            placeholder="संख्या प्रविष्ट गर्नुहोस्"
+            placeholder="Enter number"
             keyboardType="numeric"
           />
           <Text style={styles.helperText}>
-            बच्चा समावेश नगर्नुहोस् / Do not include the child
+            Do not include the child
           </Text>
         </View>
 
         {/* Additional Notes */}
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
-            ℹ️ यो जानकारीले बच्चाको सामाजिक वातावरण बुझ्न मद्दत गर्छ
-          </Text>
-          <Text style={styles.infoTextEn}>
-            This information helps understand the child's social environment
+            ℹ️ This information helps understand the child's social environment
           </Text>
         </View>
       </ScrollView>
@@ -124,14 +120,14 @@ export default function Section4() {
           onPress={handleBack}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>पछाडि / Back</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>अर्को / Next</Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>

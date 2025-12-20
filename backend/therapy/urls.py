@@ -26,4 +26,5 @@ urlpatterns = [
     path('child/<int:child_id>/history/', views.ProgressHistoryView.as_view(), name='progress-history'),
     path('child/<int:child_id>/curriculum/', views.ChildCurriculumStatusView.as_view(), name='curriculum-status'),
     path('child/<int:child_id>/reports/', views.ChildDiagnosisReportsView.as_view(), name='child-reports'),
+    path('child/<int:child_id>/feedback/', views.ChildDoctorFeedbackView.as_view(), name='child-feedback'),
 ]

@@ -14,17 +14,14 @@ import StepIndicator from "../../components/StepIndicator";
 import { AppColors } from "@/constants/theme";
 
 const PROFESSIONALS = [
-  { id: "pediatrician", label: "बाल रोग विशेषज्ञ / Pediatrician" },
-  { id: "psychologist", label: "मनोवैज्ञानिक / Psychologist" },
-  { id: "psychiatrist", label: "मनोचिकित्सक / Psychiatrist" },
-  { id: "therapist", label: "थेरापिस्ट / Therapist" },
-  { id: "speech_therapist", label: "बोली थेरापिस्ट / Speech Therapist" },
-  {
-    id: "occupational_therapist",
-    label: "व्यावसायिक थेरापिस्ट / Occupational Therapist",
-  },
-  { id: "special_educator", label: "विशेष शिक्षक / Special Educator" },
-  { id: "neurologist", label: "न्यूरोलोजिस्ट / Neurologist" },
+  { id: "pediatrician", label: "Pediatrician" },
+  { id: "psychologist", label: "Psychologist" },
+  { id: "psychiatrist", label: "Psychiatrist" },
+  { id: "therapist", label: "Therapist" },
+  { id: "speech_therapist", label: "Speech Therapist" },
+  { id: "occupational_therapist", label: "Occupational Therapist" },
+  { id: "special_educator", label: "Special Educator" },
+  { id: "neurologist", label: "Neurologist" },
 ];
 
 export default function Section6() {
@@ -77,7 +74,7 @@ export default function Section6() {
       router.push("/form/section-7");
     } catch (error) {
       console.error("Error saving section 6 data:", error);
-      Alert.alert("त्रुटि", "डाटा सुरक्षित गर्न असफल भयो");
+      Alert.alert("Error", "Failed to save data");
     }
   };
 
@@ -90,31 +87,29 @@ export default function Section6() {
       <StepIndicator currentStep={6} totalSteps={7} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>स्वास्थ्य जानकारी</Text>
-        <Text style={styles.subtitle}>Health Information</Text>
+        <Text style={styles.title}>Health Information</Text>
+        <Text style={styles.subtitle}>Please provide health details</Text>
 
         {/* Height & Weight */}
         <View style={styles.row}>
           <View style={[styles.inputGroup, styles.halfWidth]}>
-            <Text style={styles.label}>उचाइ (cm)</Text>
-            <Text style={styles.labelEn}>Height</Text>
+            <Text style={styles.label}>Height (cm)</Text>
             <TextInput
               style={styles.input}
               value={height}
               onChangeText={setHeight}
-              placeholder="cm मा"
+              placeholder="in cm"
               keyboardType="numeric"
             />
           </View>
 
           <View style={[styles.inputGroup, styles.halfWidth]}>
-            <Text style={styles.label}>तौल (kg)</Text>
-            <Text style={styles.labelEn}>Weight</Text>
+            <Text style={styles.label}>Weight (kg)</Text>
             <TextInput
               style={styles.input}
               value={weight}
               onChangeText={setWeight}
-              placeholder="kg मा"
+              placeholder="in kg"
               keyboardType="numeric"
             />
           </View>
@@ -122,8 +117,7 @@ export default function Section6() {
 
         {/* Vaccination Status */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>खोप स्थिति</Text>
-          <Text style={styles.labelEn}>Vaccination Status</Text>
+          <Text style={styles.label}>Vaccination Status</Text>
           <View style={styles.vaccinationContainer}>
             <TouchableOpacity
               style={[
@@ -140,7 +134,7 @@ export default function Section6() {
                     styles.vaccinationTextActive,
                 ]}
               >
-                पूर्ण / Complete
+                Complete
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -158,7 +152,7 @@ export default function Section6() {
                     styles.vaccinationTextActive,
                 ]}
               >
-                अपूर्ण / Incomplete
+                Incomplete
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -176,7 +170,7 @@ export default function Section6() {
                     styles.vaccinationTextActive,
                 ]}
               >
-                थाहा छैन / Unknown
+                Unknown
               </Text>
             </TouchableOpacity>
           </View>
@@ -184,13 +178,12 @@ export default function Section6() {
 
         {/* Medical Conditions */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>स्वास्थ्य समस्याहरू</Text>
-          <Text style={styles.labelEn}>Medical Conditions (if any)</Text>
+          <Text style={styles.label}>Medical Conditions (if any)</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={medicalConditions}
             onChangeText={setMedicalConditions}
-            placeholder="कुनै पनि दीर्घकालीन वा वर्तमान स्वास्थ्य समस्याहरू"
+            placeholder="Any chronic or current health conditions"
             multiline
             numberOfLines={4}
           />
@@ -198,8 +191,7 @@ export default function Section6() {
 
         {/* Current Medication */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>हाल लिइरहेको औषधि</Text>
-          <Text style={styles.labelEn}>Current Medication</Text>
+          <Text style={styles.label}>Current Medication</Text>
           <View style={styles.medicationContainer}>
             <TouchableOpacity
               style={[
@@ -214,7 +206,7 @@ export default function Section6() {
                   currentMedication === "yes" && styles.medicationTextActive,
                 ]}
               >
-                छ / Yes
+                Yes
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -230,7 +222,7 @@ export default function Section6() {
                   currentMedication === "no" && styles.medicationTextActive,
                 ]}
               >
-                छैन / No
+                No
               </Text>
             </TouchableOpacity>
           </View>
@@ -239,13 +231,12 @@ export default function Section6() {
         {/* Medication Details (if yes) */}
         {currentMedication === "yes" && (
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>औषधिको विवरण</Text>
-            <Text style={styles.labelEn}>Medication Details</Text>
+            <Text style={styles.label}>Medication Details</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
               value={medicationDetails}
               onChangeText={setMedicationDetails}
-              placeholder="औषधिको नाम, मात्रा, र कारण"
+              placeholder="Name, dosage, and reason for medication"
               multiline
               numberOfLines={3}
             />
@@ -255,10 +246,10 @@ export default function Section6() {
         {/* Professionals Consulted */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            परामर्श लिएका स्वास्थ्यकर्मी / Professionals Consulted
+            Professionals Consulted
           </Text>
           <Text style={styles.sectionSubtitle}>
-            (बहुवैकल्पिक / Multiple selection allowed)
+            (Multiple selection allowed)
           </Text>
 
           {PROFESSIONALS.map((professional) => (
@@ -290,14 +281,14 @@ export default function Section6() {
           onPress={handleBack}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>पछाडि / Back</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>अर्को / Next</Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -70,22 +70,22 @@ export default function SuccessScreen() {
         <View style={styles.successCircle}>
           <Text style={styles.successIcon}>✓</Text>
         </View>
-        <Text style={styles.successTitle}>तयार छ!</Text>
+        <Text style={styles.successTitle}>Ready!</Text>
         <Text style={styles.successSubtitle}>
-          तपाईंको बच्चाको १५-दिने मूल्यांकन कार्यक्रम सुरु गर्न सक्नुहुन्छ
+          You can now start your child's 15-day assessment program
         </Text>
       </View>
 
       {/* What's Next Card */}
       <View style={styles.nextStepsCard}>
-        <Text style={styles.nextStepsTitle}>🎯 अर्को के गर्ने?</Text>
+        <Text style={styles.nextStepsTitle}>🎯 What's Next?</Text>
 
         <View style={styles.stepItem}>
           <View style={styles.stepNumber}>
             <Text style={styles.stepNumberText}>1</Text>
           </View>
           <Text style={styles.stepText}>
-            हरेक दिन ५ वटा सरल कार्यहरू गर्नुहोस्
+            Complete 5 simple tasks every day
           </Text>
         </View>
 
@@ -94,7 +94,7 @@ export default function SuccessScreen() {
             <Text style={styles.stepNumberText}>2</Text>
           </View>
           <Text style={styles.stepText}>
-            बच्चाले कसरी गर्यो भनेर रेकर्ड गर्नुहोस्
+            Record how the child performed
           </Text>
         </View>
 
@@ -103,33 +103,33 @@ export default function SuccessScreen() {
             <Text style={styles.stepNumberText}>3</Text>
           </View>
           <Text style={styles.stepText}>
-            १५ दिन पछि डाक्टरले समीक्षा गर्नेछन्
+            After 15 days, a doctor will review the results
           </Text>
         </View>
       </View>
 
       {/* Task Categories Info */}
       <View style={styles.categoriesCard}>
-        <Text style={styles.categoriesTitle}>📚 दैनिक कार्य क्षेत्रहरू</Text>
+        <Text style={styles.categoriesTitle}>📚 Daily Task Categories</Text>
         <View style={styles.categoryRow}>
           <Text style={styles.categoryIcon}>👋</Text>
-          <Text style={styles.categoryText}>सामाजिक संलग्नता</Text>
+          <Text style={styles.categoryText}>Social Engagement</Text>
         </View>
         <View style={styles.categoryRow}>
           <Text style={styles.categoryIcon}>👀</Text>
-          <Text style={styles.categoryText}>संयुक्त ध्यान</Text>
+          <Text style={styles.categoryText}>Joint Attention</Text>
         </View>
         <View style={styles.categoryRow}>
           <Text style={styles.categoryIcon}>🗣️</Text>
-          <Text style={styles.categoryText}>संवाद</Text>
+          <Text style={styles.categoryText}>Communication</Text>
         </View>
         <View style={styles.categoryRow}>
           <Text style={styles.categoryIcon}>🎮</Text>
-          <Text style={styles.categoryText}>खेल कौशल</Text>
+          <Text style={styles.categoryText}>Play Skills</Text>
         </View>
         <View style={styles.categoryRow}>
           <Text style={styles.categoryIcon}>🧠</Text>
-          <Text style={styles.categoryText}>संज्ञानात्मक/स्व-सहायता</Text>
+          <Text style={styles.categoryText}>Cognitive/Self-Help</Text>
         </View>
       </View>
 
@@ -137,18 +137,18 @@ export default function SuccessScreen() {
       <View style={styles.infoNote}>
         <Text style={styles.infoIcon}>💡</Text>
         <Text style={styles.infoText}>
-          हरेक कार्यमा २-५ मिनेट मात्र लाग्छ। बच्चासँग खेल्दा गर्न सक्नुहुन्छ!
+          Each task takes only 2-5 minutes. You can do them while playing with your child!
         </Text>
       </View>
 
       {/* Buttons */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.startButton} onPress={handleStartTasks}>
-          <Text style={styles.startButtonText}>🚀 कार्यहरू सुरु गर्नुहोस्</Text>
+          <Text style={styles.startButtonText}>🚀 Start Tasks</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.homeButton} onPress={handleGoHome}>
-          <Text style={styles.homeButtonText}>🏠 गृहपृष्ठमा जानुहोस्</Text>
+          <Text style={styles.homeButtonText}>🏠 Go to Home</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

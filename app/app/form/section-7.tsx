@@ -17,11 +17,11 @@ import { AppColors } from "@/constants/theme";
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 const COMFORT_LEVELS = [
-  { value: 1, label: "अत्यन्तै असहज / Very Uncomfortable" },
-  { value: 2, label: "असहज / Uncomfortable" },
-  { value: 3, label: "सामान्य / Neutral" },
-  { value: 4, label: "सहज / Comfortable" },
-  { value: 5, label: "अत्यन्तै सहज / Very Comfortable" },
+  { value: 1, label: "Very Uncomfortable" },
+  { value: 2, label: "Uncomfortable" },
+  { value: 3, label: "Neutral" },
+  { value: 4, label: "Comfortable" },
+  { value: 5, label: "Very Comfortable" },
 ];
 
 export default function Section7() {
@@ -60,12 +60,12 @@ export default function Section7() {
       const d6 = storeMap.formSection6 || {};
 
       if (!d1.full_name) {
-        Alert.alert("त्रुटि", "कृपया सुरुका खण्डहरू पुनः जाँच गर्नुहोस्");
+        Alert.alert("Error", "Please check previous sections");
         setLoading(false);
         return;
       }
 
-      // ३. Payload तयार गर्ने - Backend Schema अनुसार
+      // Prepare payload according to Backend Schema
       const payload = {
         full_name: d1.full_name || "",
         date_of_birth: d1.date_of_birth || "",
@@ -97,7 +97,7 @@ export default function Section7() {
               ? "complete"
               : d6.has_vaccinations === "incomplete"
               ? "incomplete"
-              : "no",
+              : "unknown",
           medical_conditions: d6.medical_conditions || "",
           takes_medication: d6.takes_medication || false,
           medication_list: d6.medication_list || "",
@@ -129,12 +129,12 @@ export default function Section7() {
 
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        Alert.alert("लगइन", "कृपया पहिले लगइन गर्नुहोस्");
+        Alert.alert("Login Required", "Please login first");
         router.replace("/auth/login");
         return;
       }
 
-      // ४. API Post
+      // API Post
       const response = await axios.post(
         `${BASE_URL}/api/children/register/`,
         payload,
@@ -150,14 +150,14 @@ export default function Section7() {
       console.log("Submit success:", response.data);
       await AsyncStorage.multiRemove(keys);
 
-      // सफल भएपछि सिधै dashboard मा redirect गर्ने
+      // Redirect to dashboard after success
       router.replace("/(tabs)");
     } catch (error: any) {
       console.error("Error submitting form:", error);
       console.error("Error response data:", error.response?.data);
       console.error("Error status:", error.response?.status);
 
-      // API integrate भएपछि सिधै dashboard मा redirect गर्ने, error नदेखाउने
+      // Redirect to dashboard after API integration, without showing error
       router.replace("/(tabs)");
     } finally {
       setLoading(false);
@@ -168,13 +168,13 @@ export default function Section7() {
     <View style={styles.container}>
       <StepIndicator currentStep={7} totalSteps={7} />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>प्रविधि र सहमति</Text>
-        <Text style={styles.subtitle}>Technology & Consent</Text>
+        <Text style={styles.title}>Technology & Consent</Text>
+        <Text style={styles.subtitle}>Please review and confirm</Text>
 
         {/* Comfort Level Section */}
         <View style={styles.section}>
           <Text style={styles.label}>
-            स्मार्टफोन प्रयोग सहजता स्तर <Text style={styles.required}>*</Text>
+            Smartphone Usage Comfort Level <Text style={styles.required}>*</Text>
           </Text>
           <View style={styles.comfortContainer}>
             {COMFORT_LEVELS.map((level) => (
@@ -209,7 +209,7 @@ export default function Section7() {
 
         {/* Consent Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>सहमति / Consent</Text>
+          <Text style={styles.sectionTitle}>Consent</Text>
 
           <TouchableOpacity
             style={styles.consentContainer}
@@ -221,8 +221,7 @@ export default function Section7() {
               {consentData ? <Text style={styles.checkmark}>✓</Text> : null}
             </View>
             <Text style={styles.consentText}>
-              <Text style={styles.required}>* </Text>म बच्चाको विकास र व्यवहार
-              सम्बन्धी जानकारी संकलन गर्न सहमत छु।
+              <Text style={styles.required}>* </Text>I consent to collect information about the child's development and behavior.
             </Text>
           </TouchableOpacity>
 
@@ -236,14 +235,14 @@ export default function Section7() {
               {consentVideo ? <Text style={styles.checkmark}>✓</Text> : null}
             </View>
             <Text style={styles.consentText}>
-              म बच्चाको गतिविधिको भिडियो रेकर्डिङ गर्न सहमत छु। (वैकल्पिक)
+              I consent to video recording of the child's activities. (Optional)
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Declaration Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>घोषणा / Declaration</Text>
+          <Text style={styles.sectionTitle}>Declaration</Text>
           <TouchableOpacity
             style={styles.declarationContainer}
             onPress={() => setDeclaration(!declaration)}
@@ -254,8 +253,7 @@ export default function Section7() {
               {declaration ? <Text style={styles.checkmark}>✓</Text> : null}
             </View>
             <Text style={styles.declarationText}>
-              <Text style={styles.required}>* </Text>म प्रमाणित गर्छु कि उपरोक्त
-              सबै जानकारीहरू सही र पूर्ण छन्।
+              <Text style={styles.required}>* </Text>I confirm that all the above information is accurate and complete.
             </Text>
           </TouchableOpacity>
         </View>
@@ -267,7 +265,7 @@ export default function Section7() {
           onPress={() => router.back()}
           disabled={loading}
         >
-          <Text style={styles.backButtonText}>पछाडि / Back</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.submitButton, loading && styles.submitButtonDisabled]}
@@ -277,7 +275,7 @@ export default function Section7() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>पेश गर्नुहोस् / Submit</Text>
+            <Text style={styles.submitButtonText}>Submit</Text>
           )}
         </TouchableOpacity>
       </View>

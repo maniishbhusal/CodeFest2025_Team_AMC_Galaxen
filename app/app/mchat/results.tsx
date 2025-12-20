@@ -25,56 +25,36 @@ export default function MChatResultsScreen() {
           color: "#4CAF50",
           bgColor: "#E8F5E9",
           icon: "✓",
-          titleNe: "कम जोखिम",
-          titleEn: "Low Risk",
-          descNe:
-            "तपाईंको बच्चाको M-CHAT स्कोर कम जोखिम श्रेणीमा छ। यो राम्रो समाचार हो!",
-          descEn:
-            "Your child's M-CHAT score is in the low risk category. This is good news!",
-          recommendationNe:
-            "तपाईंको बच्चाको विकास सामान्य देखिन्छ। नियमित अनुगमन जारी राख्नुहोस्।",
-          recommendationEn:
-            "Your child's development appears typical. Continue regular monitoring.",
+          title: "Low Risk",
+          desc: "Your child's M-CHAT score is in the low risk category. This is good news!",
+          recommendation: "Your child's development appears typical. Continue regular monitoring.",
         };
       case "medium":
         return {
           color: "#FF9800",
           bgColor: "#FFF3E0",
           icon: "!",
-          titleNe: "मध्यम जोखिम",
-          titleEn: "Medium Risk",
-          descNe: "तपाईंको बच्चाको M-CHAT स्कोर मध्यम जोखिम श्रेणीमा छ।",
-          descEn: "Your child's M-CHAT score is in the medium risk category.",
-          recommendationNe:
-            "थप मूल्यांकनको लागि विशेषज्ञसँग परामर्श गर्न सिफारिस गरिएको छ।",
-          recommendationEn:
-            "A follow-up consultation with a specialist is recommended for further evaluation.",
+          title: "Medium Risk",
+          desc: "Your child's M-CHAT score is in the medium risk category.",
+          recommendation: "A follow-up consultation with a specialist is recommended for further evaluation.",
         };
       case "high":
         return {
           color: "#F44336",
           bgColor: "#FFEBEE",
           icon: "!!",
-          titleNe: "उच्च जोखिम",
-          titleEn: "High Risk",
-          descNe: "तपाईंको बच्चाको M-CHAT स्कोर उच्च जोखिम श्रेणीमा छ।",
-          descEn: "Your child's M-CHAT score is in the high risk category.",
-          recommendationNe:
-            "कृपया चाँडो सम्भव विशेषज्ञसँग परामर्श लिनुहोस्। छिटो हस्तक्षेपले राम्रो नतिजा दिन्छ।",
-          recommendationEn:
-            "Please consult with a specialist as soon as possible. Early intervention leads to better outcomes.",
+          title: "High Risk",
+          desc: "Your child's M-CHAT score is in the high risk category.",
+          recommendation: "Please consult with a specialist as soon as possible. Early intervention leads to better outcomes.",
         };
       default:
         return {
           color: "#4CAF50",
           bgColor: "#E8F5E9",
           icon: "✓",
-          titleNe: "कम जोखिम",
-          titleEn: "Low Risk",
-          descNe: "तपाईंको बच्चाको M-CHAT स्कोर कम जोखिम श्रेणीमा छ।",
-          descEn: "Your child's M-CHAT score is in the low risk category.",
-          recommendationNe: "तपाईंको बच्चाको विकास सामान्य देखिन्छ।",
-          recommendationEn: "Your child's development appears typical.",
+          title: "Low Risk",
+          desc: "Your child's M-CHAT score is in the low risk category.",
+          recommendation: "Your child's development appears typical.",
         };
     }
   };
@@ -113,50 +93,48 @@ export default function MChatResultsScreen() {
 
           <View style={[styles.riskBadge, { backgroundColor: config.color }]}>
             <Text style={styles.riskIcon}>{config.icon}</Text>
-            <Text style={styles.riskText}>{config.titleNe}</Text>
+            <Text style={styles.riskText}>{config.title}</Text>
           </View>
 
           <Text style={[styles.riskTitle, { color: config.color }]}>
-            {config.titleNe}
+            {config.title}
           </Text>
         </View>
 
         {/* Description Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>📋 नतिजा विवरण</Text>
-          <Text style={styles.descriptionNe}>{config.descNe}</Text>
-          {/* <Text style={styles.descriptionEn}>{config.descEn}</Text> */}
+          <Text style={styles.cardTitle}>📋 Result Details</Text>
+          <Text style={styles.descriptionNe}>{config.desc}</Text>
         </View>
 
         {/* Recommendation Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>💡 सिफारिस</Text>
-          <Text style={styles.recommendationNe}>{config.recommendationNe}</Text>
-          {/* <Text style={styles.recommendationEn}>{config.recommendationEn}</Text> */}
+          <Text style={styles.cardTitle}>💡 Recommendation</Text>
+          <Text style={styles.recommendationNe}>{config.recommendation}</Text>
         </View>
 
         {/* Score Breakdown */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>📊 स्कोर विवरण</Text>
+          <Text style={styles.cardTitle}>📊 Score Breakdown</Text>
 
           <View style={styles.scoreBreakdown}>
             <View style={styles.scoreRow}>
               <View
                 style={[styles.scoreIndicator, { backgroundColor: "#4CAF50" }]}
               />
-              <Text style={styles.scoreLabel}>0-2 = कम जोखिम</Text>
+              <Text style={styles.scoreLabel}>0-2 = Low Risk</Text>
             </View>
             <View style={styles.scoreRow}>
               <View
                 style={[styles.scoreIndicator, { backgroundColor: "#FF9800" }]}
               />
-              <Text style={styles.scoreLabel}>3-7 = मध्यम जोखिम</Text>
+              <Text style={styles.scoreLabel}>3-7 = Medium Risk</Text>
             </View>
             <View style={styles.scoreRow}>
               <View
                 style={[styles.scoreIndicator, { backgroundColor: "#F44336" }]}
               />
-              <Text style={styles.scoreLabel}>8-20 = उच्च जोखिम</Text>
+              <Text style={styles.scoreLabel}>8-20 = High Risk</Text>
             </View>
           </View>
         </View>
@@ -165,31 +143,24 @@ export default function MChatResultsScreen() {
         <View style={styles.noteCard}>
           <Text style={styles.noteIcon}>⚠️</Text>
           <View style={styles.noteContent}>
-            <Text style={styles.noteTitle}>महत्त्वपूर्ण नोट</Text>
+            <Text style={styles.noteTitle}>Important Note</Text>
             <Text style={styles.noteText}>
-              यो एक स्क्रीनिंग उपकरण हो, निदान होइन। अन्तिम निदान योग्य
-              स्वास्थ्य पेशेवरद्वारा मात्र गर्न सकिन्छ।
-            </Text>
-            {/* <Text style={styles.noteTextEn}>
               This is a screening tool, not a diagnosis. A final diagnosis can
               only be made by a qualified healthcare professional.
-            </Text> */}
+            </Text>
           </View>
         </View>
 
         {/* Next Steps */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>📌 अर्को कदमहरू</Text>
+          <Text style={styles.cardTitle}>📌 Next Steps</Text>
 
           <View style={styles.stepItem}>
             <Text style={styles.stepNumber}>1</Text>
             <View style={styles.stepContent}>
               <Text style={styles.stepText}>
-                डाक्टरले तपाईंको बच्चाको प्रोफाइल समीक्षा गर्नेछन्।
-              </Text>
-              {/* <Text style={styles.stepTextEn}>
                 A doctor will review your child's profile.
-              </Text> */}
+              </Text>
             </View>
           </View>
 
@@ -197,11 +168,8 @@ export default function MChatResultsScreen() {
             <Text style={styles.stepNumber}>2</Text>
             <View style={styles.stepContent}>
               <Text style={styles.stepText}>
-                तपाईंलाई थप निर्देशनहरू प्राप्त हुनेछ।
-              </Text>
-              {/* <Text style={styles.stepTextEn}>
                 You will receive further instructions.
-              </Text> */}
+              </Text>
             </View>
           </View>
 
@@ -209,11 +177,8 @@ export default function MChatResultsScreen() {
             <Text style={styles.stepNumber}>3</Text>
             <View style={styles.stepContent}>
               <Text style={styles.stepText}>
-                आवश्यक परे, थेरापी पाठ्यक्रम तोकिनेछ।
-              </Text>
-              {/* <Text style={styles.stepTextEn}>
                 If needed, a therapy curriculum will be assigned.
-              </Text> */}
+              </Text>
             </View>
           </View>
         </View>
@@ -227,7 +192,7 @@ export default function MChatResultsScreen() {
           activeOpacity={0.8}
         >
           <Text style={styles.uploadVideosButtonText}>
-            📹 भिडियो अपलोड गर्नुहोस्
+            📹 Upload Videos
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -235,7 +200,7 @@ export default function MChatResultsScreen() {
           onPress={handleContinue}
           activeOpacity={0.8}
         >
-          <Text style={styles.continueButtonText}>डास्बोर्डमा जानुहोस्</Text>
+          <Text style={styles.continueButtonText}>Go to Dashboard</Text>
         </TouchableOpacity>
       </View>
 
@@ -248,48 +213,48 @@ export default function MChatResultsScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>📹 भिडियो रेकर्डिङ टिप्स</Text>
+            <Text style={styles.modalTitle}>📹 Video Recording Tips</Text>
 
             <ScrollView style={styles.tipsScroll}>
               <View style={styles.tipItem}>
                 <Text style={styles.tipIcon}>💡</Text>
                 <Text style={styles.tipText}>
-                  राम्रो प्रकाश भएको ठाउँमा भिडियो खिच्नुहोस्
+                  Record video in a well-lit area
                 </Text>
               </View>
 
               <View style={styles.tipItem}>
                 <Text style={styles.tipIcon}>📱</Text>
                 <Text style={styles.tipText}>
-                  फोनलाई स्थिर राख्नुहोस् (तेर्सो वा ठाडो)
+                  Keep the phone steady (horizontal or vertical)
                 </Text>
               </View>
 
               <View style={styles.tipItem}>
                 <Text style={styles.tipIcon}>👶</Text>
                 <Text style={styles.tipText}>
-                  बच्चाको अनुहार र व्यवहार स्पष्ट देखिने गरी खिच्नुहोस्
+                  Make sure the child's face and behavior are clearly visible
                 </Text>
               </View>
 
               <View style={styles.tipItem}>
                 <Text style={styles.tipIcon}>🎯</Text>
                 <Text style={styles.tipText}>
-                  बच्चालाई खेलेको, बोलेको वा गतिविधि गरेको देखाउनुहोस्
+                  Show the child playing, talking, or doing activities
                 </Text>
               </View>
 
               <View style={styles.tipItem}>
                 <Text style={styles.tipIcon}>⏱️</Text>
                 <Text style={styles.tipText}>
-                  कम्तिमा 30 सेकेन्ड देखि 2 मिनेटको भिडियो लिनुहोस्
+                  Record for at least 30 seconds to 2 minutes
                 </Text>
               </View>
 
               <View style={styles.tipItem}>
                 <Text style={styles.tipIcon}>🔇</Text>
                 <Text style={styles.tipText}>
-                  शान्त वातावरण छनोट गर्नुहोस् (धेरै शोर नभएको)
+                  Choose a quiet environment (with minimal noise)
                 </Text>
               </View>
             </ScrollView>
@@ -299,14 +264,14 @@ export default function MChatResultsScreen() {
                 style={styles.modalCancelButton}
                 onPress={() => setShowTipsModal(false)}
               >
-                <Text style={styles.modalCancelText}>रद्द गर्नुहोस्</Text>
+                <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalProceedButton}
                 onPress={handleProceedToUpload}
               >
                 <Text style={styles.modalProceedText}>
-                  भिडियो अपलोड गर्नुहोस्
+                  Upload Videos
                 </Text>
               </TouchableOpacity>
             </View>

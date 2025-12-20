@@ -14,13 +14,13 @@ import StepIndicator from "../../components/StepIndicator";
 import { AppColors } from "@/constants/theme";
 
 const PROVINCES = [
-  "प्रदेश नं. १ / Province 1",
-  "मधेश प्रदेश / Madhesh Pradesh",
-  "बागमती प्रदेश / Bagmati Pradesh",
-  "गण्डकी प्रदेश / Gandaki Pradesh",
-  "लुम्बिनी प्रदेश / Lumbini Pradesh",
-  "कर्णाली प्रदेश / Karnali Pradesh",
-  "सुदूरपश्चिम प्रदेश / Sudurpashchim Pradesh",
+  "Province 1",
+  "Madhesh Pradesh",
+  "Bagmati Pradesh",
+  "Gandaki Pradesh",
+  "Lumbini Pradesh",
+  "Karnali Pradesh",
+  "Sudurpashchim Pradesh",
 ];
 
 export default function Section3() {
@@ -50,7 +50,7 @@ export default function Section3() {
       router.push("/form/section-4");
     } catch (error) {
       console.error("Error saving section 3 data:", error);
-      Alert.alert("त्रुटि", "डाटा सुरक्षित गर्न असफल भयो");
+      Alert.alert("Error", "Failed to save data");
     }
   };
 
@@ -63,20 +63,19 @@ export default function Section3() {
       <StepIndicator currentStep={3} totalSteps={7} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>सम्पर्क जानकारी</Text>
-        <Text style={styles.subtitle}>Contact Information</Text>
+        <Text style={styles.title}>Contact Information</Text>
+        <Text style={styles.subtitle}>Please fill in your contact details</Text>
 
         {/* Address */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            ठेगाना <Text style={styles.required}>*</Text>
+            Address <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Address</Text>
           <TextInput
             style={styles.input}
             value={address}
             onChangeText={setAddress}
-            placeholder="गाउँ/टोल, वडा नं."
+            placeholder="Village/Tole, Ward No."
             multiline
           />
         </View>
@@ -84,37 +83,34 @@ export default function Section3() {
         {/* Municipality */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            नगरपालिका/गाउँपालिका <Text style={styles.required}>*</Text>
+            Municipality <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Municipality/Rural Municipality</Text>
           <TextInput
             style={styles.input}
             value={municipality}
             onChangeText={setMunicipality}
-            placeholder="नगरपालिका/गाउँपालिकाको नाम"
+            placeholder="Municipality name"
           />
         </View>
 
         {/* District */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            जिल्ला <Text style={styles.required}>*</Text>
+            District <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>District</Text>
           <TextInput
             style={styles.input}
             value={district}
             onChangeText={setDistrict}
-            placeholder="जिल्लाको नाम"
+            placeholder="District name"
           />
         </View>
 
         {/* Province */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            प्रदेश <Text style={styles.required}>*</Text>
+            Province <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Province</Text>
           <View style={styles.provinceContainer}>
             {PROVINCES.map((prov, index) => (
               <TouchableOpacity
@@ -141,9 +137,8 @@ export default function Section3() {
         {/* Phone Number */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            फोन नम्बर <Text style={styles.required}>*</Text>
+            Phone Number <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Phone Number</Text>
           <TextInput
             style={styles.input}
             value={phoneNumber}
@@ -155,8 +150,7 @@ export default function Section3() {
 
         {/* Alternate Phone */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>वैकल्पिक फोन नम्बर</Text>
-          <Text style={styles.labelEn}>Alternate Phone Number</Text>
+          <Text style={styles.label}>Alternate Phone Number</Text>
           <TextInput
             style={styles.input}
             value={alternatePhone}
@@ -175,14 +169,13 @@ export default function Section3() {
             {isWhatsApp && <Text style={styles.checkmark}>✓</Text>}
           </View>
           <Text style={styles.checkboxLabel}>
-            यो नम्बर WhatsApp मा उपलब्ध छ / This number is available on WhatsApp
+            This number is available on WhatsApp
           </Text>
         </TouchableOpacity>
 
         {/* Email */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>इमेल (वैकल्पिक)</Text>
-          <Text style={styles.labelEn}>Email (Optional)</Text>
+          <Text style={styles.label}>Email (Optional)</Text>
           <TextInput
             style={styles.input}
             value={email}
@@ -197,17 +190,18 @@ export default function Section3() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.backButton}
+          
           onPress={handleBack}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>पछाडि / Back</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>अर्को / Next</Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>

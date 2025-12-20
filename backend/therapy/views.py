@@ -16,6 +16,20 @@ from .serializers import (
 )
 from children.models import Child
 from assessments.models import ChildAssessment
+from accounts.models import Doctor
+
+
+def get_or_create_doctor_profile(user):
+    """Helper to safely get or create doctor profile for a user"""
+    doctor, created = Doctor.objects.get_or_create(
+        user=user,
+        defaults={
+            'license_number': 'PENDING',
+            'specialization': 'General',
+            'is_approved': True,
+        }
+    )
+    return doctor
 
 
 # ============== CURRICULUM ENDPOINTS ==============
@@ -88,7 +102,7 @@ class DoctorAcceptedPatientsView(APIView):
         if request.user.role != 'doctor':
             return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
 
-        doctor = request.user.doctor_profile
+        doctor = get_or_create_doctor_profile(request.user)
         accepted = ChildAssessment.objects.filter(
             assigned_doctor=doctor,
             status__in=['accepted', 'completed']
@@ -212,16 +226,7 @@ class DoctorAcceptPatientView(APIView):
         if assessment.status != 'pending':
             return Response({'error': 'Patient already accepted'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get or create doctor profile
-        from accounts.models import Doctor
-        doctor, created = Doctor.objects.get_or_create(
-            user=request.user,
-            defaults={
-                'license_number': 'PENDING',
-                'specialization': 'General',
-                'is_approved': True,
-            }
-        )
+        doctor = get_or_create_doctor_profile(request.user)
 
         assessment.assigned_doctor = doctor
         assessment.status = 'accepted'
@@ -244,14 +249,20 @@ class DoctorAssignCurriculumView(APIView):
             return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
 
         child = get_object_or_404(Child, pk=child_id)
-        doctor = request.user.doctor_profile
+        doctor = get_or_create_doctor_profile(request.user)
 
         # Check if child is assigned to this doctor
         assessment = get_object_or_404(ChildAssessment, child=child, assigned_doctor=doctor)
 
         # Check if child already has an active curriculum
-        if ChildCurriculum.objects.filter(child=child, status='active').exists():
-            return Response({'error': 'Child already has an active curriculum'}, status=status.HTTP_400_BAD_REQUEST)
+        existing_active = ChildCurriculum.objects.filter(child=child, status='active').first()
+        if existing_active:
+            # If existing curriculum is an assessment type, mark it completed and allow new assignment
+            if existing_active.curriculum.type == 'assessment':
+                existing_active.status = 'completed'
+                existing_active.save()
+            else:
+                return Response({'error': 'Child already has an active curriculum'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = AssignCurriculumSerializer(data=request.data)
         if serializer.is_valid():
@@ -328,7 +339,7 @@ class DoctorCreateReviewView(APIView):
             return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
 
         child = get_object_or_404(Child, pk=child_id)
-        doctor = request.user.doctor_profile
+        doctor = get_or_create_doctor_profile(request.user)
 
         child_curriculum = ChildCurriculum.objects.filter(
             child=child, status='active'
@@ -573,7 +584,7 @@ class DoctorCreateDiagnosisView(APIView):
             return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
 
         child = get_object_or_404(Child, pk=child_id)
-        doctor = request.user.doctor_profile
+        doctor = get_or_create_doctor_profile(request.user)
 
         # Verify doctor has accepted this patient
         assessment = ChildAssessment.objects.filter(
@@ -626,7 +637,7 @@ class ChildDiagnosisReportsView(APIView):
             reports = DiagnosisReport.objects.filter(child=child, shared_with_parent=True)
         elif request.user.role == 'doctor':
             # Doctors can see all reports for their patients
-            doctor = request.user.doctor_profile
+            doctor = get_or_create_doctor_profile(request.user)
             # Verify doctor is assigned to this patient
             assessment = ChildAssessment.objects.filter(
                 child=child,
@@ -646,6 +657,46 @@ class ChildDiagnosisReportsView(APIView):
         })
 
 
+class ChildDoctorFeedbackView(APIView):
+    """Get doctor reviews/feedback for a child (for parent home screen)"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, child_id):
+        child = get_object_or_404(Child, pk=child_id)
+
+        # Check access - parent can only see their own child's feedback
+        if request.user.role == 'parent' and child.parent != request.user:
+            return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Get active or most recent curriculum
+        child_curriculum = ChildCurriculum.objects.filter(child=child).order_by('-created_at').first()
+
+        if not child_curriculum:
+            return Response({
+                'has_feedback': False,
+                'reviews': [],
+                'message': 'No curriculum assigned yet'
+            })
+
+        # Get all reviews for this curriculum
+        reviews = DoctorReview.objects.filter(
+            child_curriculum=child_curriculum
+        ).select_related('doctor', 'doctor__user').order_by('-reviewed_at')
+
+        if not reviews.exists():
+            return Response({
+                'has_feedback': False,
+                'reviews': [],
+                'message': 'No doctor feedback yet'
+            })
+
+        return Response({
+            'has_feedback': True,
+            'reviews': DoctorReviewSerializer(reviews, many=True).data,
+            'latest_review': DoctorReviewSerializer(reviews.first()).data,
+        })
+
+
 class DoctorToggleReportShareView(APIView):
     """Toggle whether a diagnosis report is shared with parent"""
     permission_classes = [IsAuthenticated]
@@ -657,7 +708,8 @@ class DoctorToggleReportShareView(APIView):
         report = get_object_or_404(DiagnosisReport, pk=report_id)
 
         # Verify doctor owns this report
-        if report.doctor != request.user.doctor_profile:
+        doctor = get_or_create_doctor_profile(request.user)
+        if report.doctor != doctor:
             return Response({'error': 'You can only modify your own reports'}, status=status.HTTP_403_FORBIDDEN)
 
         report.shared_with_parent = not report.shared_with_parent

@@ -6,8 +6,9 @@ export default function TasksTab() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to video upload page
-    router.replace("/videos/upload");
+    // Navigate to therapy today page (tasks)
+    // Using push instead of replace so back navigation works
+    router.push("/therapy/today");
   }, []);
 
   return <View style={styles.container} />;
