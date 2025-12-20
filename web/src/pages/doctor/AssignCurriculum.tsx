@@ -56,7 +56,9 @@ export default function AssignCurriculumPage() {
       ]);
       setPatient(patientData);
       // Filter out 'general' type curricula - only show assessment and specialized
-      setCurricula(curriculaData.filter((c: Curriculum) => c.type !== 'general'));
+      setCurricula(
+        curriculaData.filter((c: Curriculum) => c.type !== "general")
+      );
     } catch (err) {
       console.error(err);
       setError("Failed to load data");
@@ -100,7 +102,7 @@ export default function AssignCurriculumPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
+          <RefreshCw className="w-8 h-8 text-orange-500 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -115,7 +117,7 @@ export default function AssignCurriculumPage() {
           <p className="text-gray-600">Patient not found</p>
           <button
             onClick={() => navigate("/doctor/dashboard")}
-            className="mt-4 text-blue-600 hover:underline"
+            className="mt-4 text-orange-600 hover:underline"
           >
             Return to Dashboard
           </button>
@@ -161,7 +163,7 @@ export default function AssignCurriculumPage() {
         {/* Patient Info Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xl font-medium">
+            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white text-xl font-medium">
               {patient.child.full_name.charAt(0)}
             </div>
             <div>
@@ -203,7 +205,7 @@ export default function AssignCurriculumPage() {
                     onClick={() => setSelectedCurriculum(curriculum.id)}
                     className={`bg-white rounded-xl border-2 p-4 cursor-pointer transition ${
                       selectedCurriculum === curriculum.id
-                        ? "border-blue-500 bg-blue-50/50"
+                        ? "border-orange-500 bg-orange-50/50"
                         : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
@@ -211,7 +213,7 @@ export default function AssignCurriculumPage() {
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                           selectedCurriculum === curriculum.id
-                            ? "bg-blue-500 text-white"
+                            ? "bg-orange-500 text-white"
                             : "bg-gray-100 text-gray-500"
                         }`}
                       >
@@ -317,7 +319,7 @@ export default function AssignCurriculumPage() {
                   <button
                     onClick={handleAssign}
                     disabled={assigning}
-                    className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {assigning ? (
                       <>

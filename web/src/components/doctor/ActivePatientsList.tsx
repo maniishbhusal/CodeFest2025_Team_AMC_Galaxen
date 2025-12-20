@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, BookOpen, BarChart3 } from "lucide-react";
-import { getActivePatients, type ActivePatient } from "@/lib/api";
+import { getActivePatients, type ActivePatient } from "@/lib/api.ts";
 
 export default function ActivePatientsList() {
   const navigate = useNavigate();
@@ -44,7 +44,10 @@ export default function ActivePatientsList() {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500">{error}</p>
-        <button onClick={fetchPatients} className="text-blue-600 text-sm mt-2 hover:underline">
+        <button
+          onClick={fetchPatients}
+          className="text-orange-600 text-sm mt-2 hover:underline"
+        >
           Retry
         </button>
       </div>
@@ -68,10 +71,14 @@ export default function ActivePatientsList() {
           className="flex items-center gap-4 py-4 px-2 hover:bg-gray-50 cursor-pointer rounded-lg transition"
         >
           {/* Status indicator */}
-          <div className={`w-3 h-3 rounded-full ${patient.has_curriculum ? "bg-green-500" : "bg-amber-500"}`} />
+          <div
+            className={`w-3 h-3 rounded-full ${
+              patient.has_curriculum ? "bg-green-500" : "bg-amber-500"
+            }`}
+          />
 
           {/* Avatar */}
-          <div className="w-11 h-11 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-base">
+          <div className="w-11 h-11 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-semibold text-base">
             {patient.child_name.charAt(0)}
           </div>
 

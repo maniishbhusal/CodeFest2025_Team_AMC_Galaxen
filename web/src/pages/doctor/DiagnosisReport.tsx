@@ -26,7 +26,9 @@ export default function DiagnosisReport() {
   const navigate = useNavigate();
 
   const [patient, setPatient] = useState<PatientDetail | null>(null);
-  const [existingReports, setExistingReports] = useState<DiagnosisReportType[]>([]);
+  const [existingReports, setExistingReports] = useState<DiagnosisReportType[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -34,7 +36,9 @@ export default function DiagnosisReport() {
 
   // Form state
   const [hasAutism, setHasAutism] = useState<boolean | null>(null);
-  const [spectrumType, setSpectrumType] = useState<"none" | "mild" | "moderate" | "severe">("none");
+  const [spectrumType, setSpectrumType] = useState<
+    "none" | "mild" | "moderate" | "severe"
+  >("none");
   const [detailedReport, setDetailedReport] = useState("");
   const [nextSteps, setNextSteps] = useState("");
   const [shareWithParent, setShareWithParent] = useState(true);
@@ -133,7 +137,7 @@ export default function DiagnosisReport() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
       </div>
     );
   }
@@ -146,7 +150,7 @@ export default function DiagnosisReport() {
           <p className="text-gray-600">Patient not found</p>
           <button
             onClick={() => navigate("/doctor/dashboard")}
-            className="mt-4 text-blue-600 hover:underline"
+            className="mt-4 text-orange-600 hover:underline"
           >
             Back to Dashboard
           </button>
@@ -169,14 +173,19 @@ export default function DiagnosisReport() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">Diagnosis Report</h1>
-                <p className="text-sm text-gray-500">{patient.child.full_name}</p>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  Diagnosis Report
+                </h1>
+                <p className="text-sm text-gray-500">
+                  {patient.child.full_name}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-purple-600" />
               <span className="text-sm font-medium text-purple-600">
-                {existingReports.length} Report{existingReports.length !== 1 ? "s" : ""}
+                {existingReports.length} Report
+                {existingReports.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -206,7 +215,9 @@ export default function DiagnosisReport() {
               <div className="p-2 bg-purple-100 rounded-xl">
                 <ClipboardCheck className="w-5 h-5 text-purple-600" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900">Create Diagnosis Report</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Create Diagnosis Report
+              </h2>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -342,17 +353,21 @@ export default function DiagnosisReport() {
           {/* Existing Reports */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-blue-100 rounded-xl">
-                <FileText className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-orange-100 rounded-xl">
+                <FileText className="w-5 h-5 text-orange-600" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900">Previous Reports</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Previous Reports
+              </h2>
             </div>
 
             {existingReports.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                 <p>No diagnosis reports yet</p>
-                <p className="text-sm mt-1">Create the first report using the form</p>
+                <p className="text-sm mt-1">
+                  Create the first report using the form
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -377,16 +392,23 @@ export default function DiagnosisReport() {
                             }`}
                           >
                             {report.has_autism
-                              ? `ASD - ${report.spectrum_type?.charAt(0).toUpperCase()}${report.spectrum_type?.slice(1)}`
+                              ? `ASD - ${report.spectrum_type
+                                  ?.charAt(0)
+                                  .toUpperCase()}${report.spectrum_type?.slice(
+                                  1
+                                )}`
                               : "No ASD"}
                           </span>
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                          {new Date(report.created_at).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {new Date(report.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
                           {" by "}
                           {report.doctor_name}
                         </p>
@@ -398,7 +420,11 @@ export default function DiagnosisReport() {
                             ? "bg-green-100 text-green-600 hover:bg-green-200"
                             : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                         }`}
-                        title={report.shared_with_parent ? "Shared with parent" : "Not shared"}
+                        title={
+                          report.shared_with_parent
+                            ? "Shared with parent"
+                            : "Not shared"
+                        }
                       >
                         {report.shared_with_parent ? (
                           <Eye className="w-4 h-4" />
@@ -411,12 +437,20 @@ export default function DiagnosisReport() {
                     {/* Report Content */}
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase mb-1">Report</p>
-                        <p className="text-sm text-gray-700 line-clamp-2">{report.detailed_report}</p>
+                        <p className="text-xs font-medium text-gray-500 uppercase mb-1">
+                          Report
+                        </p>
+                        <p className="text-sm text-gray-700 line-clamp-2">
+                          {report.detailed_report}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase mb-1">Next Steps</p>
-                        <p className="text-sm text-gray-700 line-clamp-2">{report.next_steps}</p>
+                        <p className="text-xs font-medium text-gray-500 uppercase mb-1">
+                          Next Steps
+                        </p>
+                        <p className="text-sm text-gray-700 line-clamp-2">
+                          {report.next_steps}
+                        </p>
                       </div>
                     </div>
 
@@ -424,7 +458,9 @@ export default function DiagnosisReport() {
                     <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
                       <Share2 className="w-3.5 h-3.5 text-gray-400" />
                       <span className="text-xs text-gray-500">
-                        {report.shared_with_parent ? "Visible to parent" : "Hidden from parent"}
+                        {report.shared_with_parent
+                          ? "Visible to parent"
+                          : "Hidden from parent"}
                       </span>
                     </div>
                   </div>
@@ -435,8 +471,10 @@ export default function DiagnosisReport() {
         </div>
 
         {/* Quick Reference */}
-        <div className="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl border border-purple-100 p-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Patient Quick Reference</h3>
+        <div className="mt-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100 p-6">
+          <h3 className="font-semibold text-gray-900 mb-3">
+            Patient Quick Reference
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
               <p className="text-gray-500">M-CHAT Score</p>
@@ -446,13 +484,15 @@ export default function DiagnosisReport() {
             </div>
             <div>
               <p className="text-gray-500">Risk Level</p>
-              <p className={`font-medium ${
-                patient.mchat_result?.risk_level === "high"
-                  ? "text-red-600"
-                  : patient.mchat_result?.risk_level === "medium"
-                  ? "text-amber-600"
-                  : "text-green-600"
-              }`}>
+              <p
+                className={`font-medium ${
+                  patient.mchat_result?.risk_level === "high"
+                    ? "text-red-600"
+                    : patient.mchat_result?.risk_level === "medium"
+                    ? "text-amber-600"
+                    : "text-green-600"
+                }`}
+              >
                 {patient.mchat_result?.risk_level?.charAt(0).toUpperCase()}
                 {patient.mchat_result?.risk_level?.slice(1) ?? "N/A"}
               </p>

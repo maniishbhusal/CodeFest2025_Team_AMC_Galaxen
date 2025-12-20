@@ -146,7 +146,10 @@ export default function PatientProgressPage() {
     const tasks = new Map<number, { id: number; title: string }>();
     progress.progress.forEach((entry) => {
       if (!tasks.has(entry.task.id)) {
-        tasks.set(entry.task.id, { id: entry.task.id, title: entry.task.title });
+        tasks.set(entry.task.id, {
+          id: entry.task.id,
+          title: entry.task.title,
+        });
       }
     });
     return Array.from(tasks.values());
@@ -156,7 +159,7 @@ export default function PatientProgressPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
+          <RefreshCw className="w-8 h-8 text-orange-500 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading progress data...</p>
         </div>
       </div>
@@ -188,11 +191,12 @@ export default function PatientProgressPage() {
               No Curriculum Assigned
             </h2>
             <p className="text-gray-500 mb-6">
-              Assign a curriculum to this patient to start tracking their progress.
+              Assign a curriculum to this patient to start tracking their
+              progress.
             </p>
             <button
               onClick={() => navigate(`/doctor/patient/${childId}/assign`)}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
             >
               Assign Curriculum
             </button>
@@ -210,7 +214,7 @@ export default function PatientProgressPage() {
           <p className="text-gray-600">{error || "Data not found"}</p>
           <button
             onClick={() => navigate("/doctor/dashboard")}
-            className="mt-4 text-blue-600 hover:underline"
+            className="mt-4 text-orange-600 hover:underline"
           >
             Return to Dashboard
           </button>
@@ -221,7 +225,9 @@ export default function PatientProgressPage() {
 
   const progressByDay = getProgressByDay();
   const uniqueTasks = getUniqueTasks();
-  const daysWithProgress = Object.keys(progressByDay).map(Number).sort((a, b) => a - b);
+  const daysWithProgress = Object.keys(progressByDay)
+    .map(Number)
+    .sort((a, b) => a - b);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -241,7 +247,9 @@ export default function PatientProgressPage() {
                   Progress: {patient.child.full_name}
                 </h1>
                 <p className="text-sm text-gray-500">
-                  {progress.curriculum.title} • Day {progress.curriculum.current_day}/{progress.curriculum.duration_days}
+                  {progress.curriculum.title} • Day{" "}
+                  {progress.curriculum.current_day}/
+                  {progress.curriculum.duration_days}
                 </p>
               </div>
             </div>
@@ -270,8 +278,8 @@ export default function PatientProgressPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Calendar className="w-5 h-5 text-orange-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">
@@ -325,7 +333,9 @@ export default function PatientProgressPage() {
         {/* Progress Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
           <div className="p-6 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">Progress Table</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Progress Table
+            </h2>
             <p className="text-sm text-gray-500 mt-1">
               Daily task completion status
             </p>
@@ -348,7 +358,10 @@ export default function PatientProgressPage() {
                       Task
                     </th>
                     {daysWithProgress.map((day) => (
-                      <th key={day} className="text-center py-3 px-2 text-sm font-medium text-gray-600 min-w-[60px]">
+                      <th
+                        key={day}
+                        className="text-center py-3 px-2 text-sm font-medium text-gray-600 min-w-[60px]"
+                      >
                         Day {day}
                       </th>
                     ))}
@@ -377,8 +390,10 @@ export default function PatientProgressPage() {
                                 </div>
                                 {entry.video_url && (
                                   <button
-                                    onClick={() => setPlayingVideo(entry.video_url!)}
-                                    className="text-xs text-blue-600 hover:underline flex items-center gap-0.5"
+                                    onClick={() =>
+                                      setPlayingVideo(entry.video_url!)
+                                    }
+                                    className="text-xs text-orange-600 hover:underline flex items-center gap-0.5"
                                   >
                                     <Play className="w-3 h-3" />
                                     Video
@@ -427,7 +442,9 @@ export default function PatientProgressPage() {
         {progress.reviews.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="p-6 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900">Previous Reviews</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Previous Reviews
+              </h2>
             </div>
             <div className="divide-y divide-gray-100">
               {progress.reviews.map((review) => (
@@ -440,19 +457,27 @@ export default function PatientProgressPage() {
                       {new Date(review.reviewed_at).toLocaleDateString()}
                     </span>
                     {review.spectrum_identified && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                      <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
                         {review.spectrum_identified}
                       </span>
                     )}
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700">Observations</h4>
-                      <p className="text-gray-600 text-sm mt-1">{review.observations}</p>
+                      <h4 className="text-sm font-medium text-gray-700">
+                        Observations
+                      </h4>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {review.observations}
+                      </p>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700">Recommendations</h4>
-                      <p className="text-gray-600 text-sm mt-1">{review.recommendations}</p>
+                      <h4 className="text-sm font-medium text-gray-700">
+                        Recommendations
+                      </h4>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {review.recommendations}
+                      </p>
                     </div>
                   </div>
                 </div>

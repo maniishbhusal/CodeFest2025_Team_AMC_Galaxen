@@ -118,7 +118,7 @@ export default function PatientDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex items-center gap-3">
-          <RefreshCw className="w-6 h-6 text-blue-500 animate-spin" />
+          <RefreshCw className="w-6 h-6 text-orange-500 animate-spin" />
           <span className="text-gray-600">Loading patient details...</span>
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function PatientDetailPage() {
           <p className="text-gray-600">{error || "Patient not found"}</p>
           <button
             onClick={() => navigate("/doctor/dashboard")}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
           >
             Back to Dashboard
           </button>
@@ -175,24 +175,29 @@ export default function PatientDetailPage() {
               </button>
             )}
 
-            {(patient.status === "accepted" || patient.status === "completed") && (
+            {(patient.status === "accepted" ||
+              patient.status === "completed") && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => navigate(`/doctor/patient/${childId}/assign`)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                  className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
                 >
                   <BookOpen className="w-4 h-4" />
                   Assign Curriculum
                 </button>
                 <button
-                  onClick={() => navigate(`/doctor/patient/${childId}/progress`)}
+                  onClick={() =>
+                    navigate(`/doctor/patient/${childId}/progress`)
+                  }
                   className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
                 >
                   <BarChart3 className="w-4 h-4" />
                   View Progress
                 </button>
                 <button
-                  onClick={() => navigate(`/doctor/patient/${childId}/diagnosis`)}
+                  onClick={() =>
+                    navigate(`/doctor/patient/${childId}/diagnosis`)
+                  }
                   className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition"
                 >
                   <FileText className="w-4 h-4" />
@@ -208,7 +213,7 @@ export default function PatientDetailPage() {
         {/* Child Info Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex items-start gap-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
+            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
               {patient.child.full_name.charAt(0)}
             </div>
             <div className="flex-1">
@@ -231,12 +236,16 @@ export default function PatientDetailPage() {
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Calendar className="w-4 h-4 text-gray-400" />
-                  <span>DOB: {new Date(patient.child.date_of_birth).toLocaleDateString()}</span>
+                  <span>
+                    DOB:{" "}
+                    {new Date(patient.child.date_of_birth).toLocaleDateString()}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Clock className="w-4 h-4 text-gray-400" />
                   <span>
-                    Submitted: {new Date(patient.submitted_at).toLocaleDateString()}
+                    Submitted:{" "}
+                    {new Date(patient.submitted_at).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -264,7 +273,9 @@ export default function PatientDetailPage() {
                     <p className="text-3xl font-bold text-gray-900">
                       {patient.mchat_result.total_score}
                     </p>
-                    <p className="text-sm text-gray-500">Total Score (out of 20)</p>
+                    <p className="text-sm text-gray-500">
+                      Total Score (out of 20)
+                    </p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-4 text-center">
                     <div className="flex justify-center mb-1">
@@ -274,7 +285,9 @@ export default function PatientDetailPage() {
                   </div>
                   <div className="bg-gray-50 rounded-xl p-4 text-center">
                     <p className="text-lg font-medium text-gray-700">
-                      {new Date(patient.mchat_result.created_at).toLocaleDateString()}
+                      {new Date(
+                        patient.mchat_result.created_at
+                      ).toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-500">Completed On</p>
                   </div>
@@ -285,10 +298,12 @@ export default function PatientDetailPage() {
                     <div className="flex items-start gap-3">
                       <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
                       <div>
-                        <p className="font-medium text-red-800">High Risk Detected</p>
+                        <p className="font-medium text-red-800">
+                          High Risk Detected
+                        </p>
                         <p className="text-sm text-red-600 mt-1">
-                          This child has scored in the high-risk range. Immediate professional
-                          evaluation is recommended.
+                          This child has scored in the high-risk range.
+                          Immediate professional evaluation is recommended.
                         </p>
                       </div>
                     </div>
@@ -315,7 +330,13 @@ export default function PatientDetailPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className={`p-4 rounded-xl ${patient.medical_history.pregnancy_infection ? "bg-red-50 border border-red-100" : "bg-gray-50"}`}>
+                  <div
+                    className={`p-4 rounded-xl ${
+                      patient.medical_history.pregnancy_infection
+                        ? "bg-red-50 border border-red-100"
+                        : "bg-gray-50"
+                    }`}
+                  >
                     <div className="flex items-center gap-2 mb-1">
                       {patient.medical_history.pregnancy_infection ? (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
@@ -328,12 +349,19 @@ export default function PatientDetailPage() {
                     </div>
                     <p className="text-sm text-gray-600 ml-6">
                       {patient.medical_history.pregnancy_infection
-                        ? patient.medical_history.pregnancy_infection_desc || "Yes - Details not provided"
+                        ? patient.medical_history.pregnancy_infection_desc ||
+                          "Yes - Details not provided"
                         : "No serious infection during pregnancy"}
                     </p>
                   </div>
 
-                  <div className={`p-4 rounded-xl ${patient.medical_history.birth_complications ? "bg-red-50 border border-red-100" : "bg-gray-50"}`}>
+                  <div
+                    className={`p-4 rounded-xl ${
+                      patient.medical_history.birth_complications
+                        ? "bg-red-50 border border-red-100"
+                        : "bg-gray-50"
+                    }`}
+                  >
                     <div className="flex items-center gap-2 mb-1">
                       {patient.medical_history.birth_complications ? (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
@@ -346,12 +374,19 @@ export default function PatientDetailPage() {
                     </div>
                     <p className="text-sm text-gray-600 ml-6">
                       {patient.medical_history.birth_complications
-                        ? patient.medical_history.birth_complications_desc || "Yes - Details not provided"
+                        ? patient.medical_history.birth_complications_desc ||
+                          "Yes - Details not provided"
                         : "No complications during birth"}
                     </p>
                   </div>
 
-                  <div className={`p-4 rounded-xl ${patient.medical_history.brain_injury_first_year ? "bg-red-50 border border-red-100" : "bg-gray-50"}`}>
+                  <div
+                    className={`p-4 rounded-xl ${
+                      patient.medical_history.brain_injury_first_year
+                        ? "bg-red-50 border border-red-100"
+                        : "bg-gray-50"
+                    }`}
+                  >
                     <div className="flex items-center gap-2 mb-1">
                       {patient.medical_history.brain_injury_first_year ? (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
@@ -364,12 +399,19 @@ export default function PatientDetailPage() {
                     </div>
                     <p className="text-sm text-gray-600 ml-6">
                       {patient.medical_history.brain_injury_first_year
-                        ? patient.medical_history.brain_injury_desc || "Yes - Details not provided"
+                        ? patient.medical_history.brain_injury_desc ||
+                          "Yes - Details not provided"
                         : "No brain injury during first year"}
                     </p>
                   </div>
 
-                  <div className={`p-4 rounded-xl ${patient.medical_history.family_autism_history ? "bg-amber-50 border border-amber-100" : "bg-gray-50"}`}>
+                  <div
+                    className={`p-4 rounded-xl ${
+                      patient.medical_history.family_autism_history
+                        ? "bg-amber-50 border border-amber-100"
+                        : "bg-gray-50"
+                    }`}
+                  >
                     <div className="flex items-center gap-2 mb-1">
                       {patient.medical_history.family_autism_history ? (
                         <AlertCircle className="w-4 h-4 text-amber-500" />
@@ -408,121 +450,310 @@ export default function PatientDetailPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Day</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Task</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Category</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-600">Status</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Observation</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">
+                        Day
+                      </th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">
+                        Task
+                      </th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">
+                        Category
+                      </th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-600">
+                        Status
+                      </th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">
+                        Observation
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {/* Day 1 Tasks */}
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">1</td>
-                      <td className="py-3 px-4 text-gray-700">Morning Face Time</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">Social Engagement</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Child made eye contact for 2 seconds, smiled back</td>
+                      <td className="py-3 px-4 text-gray-700">
+                        Morning Face Time
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">
+                          Social Engagement
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Child made eye contact for 2 seconds, smiled back
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">1</td>
-                      <td className="py-3 px-4 text-gray-700">Point to Treat</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Joint Attention</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
-                      <td className="py-3 px-4 text-gray-600">Needed physical prompt to follow point</td>
+                      <td className="py-3 px-4 text-gray-700">
+                        Point to Treat
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                          Joint Attention
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
+                          <AlertCircle className="w-3 h-3" />
+                          With Help
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Needed physical prompt to follow point
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">1</td>
                       <td className="py-3 px-4 text-gray-700">Choice Making</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Communication</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Reached for preferred toy independently</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                          Communication
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Reached for preferred toy independently
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">1</td>
                       <td className="py-3 px-4 text-gray-700">Car Fun</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Play Skills</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"><AlertTriangle className="w-3 h-3" />Not Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Only spun wheels, no functional play</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                          Play Skills
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+                          <AlertTriangle className="w-3 h-3" />
+                          Not Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Only spun wheels, no functional play
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">1</td>
                       <td className="py-3 px-4 text-gray-700">In/Out Game</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">Cognitive</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
-                      <td className="py-3 px-4 text-gray-600">Imitated action after demonstration</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">
+                          Cognitive
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
+                          <AlertCircle className="w-3 h-3" />
+                          With Help
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Imitated action after demonstration
+                      </td>
                     </tr>
                     {/* Day 2 Tasks */}
                     <tr className="hover:bg-gray-50 bg-gray-25">
                       <td className="py-3 px-4 font-medium text-gray-900">2</td>
                       <td className="py-3 px-4 text-gray-700">Mirror Play</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">Social Engagement</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Smiled at reflection, touched mirror</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">
+                          Social Engagement
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Smiled at reflection, touched mirror
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50 bg-gray-25">
                       <td className="py-3 px-4 font-medium text-gray-900">2</td>
                       <td className="py-3 px-4 text-gray-700">Surprise Bag</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Joint Attention</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Watched bag intently, reached for item</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                          Joint Attention
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Watched bag intently, reached for item
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50 bg-gray-25">
                       <td className="py-3 px-4 font-medium text-gray-900">2</td>
                       <td className="py-3 px-4 text-gray-700">Animal Sounds</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Communication</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
-                      <td className="py-3 px-4 text-gray-600">Made sound attempt after 3 demonstrations</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                          Communication
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
+                          <AlertCircle className="w-3 h-3" />
+                          With Help
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Made sound attempt after 3 demonstrations
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50 bg-gray-25">
                       <td className="py-3 px-4 font-medium text-gray-900">2</td>
-                      <td className="py-3 px-4 text-gray-700">Block Stacking</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Play Skills</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Stacked 2 blocks, knocked down with joy</td>
+                      <td className="py-3 px-4 text-gray-700">
+                        Block Stacking
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                          Play Skills
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Stacked 2 blocks, knocked down with joy
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50 bg-gray-25">
                       <td className="py-3 px-4 font-medium text-gray-900">2</td>
                       <td className="py-3 px-4 text-gray-700">Big & Small</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">Cognitive</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"><AlertTriangle className="w-3 h-3" />Not Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Did not differentiate between sizes</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">
+                          Cognitive
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+                          <AlertTriangle className="w-3 h-3" />
+                          Not Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Did not differentiate between sizes
+                      </td>
                     </tr>
                     {/* Day 3 Tasks */}
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">3</td>
-                      <td className="py-3 px-4 text-gray-700">Tickle Countdown</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">Social Engagement</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Showed anticipation, laughed during tickle</td>
+                      <td className="py-3 px-4 text-gray-700">
+                        Tickle Countdown
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full">
+                          Social Engagement
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Showed anticipation, laughed during tickle
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">3</td>
-                      <td className="py-3 px-4 text-gray-700">Window Watching</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Joint Attention</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
-                      <td className="py-3 px-4 text-gray-600">Looked where pointed after verbal cue</td>
+                      <td className="py-3 px-4 text-gray-700">
+                        Window Watching
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                          Joint Attention
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
+                          <AlertCircle className="w-3 h-3" />
+                          With Help
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Looked where pointed after verbal cue
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">3</td>
-                      <td className="py-3 px-4 text-gray-700">Gesture for 'More'</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Communication</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"><AlertTriangle className="w-3 h-3" />Not Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">No gesture imitation observed</td>
+                      <td className="py-3 px-4 text-gray-700">
+                        Gesture for 'More'
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                          Communication
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+                          <AlertTriangle className="w-3 h-3" />
+                          Not Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        No gesture imitation observed
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">3</td>
                       <td className="py-3 px-4 text-gray-700">Simple Puzzle</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Play Skills</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full"><AlertCircle className="w-3 h-3" />With Help</span></td>
-                      <td className="py-3 px-4 text-gray-600">Needed hand-over-hand guidance</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                          Play Skills
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
+                          <AlertCircle className="w-3 h-3" />
+                          With Help
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Needed hand-over-hand guidance
+                      </td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">3</td>
-                      <td className="py-3 px-4 text-gray-700">Follow Simple Command</td>
-                      <td className="py-3 px-4"><span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">Cognitive</span></td>
-                      <td className="py-3 px-4 text-center"><span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><CheckCircle className="w-3 h-3" />Done</span></td>
-                      <td className="py-3 px-4 text-gray-600">Followed "come here" with gesture</td>
+                      <td className="py-3 px-4 text-gray-700">
+                        Follow Simple Command
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">
+                          Cognitive
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        Followed "come here" with gesture
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -543,9 +774,9 @@ export default function PatientDetailPage() {
                     <p className="text-2xl font-bold text-red-700">4</p>
                     <p className="text-xs text-red-600">Not Done</p>
                   </div>
-                  <div className="bg-blue-50 rounded-xl p-3">
-                    <p className="text-2xl font-bold text-blue-700">73%</p>
-                    <p className="text-xs text-blue-600">Completion Rate</p>
+                  <div className="bg-orange-50 rounded-xl p-3">
+                    <p className="text-2xl font-bold text-orange-700">73%</p>
+                    <p className="text-xs text-orange-600">Completion Rate</p>
                   </div>
                 </div>
               </div>
@@ -555,13 +786,30 @@ export default function PatientDetailPage() {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5" />
                   <div>
-                    <p className="font-medium text-amber-800">Key Observations</p>
+                    <p className="font-medium text-amber-800">
+                      Key Observations
+                    </p>
                     <ul className="text-sm text-amber-700 mt-2 space-y-1">
-                      <li>• <strong>Joint Attention:</strong> Requires physical/verbal prompts to follow points</li>
-                      <li>• <strong>Play Skills:</strong> Limited functional play, prefers repetitive actions (spinning wheels)</li>
-                      <li>• <strong>Communication:</strong> Gesture imitation is weak, needs more practice</li>
-                      <li>• <strong>Social:</strong> Good eye contact and social smiling observed</li>
-                      <li>• <strong>Cognitive:</strong> Following simple commands but size concepts unclear</li>
+                      <li>
+                        • <strong>Joint Attention:</strong> Requires
+                        physical/verbal prompts to follow points
+                      </li>
+                      <li>
+                        • <strong>Play Skills:</strong> Limited functional play,
+                        prefers repetitive actions (spinning wheels)
+                      </li>
+                      <li>
+                        • <strong>Communication:</strong> Gesture imitation is
+                        weak, needs more practice
+                      </li>
+                      <li>
+                        • <strong>Social:</strong> Good eye contact and social
+                        smiling observed
+                      </li>
+                      <li>
+                        • <strong>Cognitive:</strong> Following simple commands
+                        but size concepts unclear
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -572,8 +820,8 @@ export default function PatientDetailPage() {
             {patient.videos && patient.videos.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-blue-100 rounded-xl">
-                    <Video className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-orange-100 rounded-xl">
+                    <Video className="w-5 h-5 text-orange-600" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900">
                     Assessment Videos ({patient.videos.length})
@@ -587,7 +835,7 @@ export default function PatientDetailPage() {
                       className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
                           <Play className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1">
@@ -607,7 +855,7 @@ export default function PatientDetailPage() {
                       {video.video_url && (
                         <button
                           onClick={() => setPlayingVideo(video.video_url)}
-                          className="mt-3 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                          className="mt-3 inline-flex items-center gap-1 text-sm text-orange-600 hover:text-orange-700"
                         >
                           <Play className="w-4 h-4" />
                           Watch Video
@@ -668,14 +916,18 @@ export default function PatientDetailPage() {
                   <div className="p-2 bg-amber-100 rounded-xl">
                     <GraduationCap className="w-5 h-5 text-amber-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Education</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Education
+                  </h3>
                 </div>
 
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-gray-500">School Status</p>
                     <p className="font-medium text-gray-900">
-                      {patient.education.is_in_school ? "Currently in School" : "Not in School"}
+                      {patient.education.is_in_school
+                        ? "Currently in School"
+                        : "Not in School"}
                     </p>
                   </div>
                   {patient.education.school_name && (
@@ -713,7 +965,9 @@ export default function PatientDetailPage() {
                   <div className="p-2 bg-pink-100 rounded-xl">
                     <Heart className="w-5 h-5 text-pink-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Health</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Health
+                  </h3>
                 </div>
 
                 <div className="space-y-3">
@@ -743,7 +997,9 @@ export default function PatientDetailPage() {
                   </div>
                   {patient.health.medical_conditions && (
                     <div>
-                      <p className="text-sm text-gray-500">Medical Conditions</p>
+                      <p className="text-sm text-gray-500">
+                        Medical Conditions
+                      </p>
                       <p className="font-medium text-gray-900">
                         {patient.health.medical_conditions}
                       </p>
@@ -783,15 +1039,15 @@ export default function PatientDetailPage() {
                   <h3 className="text-lg font-semibold text-gray-900">
                     Accept Patient
                   </h3>
-                  <p className="text-sm text-gray-500">
-                    Confirm your decision
-                  </p>
+                  <p className="text-sm text-gray-500">Confirm your decision</p>
                 </div>
               </div>
 
               <p className="text-gray-600 mb-6">
-                Are you sure you want to accept <strong>{patient.child.full_name}</strong> as your patient?
-                You will be responsible for their assessment review and therapy curriculum assignment.
+                Are you sure you want to accept{" "}
+                <strong>{patient.child.full_name}</strong> as your patient? You
+                will be responsible for their assessment review and therapy
+                curriculum assignment.
               </p>
 
               {patient.mchat_result?.risk_level === "high" && (
@@ -801,7 +1057,8 @@ export default function PatientDetailPage() {
                     <span className="font-medium">High Risk Patient</span>
                   </div>
                   <p className="text-red-600 text-sm mt-1">
-                    This patient has a high M-CHAT risk score. Priority attention is recommended.
+                    This patient has a high M-CHAT risk score. Priority
+                    attention is recommended.
                   </p>
                 </div>
               )}

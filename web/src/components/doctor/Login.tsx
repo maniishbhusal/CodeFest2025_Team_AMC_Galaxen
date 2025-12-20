@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, Stethoscope, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Stethoscope,
+  AlertCircle,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 
 const BASE_URL = "https://5bd65bd753d5.ngrok-free.app";
 
@@ -12,6 +19,8 @@ export default function DoctorLogin() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [focusedInput, setFocusedInput] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -64,14 +73,12 @@ export default function DoctorLogin() {
         localStorage.setItem("doctorToken", data.tokens.access);
         localStorage.setItem("doctorRefreshToken", data.tokens.refresh);
       }
-
       localStorage.setItem("doctorLoggedIn", "true");
       localStorage.setItem("doctorEmail", data.user.email);
       localStorage.setItem("doctorName", data.user.full_name);
       localStorage.setItem("doctorData", JSON.stringify(data.user));
 
       console.log("Login successful, navigating to dashboard...");
-
       setLoading(false);
 
       // Redirect to doctor dashboard
@@ -84,157 +91,217 @@ export default function DoctorLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl mb-4 shadow-lg">
-            <Stethoscope className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+        <div
+          className="absolute top-40 right-10 w-72 h-72 bg-amber-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute -bottom-8 left-1/2 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo and Title Section */}
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl mb-4 shadow-lg shadow-orange-500/30 transform hover:scale-110 transition-transform duration-300 cursor-pointer">
+            <Stethoscope className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">
-            Autistic specialist
-          </h2>
-          <p className="mt-2 text-gray-600">Sign in to access your dashboard</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
+            Autism Specialist
+            <Sparkles className="w-6 h-6 text-orange-500 animate-pulse" />
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Sign in to access your dashboard
+          </p>
         </div>
 
-        {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        {/* Login Card */}
+        <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-orange-100 transform hover:shadow-orange-200/50 transition-all duration-300">
+          {/* Error Alert */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-              <div className="flex items-start">
-                <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
-                <div className="ml-3">
-                  <p className="text-red-800 text-sm">{error}</p>
-                </div>
-              </div>
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-3 animate-shake">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address *
+            {/* Email Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                Email Address
+                <span className="text-orange-500">*</span>
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div
+                className={`relative transition-all duration-300 ${
+                  focusedInput === "email" ? "transform scale-[1.02]" : ""
+                }`}
+              >
+                <Mail
+                  className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+                    focusedInput === "email"
+                      ? "text-orange-500"
+                      : "text-gray-400"
+                  }`}
+                  size={20}
+                />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  onFocus={() => setFocusedInput("email")}
+                  onBlur={() => setFocusedInput("")}
+                  className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:outline-none transition-all duration-300 ${
+                    focusedInput === "email"
+                      ? "border-orange-500 bg-orange-50/50 shadow-lg shadow-orange-100"
+                      : "border-gray-200 bg-white hover:border-orange-300"
+                  }`}
                   placeholder="doctor@example.com"
+                  required
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password *
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                Password
+                <span className="text-orange-500">*</span>
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div
+                className={`relative transition-all duration-300 ${
+                  focusedInput === "password" ? "transform scale-[1.02]" : ""
+                }`}
+              >
+                <Lock
+                  className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+                    focusedInput === "password"
+                      ? "text-orange-500"
+                      : "text-gray-400"
+                  }`}
+                  size={20}
+                />
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  onFocus={() => setFocusedInput("password")}
+                  onBlur={() => setFocusedInput("")}
+                  className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:outline-none transition-all duration-300 ${
+                    focusedInput === "password"
+                      ? "border-orange-500 bg-orange-50/50 shadow-lg shadow-orange-100"
+                      : "border-gray-200 bg-white hover:border-orange-300"
+                  }`}
+                  placeholder="••••••••"
                   required
-                  minLength={6}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Enter your password"
                 />
               </div>
             </div>
 
+            {/* Remember me and Forgot password */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
+              <label className="flex items-center gap-2 cursor-pointer group">
                 <input
-                  id="remember-me"
-                  name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-5 h-5 rounded border-2 border-gray-300 text-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all cursor-pointer"
                 />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-700"
-                >
+                <span className="text-sm text-gray-700 group-hover:text-orange-600 transition-colors">
                   Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                  Forgot password?
-                </a>
-              </div>
+                </span>
+              </label>
+              <a
+                href="/forgot-password"
+                className="text-sm font-semibold text-orange-600 hover:text-orange-700 hover:underline transition-all"
+              >
+                Forgot password?
+              </a>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 flex items-center justify-center gap-2 group"
             >
               {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
+                <>
+                  <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
                   Signing in...
-                </span>
+                </>
               ) : (
-                "Sign In"
+                <>
+                  Sign In
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
               )}
             </button>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Don't have an account?
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
+          {/* Signup Link */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{" "}
               <a
-                href="/doctor"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                href="/doctor/signup"
+                className="font-semibold text-orange-600 hover:text-orange-700 hover:underline transition-all"
               >
-                Register as a Doctor
+                Sign up here
               </a>
-            </div>
+            </p>
           </div>
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-600">
-          Protected by industry-standard encryption
-        </p>
+        {/* Security Badge */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500 flex items-center justify-center gap-2">
+            <Lock className="w-3.5 h-3.5 text-orange-500" />
+            Protected by industry-standard encryption
+          </p>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes shake {
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-5px);
+          }
+          75% {
+            transform: translateX(5px);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+
+        .animate-shake {
+          animation: shake 0.4s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }

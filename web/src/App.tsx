@@ -29,9 +29,18 @@ const App = () => (
           <Route path="/doctor/login" element={<Login />} />
           <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
           <Route path="/doctor/patient/:childId" element={<PatientDetail />} />
-          <Route path="/doctor/patient/:childId/assign" element={<AssignCurriculum />} />
-          <Route path="/doctor/patient/:childId/progress" element={<PatientProgress />} />
-          <Route path="/doctor/patient/:childId/diagnosis" element={<DiagnosisReport />} />
+          <Route
+            path="/doctor/patient/:childId/assign"
+            element={<AssignCurriculum />}
+          />
+          <Route
+            path="/doctor/patient/:childId/progress"
+            element={<PatientProgress />}
+          />
+          <Route
+            path="/doctor/patient/:childId/diagnosis"
+            element={<DiagnosisReport />}
+          />
 
           <Route path="/register" element={<Register />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
