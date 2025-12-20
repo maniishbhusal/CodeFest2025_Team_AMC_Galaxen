@@ -37,6 +37,7 @@ class MChatResultSerializer(serializers.ModelSerializer):
 
 class AssessmentVideoSerializer(serializers.ModelSerializer):
     """Serializer for assessment videos"""
+    video_url = serializers.CharField()  # Accept any string (local path or URL)
 
     class Meta:
         model = AssessmentVideo

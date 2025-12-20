@@ -30,6 +30,61 @@ export default function RootLayout() {
           name="questionnaire/question-2"
           options={{ headerShown: false }}
         />
+        {/* M-CHAT Screening Screens */}
+        <Stack.Screen
+          name="mchat/medical-history"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="mchat/instructions"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="mchat/questions"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="mchat/results"
+          options={{ headerShown: false }}
+        />
+        {/* Video Upload & Assessment Screens */}
+        <Stack.Screen
+          name="videos/upload"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="videos/list"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="videos/confirmation"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="videos/success"
+          options={{ headerShown: false }}
+        />
+        {/* Therapy & Curriculum Screens */}
+        <Stack.Screen
+          name="therapy/curriculum"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/today"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/task-detail"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/submit-progress"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="therapy/history"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"

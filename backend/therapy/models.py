@@ -126,7 +126,7 @@ class DailyProgress(models.Model):
     day_number = models.PositiveIntegerField()
     date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_done')
-    video_url = models.URLField(blank=True, help_text="Video of child doing the task")
+    video_url = models.TextField(blank=True, help_text="Video of child doing the task (local path or URL)")
     parent_notes = models.TextField(blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
 

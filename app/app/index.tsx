@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -10,6 +11,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { AppColors } from "@/constants/theme";
+
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 export default function Index() {
   const router = useRouter();
@@ -22,18 +25,59 @@ export default function Index() {
     opacity.value = withTiming(1, { duration: 1000 });
     scale.value = withSpring(1);
 
-    // Always show language selection after splash
+    // Check auth state and navigate accordingly
     const timer = setTimeout(async () => {
       try {
+        // Load saved language
         const savedLanguage = await AsyncStorage.getItem("appLanguage");
         if (savedLanguage) {
           await i18n.changeLanguage(savedLanguage);
         }
+
+        // Check if user is logged in
+        const token = await AsyncStorage.getItem("authToken");
+
+        if (!token) {
+          // Not logged in - go to language selection / auth
+          router.replace("/language-select");
+          return;
+        }
+
+        // User is logged in - check if they have children registered
+        try {
+          const response = await axios.get(`${BASE_URL}/api/children/`, {
+            headers: { Authorization: `Bearer ${token}` },
+            timeout: 10000,
+          });
+
+          const children = response.data || [];
+
+          if (children.length > 0) {
+            // Has children - go directly to dashboard
+            router.replace("/(tabs)");
+          } else {
+            // Logged in but no children - go to form
+            router.replace("/form/section-1");
+          }
+        } catch (apiError: any) {
+          console.log("API error:", apiError.response?.status);
+
+          // If token is invalid (401), clear it and go to login
+          if (apiError.response?.status === 401) {
+            await AsyncStorage.removeItem("authToken");
+            await AsyncStorage.removeItem("userData");
+            router.replace("/language-select");
+          } else {
+            // Network error or other issue - still go to dashboard
+            // (let dashboard handle the error)
+            router.replace("/(tabs)");
+          }
+        }
       } catch (error) {
-        console.error("Error loading language:", error);
+        console.error("Error during startup:", error);
+        router.replace("/language-select");
       }
-      router.replace("/language-select");
-    }, 3000);
+    }, 2000); // Reduced to 2 seconds for better UX
 
     return () => clearTimeout(timer);
   }, []);

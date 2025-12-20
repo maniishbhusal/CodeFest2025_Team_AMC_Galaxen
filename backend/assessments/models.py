@@ -123,7 +123,7 @@ class AssessmentVideo(models.Model):
         related_name='videos'
     )
     video_type = models.CharField(max_length=20, choices=VIDEO_TYPE_CHOICES)
-    video_url = models.URLField(help_text="Cloudflare Stream URL")
+    video_url = models.TextField(help_text="Video URL or local file path")
     description = models.TextField(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
