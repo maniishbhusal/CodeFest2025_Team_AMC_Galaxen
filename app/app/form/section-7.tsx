@@ -97,7 +97,7 @@ export default function Section7() {
               ? "complete"
               : d6.has_vaccinations === "incomplete"
               ? "incomplete"
-              : "no",
+              : "unknown",
           medical_conditions: d6.medical_conditions || "",
           takes_medication: d6.takes_medication || false,
           medication_list: d6.medication_list || "",
