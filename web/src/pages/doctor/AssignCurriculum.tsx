@@ -23,7 +23,9 @@ export default function AssignCurriculumPage() {
   const navigate = useNavigate();
   const [patient, setPatient] = useState<PatientDetail | null>(null);
   const [curricula, setCurricula] = useState<Curriculum[]>([]);
-  const [selectedCurriculum, setSelectedCurriculum] = useState<number | null>(null);
+  const [selectedCurriculum, setSelectedCurriculum] = useState<number | null>(
+    null
+  );
   const [startDate, setStartDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -72,7 +74,9 @@ export default function AssignCurriculumPage() {
       navigate(`/doctor/patient/${childId}/progress`);
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "Failed to assign curriculum");
+      setError(
+        err instanceof Error ? err.message : "Failed to assign curriculum"
+      );
     } finally {
       setAssigning(false);
     }

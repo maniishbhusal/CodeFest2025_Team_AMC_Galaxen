@@ -16,7 +16,7 @@ export default function DoctorLandingPage() {
             </span>
           </div>
           <button
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/doctor/login")}
             className="px-6 py-2 bg-blue-400 text-white rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
           >
             Join Now
