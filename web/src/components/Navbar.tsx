@@ -8,7 +8,7 @@ const navItems = [
   { name: "Home", href: "/" },
   { name: "How It Works", href: "#how-it-works" },
   { name: "For Parents", href: "#for-parents" },
-  { name: "For Doctors", href: "/doctor" },
+  { name: "For AutismSpecialist", href: "/doctor" },
   { name: "Pricing", href: "#pricing" },
   { name: "About", href: "#about" },
 ];
@@ -89,20 +89,6 @@ const Navbar = () => {
           </div>
 
           {/* --- Desktop CTA Buttons --- */}
-          <div className="hidden md:flex items-center gap-4">
-            {/* Outline Button (Soft Orange Border) */}
-            <Button
-              variant="outline"
-              className="border-2 border-orange-100 text-orange-600 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-200 transition-all duration-300 rounded-full px-6"
-            >
-              Sign In
-            </Button>
-
-            {/* Solid Button (No Gradient, Solid Warm Orange) */}
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 shadow-md shadow-orange-500/20 transition-all duration-300">
-              Get Started
-            </Button>
-          </div>
 
           {/* --- Mobile Menu Button --- */}
           <button

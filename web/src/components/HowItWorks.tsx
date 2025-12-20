@@ -84,7 +84,7 @@ const steps = [
     title: "Final Reports & Agreement",
 
     checkpoints: ["Doctor Checks final report", "Agreement from both side"],
-    image: "/tracking.png",
+    image: "/reports.jpeg",
   },
 
   {
@@ -96,7 +96,7 @@ const steps = [
       "Doctor Provides 15 day tasks",
       "Parents get daily based tasks",
     ],
-    image: "/tracking.png",
+    image: "/process.jpeg",
   },
 ];
 const HowItWorks = () => {
