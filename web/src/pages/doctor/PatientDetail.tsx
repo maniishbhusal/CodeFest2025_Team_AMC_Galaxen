@@ -28,6 +28,8 @@ export default function PatientDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [accepting, setAccepting] = useState(false);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("doctorLoggedIn");
@@ -60,6 +62,7 @@ export default function PatientDetailPage() {
     setAccepting(true);
     try {
       await acceptPatient(parseInt(childId));
+      setShowAcceptModal(false);
       // Refresh patient data
       await fetchPatientDetail(parseInt(childId));
     } catch (err) {
@@ -67,6 +70,16 @@ export default function PatientDetailPage() {
       alert("Failed to accept patient");
     } finally {
       setAccepting(false);
+    }
+  };
+
+  const openAcceptModal = () => {
+    setShowAcceptModal(true);
+  };
+
+  const closeAcceptModal = () => {
+    if (!accepting) {
+      setShowAcceptModal(false);
     }
   };
 
@@ -151,15 +164,10 @@ export default function PatientDetailPage() {
 
             {patient.status === "pending" && (
               <button
-                onClick={handleAcceptPatient}
-                disabled={accepting}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+                onClick={openAcceptModal}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
               >
-                {accepting ? (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                ) : (
-                  <UserCheck className="w-4 h-4" />
-                )}
+                <UserCheck className="w-4 h-4" />
                 Accept Patient
               </button>
             )}
@@ -390,15 +398,13 @@ export default function PatientDetailPage() {
                         </div>
                       </div>
                       {video.video_url && (
-                        <a
-                          href={video.video_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => setPlayingVideo(video.video_url)}
                           className="mt-3 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
                         >
                           <Play className="w-4 h-4" />
                           Watch Video
-                        </a>
+                        </button>
                       )}
                     </div>
                   ))}
@@ -556,6 +562,106 @@ export default function PatientDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Accept Patient Confirmation Modal */}
+      {showAcceptModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <UserCheck className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Accept Patient
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Confirm your decision
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to accept <strong>{patient.child.full_name}</strong> as your patient?
+                You will be responsible for their assessment review and therapy curriculum assignment.
+              </p>
+
+              {patient.mchat_result?.risk_level === "high" && (
+                <div className="mb-6 p-3 bg-red-50 border border-red-100 rounded-lg">
+                  <div className="flex items-center gap-2 text-red-700 text-sm">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="font-medium">High Risk Patient</span>
+                  </div>
+                  <p className="text-red-600 text-sm mt-1">
+                    This patient has a high M-CHAT risk score. Priority attention is recommended.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={closeAcceptModal}
+                  disabled={accepting}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAcceptPatient}
+                  disabled={accepting}
+                  className="flex-1 px-4 py-2.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {accepting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Accepting...
+                    </>
+                  ) : (
+                    <>
+                      <UserCheck className="w-4 h-4" />
+                      Accept Patient
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Player Modal */}
+      {playingVideo && (
+        <div
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+          onClick={() => setPlayingVideo(null)}
+        >
+          <div
+            className="bg-black rounded-2xl overflow-hidden max-w-4xl w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 bg-gray-900">
+              <h3 className="text-white font-medium">Video Player</h3>
+              <button
+                onClick={() => setPlayingVideo(null)}
+                className="text-gray-400 hover:text-white transition"
+              >
+                <span className="text-2xl">&times;</span>
+              </button>
+            </div>
+            <div className="aspect-video bg-black">
+              <video
+                src={playingVideo}
+                controls
+                autoPlay
+                className="w-full h-full"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

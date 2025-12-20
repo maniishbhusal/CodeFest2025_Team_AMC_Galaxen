@@ -1666,14 +1666,14 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 4.12 Patient Videos View
+✅ 4.12 Patient Videos View
    - List all videos for patient
-   - Video player
+   - Video player modal
    - Video type labels
 
-□ 4.13 Accept Patient Flow
+✅ 4.13 Accept Patient Flow
    - "Accept this patient" button
-   - Confirmation popup
+   - Confirmation popup with patient details
    - Update status to 'accepted'
 ```
 
