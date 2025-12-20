@@ -92,11 +92,11 @@ class AssignCurriculumSerializer(serializers.Serializer):
 
 
 class DailyProgressSerializer(serializers.ModelSerializer):
-    task_title = serializers.CharField(source='task.title', read_only=True)
+    task = CurriculumTaskSerializer(read_only=True)
 
     class Meta:
         model = DailyProgress
-        fields = ['id', 'task', 'task_title', 'day_number', 'date', 'status', 'video_url', 'parent_notes', 'submitted_at']
+        fields = ['id', 'task', 'day_number', 'date', 'status', 'video_url', 'parent_notes', 'submitted_at']
         read_only_fields = ['id', 'submitted_at']
 
 
