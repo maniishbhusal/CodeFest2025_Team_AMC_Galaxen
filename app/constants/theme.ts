@@ -5,38 +5,38 @@
 
 import { Platform } from "react-native";
 
-// Main theme colors: White, Light Blue, and Light Pink
-const primaryBlue = "#ADD8E6"; // Light blue
-const lightBlue = "#D6EAF8"; // Lighter blue variant
-const darkBlue = "#87CEEB"; // Darker light blue
-const pantonePink = "#FDB5CE"; // Light pink
-const lightPink = "#FFD4E0"; // Lighter pink variant
+// Main theme colors: Orange theme for AutiSahara
+const primaryOrange = "#F97316"; // Orange 500
+const lightOrange = "#FFEDD5"; // Orange 100
+const darkOrange = "#EA580C"; // Orange 600
+const accentOrange = "#FB923C"; // Orange 400
+const paleOrange = "#FFF7ED"; // Orange 50
 const white = "#FFFFFF";
 const offWhite = "#FAFAFA";
-const lightGray = "#E8E8E8";
-const mediumGray = "#999999";
-const darkGray = "#555555";
+const lightGray = "#E5E7EB";
+const mediumGray = "#9CA3AF";
+const darkGray = "#374151";
 
 export const AppColors = {
-  primary: primaryBlue,
-  primaryLight: lightBlue,
-  primaryDark: darkBlue,
-  secondary: pantonePink,
-  secondaryLight: lightPink,
+  primary: primaryOrange,
+  primaryLight: lightOrange,
+  primaryDark: darkOrange,
+  secondary: accentOrange,
+  secondaryLight: paleOrange,
   white: white,
   background: offWhite,
   surface: white,
   border: lightGray,
   textPrimary: darkGray,
   textSecondary: mediumGray,
-  textLight: "#777777",
+  textLight: "#6B7280",
   error: "#EF4444",
-  success: primaryBlue,
+  success: "#10B981",
   disabled: mediumGray,
 };
 
-const tintColorLight = primaryBlue;
-const tintColorDark = pantonePink;
+const tintColorLight = primaryOrange;
+const tintColorDark = accentOrange;
 
 export const Colors = {
   light: {

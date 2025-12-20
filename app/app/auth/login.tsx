@@ -80,7 +80,9 @@ export default function LoginScreen() {
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.logo}>🧠</Text>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logo}>🧩</Text>
+          </View>
           <Text style={styles.title}>{t("appName")}</Text>
           <Text style={styles.subtitle}>{t("auth.loginTitle")}</Text>
         </View>
@@ -137,7 +139,16 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: AppColors.white },
   scrollContent: { flexGrow: 1, padding: 24 },
   header: { alignItems: "center", marginTop: 40, marginBottom: 40 },
-  logo: { fontSize: 60, marginBottom: 16 },
+  logoContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
+    backgroundColor: AppColors.primaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  logo: { fontSize: 50 },
   title: {
     fontSize: 28,
     fontWeight: "bold",

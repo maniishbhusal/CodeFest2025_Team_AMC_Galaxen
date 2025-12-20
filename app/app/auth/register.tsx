@@ -149,7 +149,9 @@ export default function RegisterScreen() {
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.logo}>🧠</Text>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logo}>🧩</Text>
+          </View>
           <Text style={styles.title}>{t("appName")}</Text>
           <Text style={styles.subtitle}>{t("auth.registerTitle")}</Text>
         </View>
@@ -261,9 +263,17 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 30,
   },
+  logoContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
+    backgroundColor: AppColors.primaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
   logo: {
-    fontSize: 60,
-    marginBottom: 16,
+    fontSize: 50,
   },
   title: {
     fontSize: 28,

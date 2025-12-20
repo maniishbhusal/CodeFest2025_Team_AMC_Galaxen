@@ -22,8 +22,10 @@ export default function LanguageSelectScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.logo}>🧠</Text>
-        <Text style={styles.title}>NeuroCare</Text>
+        <View style={styles.logoContainer}>
+          <Text style={styles.logo}>🧩</Text>
+        </View>
+        <Text style={styles.title}>AutiSahara</Text>
         <Text style={styles.subtitle}>
           Choose your preferred language{"\n"}
           आफ्नो भाषा छान्नुहोस्
@@ -71,9 +73,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 30,
   },
+  logoContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 30,
+    backgroundColor: AppColors.primaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
   logo: {
-    fontSize: 80,
-    marginBottom: 20,
+    fontSize: 60,
   },
   title: {
     fontSize: 36,

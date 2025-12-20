@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,8 +9,9 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
+  withSequence,
+  withDelay,
 } from "react-native-reanimated";
-import { AppColors } from "@/constants/theme";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
@@ -18,12 +19,18 @@ export default function Index() {
   const router = useRouter();
   const { i18n } = useTranslation();
   const opacity = useSharedValue(0);
-  const scale = useSharedValue(0.5);
+  const scale = useSharedValue(0.8);
+  const taglineOpacity = useSharedValue(0);
+  const taglineTranslateY = useSharedValue(20);
 
   useEffect(() => {
     // Animate logo
-    opacity.value = withTiming(1, { duration: 1000 });
-    scale.value = withSpring(1);
+    opacity.value = withTiming(1, { duration: 800 });
+    scale.value = withSpring(1, { damping: 12, stiffness: 100 });
+
+    // Animate tagline with delay
+    taglineOpacity.value = withDelay(400, withTiming(1, { duration: 600 }));
+    taglineTranslateY.value = withDelay(400, withSpring(0, { damping: 15 }));
 
     // Check auth state and navigate accordingly
     const timer = setTimeout(async () => {
@@ -77,26 +84,48 @@ export default function Index() {
         console.error("Error during startup:", error);
         router.replace("/language-select");
       }
-    }, 2000); // Reduced to 2 seconds for better UX
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const logoStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
     transform: [{ scale: scale.value }],
   }));
 
+  const taglineStyle = useAnimatedStyle(() => ({
+    opacity: taglineOpacity.value,
+    transform: [{ translateY: taglineTranslateY.value }],
+  }));
+
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.content, animatedStyle]}>
-        {/* Replace with your logo */}
+      {/* Background decoration circles */}
+      <View style={styles.bgCircle1} />
+      <View style={styles.bgCircle2} />
+      <View style={styles.bgCircle3} />
+
+      <Animated.View style={[styles.content, logoStyle]}>
+        {/* Logo with puzzle piece theme */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logo}>🧠</Text>
+          <View style={styles.logoInner}>
+            <Text style={styles.logoIcon}>🧩</Text>
+          </View>
         </View>
+
         <Text style={styles.title}>AutiSahara</Text>
-        <Text style={styles.subtitle}>Mental Health Support Platform</Text>
       </Animated.View>
+
+      <Animated.View style={[styles.taglineContainer, taglineStyle]}>
+        <Text style={styles.subtitle}>Early Autism Screening</Text>
+        <Text style={styles.subtitleSmall}>& Therapy Support for Your Child</Text>
+      </Animated.View>
+
+      {/* Loading indicator */}
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="small" color="rgba(255,255,255,0.7)" />
+      </View>
     </View>
   );
 }
@@ -104,28 +133,86 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.primary,
+    backgroundColor: "#F97316",
     justifyContent: "center",
     alignItems: "center",
+  },
+  bgCircle1: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    top: -100,
+    right: -80,
+  },
+  bgCircle2: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    bottom: -50,
+    left: -60,
+  },
+  bgCircle3: {
+    position: "absolute",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    top: "40%",
+    left: -40,
   },
   content: {
     alignItems: "center",
   },
   logoContainer: {
     marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 10,
   },
-  logo: {
-    fontSize: 80,
+  logoInner: {
+    width: 120,
+    height: 120,
+    borderRadius: 30,
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoIcon: {
+    fontSize: 64,
   },
   title: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: AppColors.white,
-    marginBottom: 8,
+    fontSize: 38,
+    fontWeight: "800",
+    color: "#FFF",
+    letterSpacing: 1,
+    textShadowColor: "rgba(0,0,0,0.1)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  taglineContainer: {
+    alignItems: "center",
+    marginTop: 16,
   },
   subtitle: {
-    fontSize: 16,
-    color: AppColors.secondaryLight,
+    fontSize: 17,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.95)",
     textAlign: "center",
+  },
+  subtitleSmall: {
+    fontSize: 14,
+    color: "rgba(255,255,255,0.8)",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  loadingContainer: {
+    position: "absolute",
+    bottom: 80,
   },
 });
