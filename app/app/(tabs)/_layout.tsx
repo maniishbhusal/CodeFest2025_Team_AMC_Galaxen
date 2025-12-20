@@ -12,47 +12,45 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
 
+  // Theme Colors - Dashboard sanga match huna ko lagi
+  const activeColor = "#FF007F"; // Hot Pink
+  const inactiveColor = "#94A3B8"; // Slate Gray
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: true,
-        headerStyle: {
-          backgroundColor: "#1e40af",
-        },
-        headerTintColor: "#ffffff",
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
+        tabBarActiveTintColor: activeColor,
+        tabBarInactiveTintColor: inactiveColor,
+        headerShown: false, // Dashboard ma aafnai Header vayeko le yaha hide gareko
 
         tabBarButton: HapticTab,
 
-        // ✅ UI सुधारिएको TAB BAR STYLE
+        // ✅ MODERN TAB BAR STYLE
         tabBarStyle: {
           backgroundColor: colorScheme === "dark" ? "#1e293b" : "#ffffff",
           borderTopWidth: 1,
-          borderTopColor: colorScheme === "dark" ? "#334155" : "#e2e8f0",
+          borderTopColor: colorScheme === "dark" ? "#334155" : "#f1f5f9",
 
-          // उचाइलाई अलि बढाउँदा कन्टेन्ट अट्छ (Height adjusted)
-          height: Platform.OS === "ios" ? 10 + insets.bottom : 80,
-
-          // प्याडिङ मिलाइएको (Padding adjusted to fix cut-off)
+          // Height and Shadow
+          height: Platform.OS === "ios" ? 85 : 70,
           paddingBottom: Platform.OS === "ios" ? insets.bottom : 12,
           paddingTop: 10,
 
-          // ट्याब बारको ओभरफ्लो रोक्न
+          // Smooth Floating Look (Optional: position absolute rakhauda index.tsx ko paddingBottom check garnu hola)
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          elevation: 8, // एन्ड्रोइडको लागि स्याडो
+          elevation: 20,
+          shadowColor: "#000",
+          shadowOpacity: 0.1,
+          shadowRadius: 10,
         },
 
-        // आइकन र टेक्स्टको स्थान मिलाउन
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-          marginTop: 2,
+          fontSize: 12,
+          fontWeight: "700",
+          marginTop: -7,
         },
 
         tabBarIconStyle: {
@@ -62,60 +60,52 @@ export default function TabLayout() {
         tabBarHideOnKeyboard: true,
       }}
     >
+      {/* 1. HOME SCREEN */}
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-          headerTitle: "AutiSahara",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="house.fill" color={color} />
+            <IconSymbol size={24} name="house.fill" color={color} />
           ),
         }}
       />
 
+      {/* 2. TASKS SCREEN (Changed from Explore) */}
       <Tabs.Screen
-        name="explore"
+        name="tasks"
         options={{
-          title: "Resources",
-          headerTitle: "Mental Health Resources",
+          title: "Tasks",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="book.fill" color={color} />
+            <IconSymbol size={24} name="checklist" color={color} />
           ),
         }}
       />
 
+      {/* 3. REPORT SCREEN (Purano Journal/Chat screen lai map garna sakinnxa) */}
       <Tabs.Screen
-        name="journal"
+        name="journal" // Route name 'report' xaina vane purano journal route nai use garnu hola
         options={{
-          title: "Journal",
-          headerTitle: "My Journal",
+          title: "Report",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="pencil" color={color} />
+            <IconSymbol size={24} name="chart.bar.fill" color={color} />
           ),
         }}
       />
 
-      <Tabs.Screen
-        name="chat"
-        options={{
-          title: "Chat",
-          headerTitle: "Support Chat",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="message.fill" color={color} />
-          ),
-        }}
-      />
-
+      {/* 4. PROFILE SCREEN */}
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
-          headerTitle: "My Profile",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="person.fill" color={color} />
+            <IconSymbol size={24} name="person.fill" color={color} />
           ),
         }}
       />
+
+      {/* Hiding Unwanted Tabs */}
+      <Tabs.Screen name="chat" options={{ href: null }} />
     </Tabs>
   );
 }
