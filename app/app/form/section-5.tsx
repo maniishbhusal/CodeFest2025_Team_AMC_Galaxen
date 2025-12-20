@@ -75,7 +75,7 @@ export default function Section5() {
       router.push("/form/section-6");
     } catch (error) {
       console.error("Error saving section 5 data:", error);
-      Alert.alert("त्रुटि", "डाटा सुरक्षित गर्न असफल भयो");
+      Alert.alert("Error", "Failed to save data");
     }
   };
 
@@ -88,15 +88,14 @@ export default function Section5() {
       <StepIndicator currentStep={5} totalSteps={7} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>शिक्षा र दैनिक दिनचर्या</Text>
-        <Text style={styles.subtitle}>Education & Daily Routine</Text>
+        <Text style={styles.title}>Education & Daily Routine</Text>
+        <Text style={styles.subtitle}>Please provide education and schedule details</Text>
 
         {/* Goes to School */}
         <View style={styles.section}>
           <Text style={styles.label}>
-            के बच्चा विद्यालय जान्छ? <Text style={styles.required}>*</Text>
+            Does the child go to school? <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Does the child go to school?</Text>
           <View style={styles.toggleContainer}>
             <TouchableOpacity
               style={[
@@ -111,7 +110,7 @@ export default function Section5() {
                   goesToSchool === true && styles.toggleTextActive,
                 ]}
               >
-                छ / Yes
+                Yes
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -127,7 +126,7 @@ export default function Section5() {
                   goesToSchool === false && styles.toggleTextActive,
                 ]}
               >
-                छैन / No
+                No
               </Text>
             </TouchableOpacity>
           </View>
@@ -138,31 +137,28 @@ export default function Section5() {
           <>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>
-                विद्यालयको नाम <Text style={styles.required}>*</Text>
+                School Name <Text style={styles.required}>*</Text>
               </Text>
-              <Text style={styles.labelEn}>School Name</Text>
               <TextInput
                 style={styles.input}
                 value={schoolName}
                 onChangeText={setSchoolName}
-                placeholder="विद्यालयको पूरा नाम"
+                placeholder="Enter school name"
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>कक्षा</Text>
-              <Text style={styles.labelEn}>Grade/Class</Text>
+              <Text style={styles.label}>Grade/Class</Text>
               <TextInput
                 style={styles.input}
                 value={grade}
                 onChangeText={setGrade}
-                placeholder="जस्तै: कक्षा १, Nursery, KG"
+                placeholder="e.g., Class 1, Nursery, KG"
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>विद्यालयको प्रकार</Text>
-              <Text style={styles.labelEn}>School Type</Text>
+              <Text style={styles.label}>School Type</Text>
               <View style={styles.schoolTypeContainer}>
                 <TouchableOpacity
                   style={[
@@ -177,7 +173,7 @@ export default function Section5() {
                       schoolType === "public" && styles.schoolTypeTextActive,
                     ]}
                   >
-                    सरकारी / Public
+                    Public
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -193,7 +189,7 @@ export default function Section5() {
                       schoolType === "private" && styles.schoolTypeTextActive,
                     ]}
                   >
-                    निजी / Private
+                    Private
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -209,7 +205,7 @@ export default function Section5() {
                       schoolType === "special" && styles.schoolTypeTextActive,
                     ]}
                   >
-                    विशेष / Special
+                    Special
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -220,12 +216,11 @@ export default function Section5() {
         {/* Daily Routine */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            दैनिक दिनचर्या / Daily Routine
+            Daily Routine
           </Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>बिहान उठ्ने समय</Text>
-            <Text style={styles.labelEn}>Wake Up Time</Text>
+            <Text style={styles.label}>Wake Up Time</Text>
             <TouchableOpacity
               style={styles.timeButton}
               onPress={() => setShowWakeUpPicker(true)}
@@ -243,8 +238,7 @@ export default function Section5() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>सुत्ने समय</Text>
-            <Text style={styles.labelEn}>Sleep Time</Text>
+            <Text style={styles.label}>Sleep Time</Text>
             <TouchableOpacity
               style={styles.timeButton}
               onPress={() => setShowSleepPicker(true)}
@@ -269,14 +263,14 @@ export default function Section5() {
           onPress={handleBack}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>पछाडि / Back</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>अर्को / Next</Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>

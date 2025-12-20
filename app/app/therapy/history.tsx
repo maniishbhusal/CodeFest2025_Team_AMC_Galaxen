@@ -87,11 +87,11 @@ export default function HistoryScreen() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "done_without_help":
-        return "आफैं गर्यो";
+        return "Did it alone";
       case "done_with_help":
-        return "सहायतासँग";
+        return "With help";
       case "not_done":
-        return "गर्न सकेन";
+        return "Couldn't do";
       default:
         return status;
     }
@@ -112,7 +112,7 @@ export default function HistoryScreen() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ne-NP", {
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
@@ -155,7 +155,7 @@ export default function HistoryScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={AppColors.primary} />
-        <Text style={styles.loadingText}>इतिहास लोड हुँदैछ...</Text>
+        <Text style={styles.loadingText}>Loading history...</Text>
       </View>
     );
   }
@@ -168,9 +168,9 @@ export default function HistoryScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>प्रगति इतिहास</Text>
+          <Text style={styles.headerTitle}>Progress History</Text>
           <Text style={styles.headerSubtitle}>
-            {historyData?.completed_days || 0}/{historyData?.total_days || 0} दिन पूरा
+            {historyData?.completed_days || 0}/{historyData?.total_days || 0} days completed
           </Text>
         </View>
       </View>
@@ -180,27 +180,27 @@ export default function HistoryScreen() {
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{historyData?.total_days || 0}</Text>
-            <Text style={styles.statLabel}>कुल दिन</Text>
+            <Text style={styles.statLabel}>Total Days</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={[styles.statValue, { color: "#4CAF50" }]}>
               {historyData?.completed_days || 0}
             </Text>
-            <Text style={styles.statLabel}>पूरा भयो</Text>
+            <Text style={styles.statLabel}>Completed</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={[styles.statValue, { color: AppColors.secondary }]}>
               {historyData?.progress.length || 0}
             </Text>
-            <Text style={styles.statLabel}>कार्य पेश</Text>
+            <Text style={styles.statLabel}>Submitted</Text>
           </View>
         </View>
 
         {/* Calendar View */}
         <View style={styles.calendarSection}>
-          <Text style={styles.sectionTitle}>दिन अनुसार प्रगति</Text>
+          <Text style={styles.sectionTitle}>Progress by Day</Text>
           <View style={styles.calendarGrid}>
             {Array.from({ length: historyData?.total_days || 15 }, (_, i) => i + 1).map(
               (day) => (
@@ -238,11 +238,11 @@ export default function HistoryScreen() {
         {/* Selected Day Details */}
         {selectedDay && (
           <View style={styles.dayDetailsSection}>
-            <Text style={styles.sectionTitle}>दिन {selectedDay} को विवरण</Text>
+            <Text style={styles.sectionTitle}>Day {selectedDay} Details</Text>
             {getDayProgress(selectedDay).length === 0 ? (
               <View style={styles.noProgressCard}>
                 <Text style={styles.noProgressText}>
-                  यस दिनको कुनै प्रगति पेश भएको छैन
+                  No progress submitted for this day
                 </Text>
               </View>
             ) : (
@@ -271,13 +271,13 @@ export default function HistoryScreen() {
                   </View>
                   {entry.parent_notes && (
                     <View style={styles.notesContainer}>
-                      <Text style={styles.notesLabel}>नोट:</Text>
+                      <Text style={styles.notesLabel}>Note:</Text>
                       <Text style={styles.notesText}>{entry.parent_notes}</Text>
                     </View>
                   )}
                   {entry.video_url && (
                     <View style={styles.videoIndicator}>
-                      <Text style={styles.videoIndicatorText}>📹 भिडियो संलग्न</Text>
+                      <Text style={styles.videoIndicatorText}>📹 Video attached</Text>
                     </View>
                   )}
                 </View>
@@ -288,23 +288,23 @@ export default function HistoryScreen() {
 
         {/* Legend */}
         <View style={styles.legendSection}>
-          <Text style={styles.legendTitle}>रंग संकेत</Text>
+          <Text style={styles.legendTitle}>Color Legend</Text>
           <View style={styles.legendItems}>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: "#4CAF50" }]} />
-              <Text style={styles.legendText}>पूर्ण पूरा</Text>
+              <Text style={styles.legendText}>Fully Done</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: "#FF9800" }]} />
-              <Text style={styles.legendText}>आंशिक</Text>
+              <Text style={styles.legendText}>Partial</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: "#F44336" }]} />
-              <Text style={styles.legendText}>अपूर्ण</Text>
+              <Text style={styles.legendText}>Incomplete</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: AppColors.border }]} />
-              <Text style={styles.legendText}>बाँकी</Text>
+              <Text style={styles.legendText}>Pending</Text>
             </View>
           </View>
         </View>

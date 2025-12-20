@@ -44,7 +44,7 @@ export default function Section2() {
       router.push("/form/section-3");
     } catch (error) {
       console.error("Error saving section 2 data:", error);
-      Alert.alert("त्रुटि", "डाटा सुरक्षित गर्न असफल भयो");
+      Alert.alert("Error", "Failed to save data");
     }
   };
 
@@ -57,79 +57,77 @@ export default function Section2() {
       <StepIndicator currentStep={2} totalSteps={7} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>अभिभावकको जानकारी</Text>
-        <Text style={styles.subtitle}>Parent Information</Text>
+        <Text style={styles.title}>Parent Information</Text>
+        <Text style={styles.subtitle}>Please fill in parent details</Text>
 
         {/* Mother Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>आमाको जानकारी / Mother's Info</Text>
+          <Text style={styles.sectionTitle}>Mother's Information</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>नाम / Name</Text>
+            <Text style={styles.label}>Name</Text>
             <TextInput
               style={styles.input}
               value={motherName}
               onChangeText={setMotherName}
-              placeholder="आमाको पूरा नाम"
+              placeholder="Mother's full name"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>उमेर / Age</Text>
+            <Text style={styles.label}>Age</Text>
             <TextInput
               style={styles.input}
               value={motherAge}
               onChangeText={setMotherAge}
-              placeholder="उमेर"
+              placeholder="Age"
               keyboardType="numeric"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>पेशा / Occupation</Text>
+            <Text style={styles.label}>Occupation</Text>
             <TextInput
               style={styles.input}
               value={motherOccupation}
               onChangeText={setMotherOccupation}
-              placeholder="पेशा"
+              placeholder="Occupation"
             />
           </View>
         </View>
 
         {/* Father Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            बुबाको जानकारी / Father's Info
-          </Text>
+          <Text style={styles.sectionTitle}>Father's Information</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>नाम / Name</Text>
+            <Text style={styles.label}>Name</Text>
             <TextInput
               style={styles.input}
               value={fatherName}
               onChangeText={setFatherName}
-              placeholder="बुबाको पूरा नाम"
+              placeholder="Father's full name"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>उमेर / Age</Text>
+            <Text style={styles.label}>Age</Text>
             <TextInput
               style={styles.input}
               value={fatherAge}
               onChangeText={setFatherAge}
-              placeholder="उमेर"
+              placeholder="Age"
               keyboardType="numeric"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>पेशा / Occupation</Text>
+            <Text style={styles.label}>Occupation</Text>
             <TextInput
               style={styles.input}
               value={fatherOccupation}
               onChangeText={setFatherOccupation}
-              placeholder="पेशा"
+              placeholder="Occupation"
             />
           </View>
         </View>
@@ -137,9 +135,8 @@ export default function Section2() {
         {/* Primary Caregiver */}
         <View style={styles.section}>
           <Text style={styles.label}>
-            प्राथमिक हेरचाहकर्ता <Text style={styles.required}>*</Text>
+            Primary Caregiver <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Primary Caregiver</Text>
           <View style={styles.caregiverContainer}>
             <TouchableOpacity
               style={[
@@ -154,7 +151,7 @@ export default function Section2() {
                   primaryCaregiver === "mother" && styles.caregiverTextActive,
                 ]}
               >
-                आमा / Mother
+                Mother
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -170,7 +167,7 @@ export default function Section2() {
                   primaryCaregiver === "father" && styles.caregiverTextActive,
                 ]}
               >
-                बुबा / Father
+                Father
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -186,7 +183,7 @@ export default function Section2() {
                   primaryCaregiver === "both" && styles.caregiverTextActive,
                 ]}
               >
-                दुवै / Both
+                Both
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -202,7 +199,7 @@ export default function Section2() {
                   primaryCaregiver === "other" && styles.caregiverTextActive,
                 ]}
               >
-                अन्य / Other
+                Other
               </Text>
             </TouchableOpacity>
           </View>
@@ -215,14 +212,14 @@ export default function Section2() {
           onPress={handleBack}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>पछाडि / Back</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>अर्को / Next</Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>

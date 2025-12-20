@@ -39,40 +39,28 @@ export default function MChatInstructionsScreen() {
         {/* Main Info Card */}
         <View style={styles.infoCard}>
           <Text style={styles.cardTitle}>
-            अभिभावकहरूका लागि निर्देशन
-          </Text>
-          <Text style={styles.cardTitleEn}>
             Instructions for Parents
           </Text>
 
           <View style={styles.divider} />
 
           <Text style={styles.instructionText}>
-            कृपया यी प्रश्नहरू तपाईंको बच्चाको बारेमा जवाफ दिनुहोस्। तपाईंको बच्चा
-            <Text style={styles.bold}> सामान्यतया </Text>
-            कस्तो व्यवहार गर्छ भन्ने कुरा ध्यानमा राख्नुहोस्।
-          </Text>
-
-          {/* <Text style={styles.instructionTextEn}>
             Please answer these questions about your child. Keep in mind how your child
             <Text style={styles.bold}> usually </Text>
             behaves.
-          </Text> */}
+          </Text>
         </View>
 
         {/* Important Notes */}
         <View style={styles.noteCard}>
-          <Text style={styles.noteTitle}>📋 महत्त्वपूर्ण जानकारी</Text>
+          <Text style={styles.noteTitle}>📋 Important Information</Text>
 
           <View style={styles.noteItem}>
             <Text style={styles.noteIcon}>👶</Text>
             <View style={styles.noteContent}>
               <Text style={styles.noteText}>
-                यो प्रश्नावली 16-30 महिनाका बच्चाहरूका लागि हो।
-              </Text>
-              {/* <Text style={styles.noteTextEn}>
                 This questionnaire is for children aged 16-30 months.
-              </Text> */}
+              </Text>
             </View>
           </View>
 
@@ -80,11 +68,8 @@ export default function MChatInstructionsScreen() {
             <Text style={styles.noteIcon}>✅</Text>
             <View style={styles.noteContent}>
               <Text style={styles.noteText}>
-                प्रत्येक प्रश्नको हो वा होइन छान्नुहोस्।
-              </Text>
-              {/* <Text style={styles.noteTextEn}>
                 Select YES or NO for each question.
-              </Text> */}
+              </Text>
             </View>
           </View>
 
@@ -92,11 +77,8 @@ export default function MChatInstructionsScreen() {
             <Text style={styles.noteIcon}>🔄</Text>
             <View style={styles.noteContent}>
               <Text style={styles.noteText}>
-                यदि बच्चाले कहिलेकाहीं मात्र त्यो व्यवहार गर्छ भने, होइन छान्नुहोस्।
-              </Text>
-              {/* <Text style={styles.noteTextEn}>
                 If your child does it only sometimes, answer NO.
-              </Text> */}
+              </Text>
             </View>
           </View>
 
@@ -104,42 +86,39 @@ export default function MChatInstructionsScreen() {
             <Text style={styles.noteIcon}>⏱️</Text>
             <View style={styles.noteContent}>
               <Text style={styles.noteText}>
-                लगभग 5-10 मिनेट लाग्नेछ।
-              </Text>
-              {/* <Text style={styles.noteTextEn}>
                 This will take about 5-10 minutes.
-              </Text> */}
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Scoring Info */}
         <View style={styles.scoringCard}>
-          <Text style={styles.scoringTitle}>📊 स्कोरिङ जानकारी</Text>
+          <Text style={styles.scoringTitle}>📊 Scoring Information</Text>
 
           <View style={styles.scoreRow}>
             <View style={[styles.scoreBadge, styles.lowRisk]}>
               <Text style={styles.scoreText}>0-2</Text>
             </View>
-            <Text style={styles.scoreLabel}>कम जोखिम</Text>
+            <Text style={styles.scoreLabel}>Low Risk</Text>
           </View>
 
           <View style={styles.scoreRow}>
             <View style={[styles.scoreBadge, styles.mediumRisk]}>
               <Text style={styles.scoreText}>3-7</Text>
             </View>
-            <Text style={styles.scoreLabel}>मध्यम जोखिम</Text>
+            <Text style={styles.scoreLabel}>Medium Risk</Text>
           </View>
 
           <View style={styles.scoreRow}>
             <View style={[styles.scoreBadge, styles.highRisk]}>
               <Text style={styles.scoreText}>8-20</Text>
             </View>
-            <Text style={styles.scoreLabel}>उच्च जोखिम</Text>
+            <Text style={styles.scoreLabel}>High Risk</Text>
           </View>
 
           <Text style={styles.scoringNote}>
-            नोट: यो स्क्रीनिंग उपकरण हो, निदान होइन। डाक्टरले समीक्षा गर्नेछन्।
+            Note: This is a screening tool, not a diagnosis. A doctor will review the results.
           </Text>
         </View>
 
@@ -147,8 +126,7 @@ export default function MChatInstructionsScreen() {
         <View style={styles.privacyCard}>
           <Text style={styles.privacyIcon}>🔒</Text>
           <Text style={styles.privacyText}>
-            तपाईंको सबै जानकारी पूर्णतया गोप्य राखिनेछ र केवल तपाईंको बच्चाको
-            हेरचाहका लागि प्रयोग गरिनेछ।
+            All your information will be kept completely confidential and will only be used for your child's care.
           </Text>
         </View>
       </ScrollView>
@@ -160,14 +138,14 @@ export default function MChatInstructionsScreen() {
           onPress={handleBack}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>पछाडि</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.startButton}
           onPress={handleStart}
           activeOpacity={0.8}
         >
-          <Text style={styles.startButtonText}>सुरु गर्नुहोस्</Text>
+          <Text style={styles.startButtonText}>Start</Text>
         </TouchableOpacity>
       </View>
     </View>

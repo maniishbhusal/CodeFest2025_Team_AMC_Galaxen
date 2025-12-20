@@ -215,8 +215,8 @@ export default function MChatQuestionsScreen() {
     const answeredCount = Object.keys(answers).length;
     if (answeredCount < MCHAT_QUESTIONS.length) {
       Alert.alert(
-        "अपूर्ण",
-        `कृपया सबै प्रश्नहरूको जवाफ दिनुहोस्। (${answeredCount}/${MCHAT_QUESTIONS.length})`
+        "Incomplete",
+        `Please answer all questions. (${answeredCount}/${MCHAT_QUESTIONS.length})`
       );
       return;
     }
@@ -226,7 +226,7 @@ export default function MChatQuestionsScreen() {
 
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        Alert.alert("त्रुटि", "कृपया पहिले लगइन गर्नुहोस्");
+        Alert.alert("Error", "Please login first");
         router.replace("/auth/login");
         return;
       }
@@ -266,11 +266,11 @@ export default function MChatQuestionsScreen() {
       const { score, riskLevel } = calculateScoreLocally(answers);
 
       Alert.alert(
-        "नोट",
-        "M-CHAT परिणाम स्थानीय रूपमा गणना गरियो। तपाईंको जवाफ सुरक्षित छन्।",
+        "Note",
+        "M-CHAT results were calculated locally. Your answers are saved.",
         [
           {
-            text: "ठिक छ",
+            text: "OK",
             onPress: () => {
               router.push({
                 pathname: "/mchat/results",
@@ -329,7 +329,7 @@ export default function MChatQuestionsScreen() {
       <View style={styles.header}>
         <View style={styles.progressInfo}>
           <Text style={styles.progressText}>
-            प्रश्न {currentQuestion + 1} / {MCHAT_QUESTIONS.length}
+            Question {currentQuestion + 1} / {MCHAT_QUESTIONS.length}
           </Text>
           <Text style={styles.progressPercent}>{Math.round(progress)}%</Text>
         </View>
@@ -345,8 +345,7 @@ export default function MChatQuestionsScreen() {
             <Text style={styles.questionNumberText}>Q{question.id}</Text>
           </View>
 
-          <Text style={styles.questionNepali}>{question.nepali}</Text>
-          {/* <Text style={styles.questionEnglish}>{question.english}</Text> */}
+          <Text style={styles.questionNepali}>{question.english}</Text>
 
           {question.example && (
             <Text style={styles.questionExample}>{question.example}</Text>
@@ -376,7 +375,7 @@ export default function MChatQuestionsScreen() {
                   currentAnswer === true && styles.answerTextActive,
                 ]}
               >
-                हो
+                Yes
               </Text>
             </TouchableOpacity>
 
@@ -402,7 +401,7 @@ export default function MChatQuestionsScreen() {
                   currentAnswer === false && styles.answerTextActive,
                 ]}
               >
-                होइन
+                No
               </Text>
             </TouchableOpacity>
           </View>
@@ -440,7 +439,7 @@ export default function MChatQuestionsScreen() {
               currentQuestion === 0 && styles.navButtonTextDisabled,
             ]}
           >
-            ← अघिल्लो
+            ← Previous
           </Text>
         </TouchableOpacity>
 
@@ -456,7 +455,7 @@ export default function MChatQuestionsScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.submitButtonText}>पेश गर्नुहोस् ✓</Text>
+              <Text style={styles.submitButtonText}>Submit ✓</Text>
             )}
           </TouchableOpacity>
         ) : (
@@ -476,7 +475,7 @@ export default function MChatQuestionsScreen() {
                 currentAnswer === null && styles.navButtonTextDisabled,
               ]}
             >
-              अर्को →
+              Next →
             </Text>
           </TouchableOpacity>
         )}

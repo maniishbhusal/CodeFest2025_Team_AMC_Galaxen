@@ -15,32 +15,28 @@ import { AppColors } from "@/constants/theme";
 const QUESTIONS = [
   {
     id: "a1",
-    nepali: "A1. तपाईंको गर्भावस्थामा, तपाईंलाई कुनै गम्भीर संक्रमण भएको थियो जसलाई अस्पताल उपचारको आवश्यकता थियो?",
-    english: "During your pregnancy with this child, did you have a serious infection that required hospital treatment?",
-    example: "(उदाहरण: उच्च ज्वरो, रुबेला, वा अन्य संक्रमण)",
+    question: "A1. During your pregnancy with this child, did you have a serious infection that required hospital treatment?",
+    example: "(Example: high fever, rubella, or other infections)",
     field: "pregnancy_infection",
     descField: "pregnancy_infection_desc",
   },
   {
     id: "a2",
-    nepali: "A2. के तपाईंको बच्चाको जन्ममा कुनै जटिलता थियो वा बच्चालाई जन्मपछि विशेष हेरचाहको आवश्यकता थियो?",
-    english: "Was your child's birth complicated by an emergency or did your baby need special care right after birth?",
-    example: "(उदाहरण: आकस्मिक सिजेरियन, अक्सिजनको आवश्यकता, NICU मा एक हप्ता भन्दा बढी)",
+    question: "A2. Was your child's birth complicated by an emergency or did your baby need special care right after birth?",
+    example: "(Example: emergency C-section, oxygen needed, NICU stay over a week)",
     field: "birth_complications",
     descField: "birth_complications_desc",
   },
   {
     id: "a3",
-    nepali: "A3. बच्चाको पहिलो वर्षमा, उनीहरूलाई कुनै गम्भीर मस्तिष्क संक्रमण वा टाउकोमा चोट लागेको थियो?",
-    english: "During your child's first year, did they have a serious brain infection or significant head injury?",
-    example: "(उदाहरण: मेनिन्जाइटिस, एन्सेफलाइटिस, वा टाउकोमा गम्भीर चोट)",
+    question: "A3. During your child's first year, did they have a serious brain infection or significant head injury?",
+    example: "(Example: meningitis, encephalitis, or serious head trauma)",
     field: "brain_injury_first_year",
     descField: "brain_injury_desc",
   },
   {
     id: "a4",
-    nepali: "A4. के तपाईंको बच्चाको कुनै दाजुभाइ, दिदीबहिनी वा नजिकको आफन्तलाई अटिज्म वा गम्भीर विकासात्मक ढिलाइको निदान भएको छ?",
-    english: "Does your child have an older brother, sister, or cousin who has been diagnosed with autism or serious developmental delay?",
+    question: "A4. Does your child have an older brother, sister, or cousin who has been diagnosed with autism or serious developmental delay?",
     example: "",
     field: "family_autism_history",
     descField: null,
@@ -82,7 +78,7 @@ export default function MedicalHistoryScreen() {
     // Check if all questions are answered
     const unanswered = Object.values(answers).some((v) => v === null);
     if (unanswered) {
-      Alert.alert("अपूर्ण", "कृपया सबै प्रश्नहरूको जवाफ दिनुहोस्।");
+      Alert.alert("Incomplete", "Please answer all questions.");
       return;
     }
 
@@ -105,7 +101,7 @@ export default function MedicalHistoryScreen() {
       });
     } catch (error) {
       console.error("Error saving medical history:", error);
-      Alert.alert("त्रुटि", "डाटा सुरक्षित गर्न असफल भयो");
+      Alert.alert("Error", "Failed to save data");
     }
   };
 
@@ -117,10 +113,10 @@ export default function MedicalHistoryScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>चिकित्सा इतिहास</Text>
-        <Text style={styles.headerSubtitle}>स्वास्थ्य पृष्ठभूमि</Text>
+        <Text style={styles.headerTitle}>Medical History</Text>
+        <Text style={styles.headerSubtitle}>Health Background</Text>
         <Text style={styles.headerNote}>
-          कृपया प्रत्येक प्रश्नको हो वा होइन छान्नुहोस्
+          Please select Yes or No for each question
         </Text>
       </View>
 
@@ -129,7 +125,7 @@ export default function MedicalHistoryScreen() {
         <View style={styles.warningBanner}>
           <Text style={styles.warningIcon}>⚠️</Text>
           <Text style={styles.warningText}>
-            एक वा बढी जोखिम कारकहरू पत्ता लागेका छन्। विशेषज्ञ परामर्श सिफारिस गरिएको छ।
+            One or more risk factors detected. Specialist consultation is recommended.
           </Text>
         </View>
       )}
@@ -137,8 +133,7 @@ export default function MedicalHistoryScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {QUESTIONS.map((question, index) => (
           <View key={question.id} style={styles.questionCard}>
-            <Text style={styles.questionNepali}>{question.nepali}</Text>
-            {/* <Text style={styles.questionEnglish}>{question.english}</Text> */}
+            <Text style={styles.questionNepali}>{question.question}</Text>
             {question.example && (
               <Text style={styles.questionExample}>{question.example}</Text>
             )}
@@ -158,7 +153,7 @@ export default function MedicalHistoryScreen() {
                     answers[question.field] === true && styles.answerButtonTextActive,
                   ]}
                 >
-                  हो
+                  Yes
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -174,7 +169,7 @@ export default function MedicalHistoryScreen() {
                     answers[question.field] === false && styles.answerButtonTextActive,
                   ]}
                 >
-                  होइन
+                  No
                 </Text>
               </TouchableOpacity>
             </View>
@@ -183,7 +178,7 @@ export default function MedicalHistoryScreen() {
             {answers[question.field] === true && question.descField && (
               <View style={styles.descriptionContainer}>
                 <Text style={styles.descriptionLabel}>
-                  कृपया विवरण दिनुहोस्:
+                  Please provide details:
                 </Text>
                 <TextInput
                   style={styles.descriptionInput}
@@ -194,7 +189,7 @@ export default function MedicalHistoryScreen() {
                       [question.descField!]: text,
                     }))
                   }
-                  placeholder="विवरण लेख्नुहोस्..."
+                  placeholder="Write details here..."
                   multiline
                   numberOfLines={3}
                 />
@@ -207,8 +202,8 @@ export default function MedicalHistoryScreen() {
         <View style={styles.infoBox}>
           <Text style={styles.infoIcon}>ℹ️</Text>
           <Text style={styles.infoText}>
-            यी प्रश्नहरूले डाक्टरलाई तपाईंको बच्चाको स्वास्थ्य पृष्ठभूमि बुझ्न मद्दत गर्छ।
-            सबै जानकारी गोप्य राखिनेछ।
+            These questions help the doctor understand your child's health background.
+            All information will be kept confidential.
           </Text>
         </View>
       </ScrollView>
@@ -220,14 +215,14 @@ export default function MedicalHistoryScreen() {
           onPress={handleBack}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>पछाडि</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>अर्को</Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>

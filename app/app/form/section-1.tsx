@@ -55,7 +55,7 @@ export default function Section1() {
       router.push("/form/section-2");
     } catch (error) {
       console.error("Error saving section 1 data:", error);
-      Alert.alert("त्रुटि", "डाटा सुरक्षित गर्न असफल भयो");
+      Alert.alert("Error", "Failed to save data");
     }
   };
 
@@ -64,35 +64,33 @@ export default function Section1() {
       <StepIndicator currentStep={1} totalSteps={7} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>बच्चाको आधारभूत जानकारी</Text>
-        <Text style={styles.subtitle}>Child Basic Information</Text>
+        <Text style={styles.title}>Child Basic Information</Text>
+        <Text style={styles.subtitle}>Please fill in your child's details</Text>
 
         {/* Full Name */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            बच्चाको पूरा नाम <Text style={styles.required}>*</Text>
+            Child's Full Name <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Child's Full Name</Text>
           <TextInput
             style={styles.input}
             value={fullName}
             onChangeText={setFullName}
-            placeholder="पूरा नाम प्रविष्ट गर्नुहोस्"
+            placeholder="Enter full name"
           />
         </View>
 
         {/* Date of Birth */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            जन्म मिति <Text style={styles.required}>*</Text>
+            Date of Birth <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Date of Birth</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
           >
             <Text style={styles.dateText}>
-              {dateOfBirth.toLocaleDateString("ne-NP")}
+              {dateOfBirth.toLocaleDateString("en-US")}
             </Text>
           </TouchableOpacity>
           {showDatePicker && (
@@ -108,28 +106,27 @@ export default function Section1() {
 
         {/* Age */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>उमेर</Text>
-          <Text style={styles.labelEn}>Age</Text>
+          <Text style={styles.label}>Age</Text>
           <View style={styles.ageContainer}>
             <View style={styles.ageInput}>
               <TextInput
                 style={styles.input}
                 value={ageYears}
                 onChangeText={setAgeYears}
-                placeholder="वर्ष"
+                placeholder="Years"
                 keyboardType="numeric"
               />
-              <Text style={styles.ageUnit}>वर्ष (Years)</Text>
+              <Text style={styles.ageUnit}>Years</Text>
             </View>
             <View style={styles.ageInput}>
               <TextInput
                 style={styles.input}
                 value={ageMonths}
                 onChangeText={setAgeMonths}
-                placeholder="महिना"
+                placeholder="Months"
                 keyboardType="numeric"
               />
-              <Text style={styles.ageUnit}>महिना (Months)</Text>
+              <Text style={styles.ageUnit}>Months</Text>
             </View>
           </View>
         </View>
@@ -137,9 +134,8 @@ export default function Section1() {
         {/* Gender */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            लिङ्ग <Text style={styles.required}>*</Text>
+            Gender <Text style={styles.required}>*</Text>
           </Text>
-          <Text style={styles.labelEn}>Gender</Text>
           <View style={styles.genderContainer}>
             <TouchableOpacity
               style={[
@@ -154,7 +150,7 @@ export default function Section1() {
                   gender === "male" && styles.genderTextActive,
                 ]}
               >
-                पुरुष / Male
+                Male
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -170,7 +166,7 @@ export default function Section1() {
                   gender === "female" && styles.genderTextActive,
                 ]}
               >
-                महिला / Female
+                Female
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -186,7 +182,7 @@ export default function Section1() {
                   gender === "other" && styles.genderTextActive,
                 ]}
               >
-                अन्य / Other
+                Other
               </Text>
             </TouchableOpacity>
           </View>
@@ -199,7 +195,7 @@ export default function Section1() {
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>अर्को / Next</Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -59,14 +59,14 @@ export default function CurriculumScreen() {
       if (activeCurriculum) {
         setCurriculumData(activeCurriculum);
       } else {
-        setError("पाठ्यक्रम अझै तोकिएको छैन");
+        setError("Curriculum not assigned yet");
       }
     } catch (err: any) {
       console.error("Error loading curriculum:", err);
       if (err.response?.status === 404) {
-        setError("पाठ्यक्रम अझै तोकिएको छैन");
+        setError("Curriculum not assigned yet");
       } else {
-        setError("पाठ्यक्रम लोड गर्न सकिएन");
+        setError("Failed to load curriculum");
       }
     } finally {
       setLoading(false);
@@ -94,11 +94,11 @@ export default function CurriculumScreen() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "active":
-        return "सक्रिय";
+        return "Active";
       case "paused":
-        return "रोकिएको";
+        return "Paused";
       case "completed":
-        return "पूरा भयो";
+        return "Completed";
       default:
         return status;
     }
@@ -126,7 +126,7 @@ export default function CurriculumScreen() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ne-NP", {
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -137,7 +137,7 @@ export default function CurriculumScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={AppColors.primary} />
-        <Text style={styles.loadingText}>पाठ्यक्रम लोड हुँदैछ...</Text>
+        <Text style={styles.loadingText}>Loading curriculum...</Text>
       </View>
     );
   }
@@ -149,17 +149,17 @@ export default function CurriculumScreen() {
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>थेरापी पाठ्यक्रम</Text>
+          <Text style={styles.headerTitle}>Therapy Curriculum</Text>
         </View>
 
         <View style={styles.errorContainer}>
           <Text style={styles.errorEmoji}>📚</Text>
-          <Text style={styles.errorTitle}>{error || "पाठ्यक्रम उपलब्ध छैन"}</Text>
+          <Text style={styles.errorTitle}>{error || "Curriculum not available"}</Text>
           <Text style={styles.errorSubtitle}>
-            डाक्टरले तपाईंको बच्चालाई पाठ्यक्रम तोक्नुपर्छ
+            A doctor needs to assign a curriculum for your child
           </Text>
           <TouchableOpacity style={styles.refreshButton} onPress={loadCurriculum}>
-            <Text style={styles.refreshButtonText}>पुनः प्रयास गर्नुहोस्</Text>
+            <Text style={styles.refreshButtonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -174,7 +174,7 @@ export default function CurriculumScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>थेरापी पाठ्यक्रम</Text>
+          <Text style={styles.headerTitle}>Therapy Curriculum</Text>
           <Text style={styles.headerSubtitle}>
             {curriculumData.curriculum_title}
           </Text>
@@ -185,7 +185,7 @@ export default function CurriculumScreen() {
         {/* Progress Card */}
         <View style={styles.progressCard}>
           <View style={styles.progressHeader}>
-            <Text style={styles.progressTitle}>प्रगति</Text>
+            <Text style={styles.progressTitle}>Progress</Text>
             <View
               style={[
                 styles.statusBadge,
@@ -201,19 +201,19 @@ export default function CurriculumScreen() {
           <View style={styles.progressStats}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{curriculumData.current_day}</Text>
-              <Text style={styles.statLabel}>हालको दिन</Text>
+              <Text style={styles.statLabel}>Current Day</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>
                 {curriculumData.curriculum_duration}
               </Text>
-              <Text style={styles.statLabel}>कुल दिन</Text>
+              <Text style={styles.statLabel}>Total Days</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{getProgressPercentage()}%</Text>
-              <Text style={styles.statLabel}>पूरा</Text>
+              <Text style={styles.statLabel}>Complete</Text>
             </View>
           </View>
 
@@ -229,27 +229,27 @@ export default function CurriculumScreen() {
 
         {/* Curriculum Info */}
         <View style={styles.infoCard}>
-          <Text style={styles.infoCardTitle}>पाठ्यक्रम विवरण</Text>
+          <Text style={styles.infoCardTitle}>Curriculum Details</Text>
           <Text style={styles.infoDescription}>
             {curriculumData.curriculum_title}
           </Text>
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>अवधि:</Text>
+            <Text style={styles.infoLabel}>Duration:</Text>
             <Text style={styles.infoValue}>
-              {curriculumData.curriculum_duration} दिन
+              {curriculumData.curriculum_duration} days
             </Text>
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>सुरु मिति:</Text>
+            <Text style={styles.infoLabel}>Start Date:</Text>
             <Text style={styles.infoValue}>
               {formatDate(curriculumData.start_date)}
             </Text>
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>अन्त्य मिति:</Text>
+            <Text style={styles.infoLabel}>End Date:</Text>
             <Text style={styles.infoValue}>
               {formatDate(curriculumData.end_date)}
             </Text>
@@ -264,9 +264,9 @@ export default function CurriculumScreen() {
           >
             <Text style={styles.primaryButtonEmoji}>📋</Text>
             <View style={styles.buttonContent}>
-              <Text style={styles.primaryButtonText}>आजका कार्यहरू</Text>
+              <Text style={styles.primaryButtonText}>Today's Tasks</Text>
               <Text style={styles.primaryButtonSubtext}>
-                दिन {curriculumData.current_day} का कार्यहरू हेर्नुहोस्
+                View Day {curriculumData.current_day} tasks
               </Text>
             </View>
             <Text style={styles.buttonArrow}>→</Text>
@@ -278,9 +278,9 @@ export default function CurriculumScreen() {
           >
             <Text style={styles.secondaryButtonEmoji}>📊</Text>
             <View style={styles.buttonContent}>
-              <Text style={styles.secondaryButtonText}>प्रगति इतिहास</Text>
+              <Text style={styles.secondaryButtonText}>Progress History</Text>
               <Text style={styles.secondaryButtonSubtext}>
-                पूरा भएका कार्यहरू हेर्नुहोस्
+                View completed tasks
               </Text>
             </View>
             <Text style={styles.buttonArrow}>→</Text>
@@ -291,11 +291,11 @@ export default function CurriculumScreen() {
         <View style={styles.tipsCard}>
           <Text style={styles.tipsIcon}>💡</Text>
           <View style={styles.tipsContent}>
-            <Text style={styles.tipsTitle}>सुझाव</Text>
+            <Text style={styles.tipsTitle}>Tips</Text>
             <Text style={styles.tipsText}>
-              • हरेक दिन नियमित रूपमा कार्यहरू गर्नुहोस्{"\n"}
-              • बच्चासँग खेल्दै सिकाउनुहोस्{"\n"}
-              • प्रगति भिडियो रेकर्ड गर्न नबिर्सनुहोस्
+              • Do tasks regularly every day{"\n"}
+              • Teach while playing with your child{"\n"}
+              • Don't forget to record progress videos
             </Text>
           </View>
         </View>

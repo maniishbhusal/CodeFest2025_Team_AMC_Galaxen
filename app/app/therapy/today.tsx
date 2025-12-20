@@ -109,7 +109,7 @@ export default function TodayTasksScreen() {
       console.error("Error loading today's tasks:", error);
       // Don't show alert for 404 - just means no active curriculum
       if (error.response?.status !== 404) {
-        Alert.alert("त्रुटि", "कार्यहरू लोड गर्न सकिएन");
+        Alert.alert("Error", "Failed to load tasks");
       }
     } finally {
       setLoading(false);
@@ -144,11 +144,11 @@ export default function TodayTasksScreen() {
 
     if (uncompletedTasks.length > 0) {
       Alert.alert(
-        "कार्यहरू बाँकी छ",
-        `${uncompletedTasks.length} कार्यहरू अझै पूरा भएको छैन। के तपाईं अर्को दिनमा जान चाहनुहुन्छ?`,
+        "Tasks Remaining",
+        `${uncompletedTasks.length} tasks are not completed yet. Do you want to move to the next day?`,
         [
-          { text: "रद्द गर्नुहोस्", style: "cancel" },
-          { text: "अगाडि बढ्नुहोस्", onPress: confirmAdvanceDay },
+          { text: "Cancel", style: "cancel" },
+          { text: "Continue", onPress: confirmAdvanceDay },
         ]
       );
     } else {
@@ -167,14 +167,14 @@ export default function TodayTasksScreen() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      Alert.alert("सफलता", "अर्को दिनमा सरियो!", [
-        { text: "ठीक छ", onPress: loadTodayTasks },
+      Alert.alert("Success", "Moved to next day!", [
+        { text: "OK", onPress: loadTodayTasks },
       ]);
     } catch (error: any) {
       console.error("Error advancing day:", error);
       Alert.alert(
-        "त्रुटि",
-        error.response?.data?.message || "अर्को दिनमा सार्न सकिएन"
+        "Error",
+        error.response?.data?.message || "Failed to advance to next day"
       );
     } finally {
       setAdvancingDay(false);
@@ -197,7 +197,7 @@ export default function TodayTasksScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={AppColors.primary} />
-        <Text style={styles.loadingText}>कार्यहरू लोड हुँदैछ...</Text>
+        <Text style={styles.loadingText}>Loading tasks...</Text>
       </View>
     );
   }
@@ -209,13 +209,13 @@ export default function TodayTasksScreen() {
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>आजका कार्यहरू</Text>
+          <Text style={styles.headerTitle}>Today's Tasks</Text>
         </View>
         <View style={styles.errorContainer}>
           <Text style={styles.errorEmoji}>📋</Text>
-          <Text style={styles.errorTitle}>कार्यहरू उपलब्ध छैन</Text>
-          <TouchableOpacity style={styles.refreshButton} onPress={loadTodayTasks}>
-            <Text style={styles.refreshButtonText}>पुनः प्रयास गर्नुहोस्</Text>
+          <Text style={styles.errorTitle}>No tasks available</Text>
+          <TouchableOpacity style={styles.refreshButton} onPress={() => loadTodayTasks()}>
+            <Text style={styles.refreshButtonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -230,9 +230,9 @@ export default function TodayTasksScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>आजका कार्यहरू</Text>
+          <Text style={styles.headerTitle}>Today's Tasks</Text>
           <Text style={styles.headerSubtitle}>
-            दिन {todayData.current_day}
+            Day {todayData.current_day}
           </Text>
         </View>
       </View>
@@ -241,9 +241,9 @@ export default function TodayTasksScreen() {
         {/* Progress Summary */}
         <View style={styles.summaryCard}>
           <View style={styles.summaryLeft}>
-            <Text style={styles.summaryTitle}>प्रगति</Text>
+            <Text style={styles.summaryTitle}>Progress</Text>
             <Text style={styles.summaryStats}>
-              {getCompletedCount()}/{todayData.tasks.length} कार्य पूरा
+              {getCompletedCount()}/{todayData.tasks.length} tasks completed
             </Text>
           </View>
           <View style={styles.progressCircle}>
@@ -253,14 +253,14 @@ export default function TodayTasksScreen() {
 
         {/* Tasks List */}
         <View style={styles.tasksSection}>
-          <Text style={styles.sectionTitle}>कार्य सूची</Text>
+          <Text style={styles.sectionTitle}>Task List</Text>
 
           {todayData.tasks.length === 0 ? (
             <View style={styles.noTasksCard}>
               <Text style={styles.noTasksEmoji}>🎉</Text>
-              <Text style={styles.noTasksTitle}>आज कुनै कार्य छैन</Text>
+              <Text style={styles.noTasksTitle}>No tasks for today</Text>
               <Text style={styles.noTasksSubtitle}>
-                आज विश्राम गर्नुहोस्!
+                Take a rest today!
               </Text>
             </View>
           ) : (
@@ -302,10 +302,10 @@ export default function TodayTasksScreen() {
                     </Text>
                     {completed ? (
                       <View style={styles.completedBadge}>
-                        <Text style={styles.completedBadgeText}>पूरा भयो</Text>
+                        <Text style={styles.completedBadgeText}>Completed</Text>
                       </View>
                     ) : (
-                      <Text style={styles.taskAction}>विवरण हेर्नुहोस् →</Text>
+                      <Text style={styles.taskAction}>View Details →</Text>
                     )}
                   </View>
                 </TouchableOpacity>
@@ -330,8 +330,8 @@ export default function TodayTasksScreen() {
               <>
                 <Text style={styles.advanceButtonText}>
                   {getCompletionPercentage() === 100
-                    ? "अर्को दिनमा जानुहोस्"
-                    : "कार्यहरू छोड्नुहोस् र अगाडि बढ्नुहोस्"}
+                    ? "Go to Next Day"
+                    : "Skip Tasks and Continue"}
                 </Text>
                 <Text style={styles.advanceButtonArrow}>→</Text>
               </>

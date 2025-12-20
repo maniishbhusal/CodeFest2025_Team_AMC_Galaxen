@@ -32,44 +32,44 @@ const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 // Mapping instructions to IDs
 const VIDEO_GUIDES: Record<string, { title: string; instructions: string }> = {
   walking: {
-    title: "नाम बोलाउने र हिँड्ने खेल",
+    title: "Name Calling & Walking",
     instructions:
-      "• २ मिटर टाढा बस्नुहोस्।\n• बच्चा खेलिरहेको बेला सामान्य स्वरमा नाम बोलाउनुहोस्: 'रोहन!'\n• नहेरे ठूलो स्वरमा बोलाउनुहोस्।\n• हिँडाइको चाल पनि कैद गर्नुहोस्।",
+      "• Stand 2 meters away.\n• Call the child's name normally while they're playing.\n• If no response, call louder.\n• Also capture their walking style.",
   },
   eating: {
-    title: "खाजा समयको खेल",
+    title: "Snack Time Activity",
     instructions:
-      "• जार खोल्न गाह्रो हुने खाजाको बट्टा लिनुहोस्।\n• जार देखाउनुहोस्: 'म्म्म, चिप्स!'\n• बच्चाले देख्ने तर पुग्न नसक्ने गरी समात्नुहोस्।\n• १० सेकेन्ड चुपचाप पर्खनुहोस्, बच्चाले मागेको हेर्नुहोस्।",
+      "• Get a snack jar that's hard to open.\n• Show the jar: 'Mmm, chips!'\n• Hold it where the child can see but not reach.\n• Wait silently for 10 seconds, observe if they ask.",
   },
   speaking: {
-    title: "बोल्ने र प्रतिक्रिया",
+    title: "Speaking & Response",
     instructions:
-      "• बच्चासँग कुराकानी गर्ने प्रयास गर्नुहोस्।\n• उसले निकाल्ने आवाज वा शब्दहरू रेकर्ड गर्नुहोस्।\n• आँखामा आँखा जुधाएको (Eye Contact) स्पष्ट देखिनुपर्छ।",
+      "• Try to have a conversation with the child.\n• Record the sounds or words they make.\n• Eye contact should be clearly visible.",
   },
   behavior: {
-    title: "व्यवहार अवलोकन",
+    title: "Behavior Observation",
     instructions:
-      "• बच्चाले अनौठो मानेको वा दोहोर्याइरहेको व्यवहार रेकर्ड गर्नुहोस्।\n• कम्तिमा १ मिनेटको शान्त भिडियो खिच्नुहोस्।",
+      "• Record any unusual or repetitive behaviors.\n• Capture at least 1 minute of quiet observation.",
   },
   playing: {
-    title: "पुतली वा खेलौना खेल",
+    title: "Doll or Toy Play",
     instructions:
-      "• पुतलीलाई सुताएको वा पानी खुवाएको नाटक गर्नुहोस्।\n• खेलौना बच्चातिर धकेल्नुहोस्: 'अब तिम्रो पालो!'\n• बच्चाले खेलौनासँग कसरी खेल्छ, हेर्नुहोस्।",
+      "• Pretend to put a doll to sleep or feed it.\n• Push a toy towards the child: 'Your turn!'\n• Observe how the child plays with the toy.",
   },
   other: {
-    title: "अन्य गतिविधि",
+    title: "Other Activity",
     instructions:
-      "• बच्चाको कुनै पनि महत्वपूर्ण गतिविधि खिच्नुहोस्।\n• उज्यालो ठाउँमा रेकर्ड गर्नुहोस्।",
+      "• Record any important activity of the child.\n• Record in a well-lit area.",
   },
 };
 
 const VIDEO_TYPES = [
-  { id: "walking", label: "हिँड्ने", emoji: "🚶" },
-  { id: "eating", label: "खाने", emoji: "🍽️" },
-  { id: "speaking", label: "बोल्ने", emoji: "🗣️" },
-  { id: "behavior", label: "व्यवहार", emoji: "🧠" },
-  { id: "playing", label: "खेल्ने", emoji: "🎮" },
-  { id: "other", label: "अन्य", emoji: "📹" },
+  { id: "walking", label: "Walking", emoji: "🚶" },
+  { id: "eating", label: "Eating", emoji: "🍽️" },
+  { id: "speaking", label: "Speaking", emoji: "🗣️" },
+  { id: "behavior", label: "Behavior", emoji: "🧠" },
+  { id: "playing", label: "Playing", emoji: "🎮" },
+  { id: "other", label: "Other", emoji: "📹" },
 ];
 
 export default function VideoUploadScreen() {
@@ -91,7 +91,7 @@ export default function VideoUploadScreen() {
   const pickVideo = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert("अनुमति आवश्यक", "ग्यालेरी पहुँच आवश्यक छ।");
+      Alert.alert("Permission Required", "Gallery access is required.");
       return;
     }
 
@@ -146,9 +146,9 @@ export default function VideoUploadScreen() {
       setUploadProgress(100);
       setTimeout(() => {
         setUploading(false);
-        Alert.alert("सफलता", "भिडियो सफलतापूर्वक अपलोड भयो!", [
+        Alert.alert("Success", "Video uploaded successfully!", [
           {
-            text: "थप भिडियो",
+            text: "Add More",
             onPress: () => {
               setVideoUri(null);
               setSelectedType(null);
@@ -156,7 +156,7 @@ export default function VideoUploadScreen() {
             },
           },
           {
-            text: "भिडियो सूची",
+            text: "Video List",
             onPress: () =>
               router.push({ pathname: "/videos/list", params: { childId } }),
           },
@@ -169,8 +169,8 @@ export default function VideoUploadScreen() {
         error.response?.data?.error ||
         error.response?.data?.video_url?.[0] ||
         error.message ||
-        "अपलोड असफल भयो।";
-      Alert.alert("त्रुटि", errorMsg);
+        "Upload failed.";
+      Alert.alert("Error", errorMsg);
     }
   };
 
@@ -184,8 +184,8 @@ export default function VideoUploadScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>भिडियो अपलोड</Text>
-          <Text style={styles.headerSubtitle}>चरणबद्ध गाइड</Text>
+          <Text style={styles.headerTitle}>Video Upload</Text>
+          <Text style={styles.headerSubtitle}>Step-by-Step Guide</Text>
         </View>
       </View>
 
@@ -197,10 +197,10 @@ export default function VideoUploadScreen() {
               style={[styles.stepNumber, selectedType ? styles.stepDone : null]}
             >
               <Text style={styles.stepNumberText}>
-                {selectedType ? "✓" : "१"}
+                {selectedType ? "✓" : "1"}
               </Text>
             </View>
-            <Text style={styles.sectionTitle}>भिडियोको प्रकार छान्नुहोस्</Text>
+            <Text style={styles.sectionTitle}>Select Video Type</Text>
           </View>
 
           <View style={styles.typeGrid}>
@@ -235,11 +235,11 @@ export default function VideoUploadScreen() {
                 style={[styles.stepNumber, videoUri ? styles.stepDone : null]}
               >
                 <Text style={styles.stepNumberText}>
-                  {videoUri ? "✓" : "२"}
+                  {videoUri ? "✓" : "2"}
                 </Text>
               </View>
               <Text style={styles.sectionTitle}>
-                गाइड अनुसार भिडियो छान्नुहोस्
+                Select Video Following Guide
               </Text>
             </View>
 
@@ -265,15 +265,15 @@ export default function VideoUploadScreen() {
                   onPress={pickVideo}
                 >
                   <Text style={styles.changeVideoText}>
-                    अर्को भिडियो छान्नुहोस्
+                    Choose Different Video
                   </Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <TouchableOpacity style={styles.pickButton} onPress={pickVideo}>
                 <Text style={styles.pickEmoji}>📤</Text>
-                <Text style={styles.pickTitle}>भिडियो अपलोड गर्नुहोस्</Text>
-                <Text style={styles.pickSubtitle}>अधिकतम १ मिनेट सम्मको</Text>
+                <Text style={styles.pickTitle}>Upload Video</Text>
+                <Text style={styles.pickSubtitle}>Maximum 1 minute</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -284,13 +284,13 @@ export default function VideoUploadScreen() {
           <View style={styles.stepContainer}>
             <View style={styles.stepHeader}>
               <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>३</Text>
+                <Text style={styles.stepNumberText}>3</Text>
               </View>
-              <Text style={styles.sectionTitle}>थप जानकारी (ऐच्छिक)</Text>
+              <Text style={styles.sectionTitle}>Additional Info (Optional)</Text>
             </View>
             <TextInput
               style={styles.descriptionInput}
-              placeholder="भिडियोको बारेमा केही लेख्नुहोस्..."
+              placeholder="Write something about the video..."
               value={description}
               onChangeText={setDescription}
               multiline
@@ -301,7 +301,7 @@ export default function VideoUploadScreen() {
         {uploading && (
           <View style={styles.progressSection}>
             <Text style={styles.progressText}>
-              अपलोड हुँदैछ: {uploadProgress}%
+              Uploading: {uploadProgress}%
             </Text>
             <View style={styles.progressBarContainer}>
               <View
@@ -327,7 +327,7 @@ export default function VideoUploadScreen() {
           {uploading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.uploadButtonText}>सुरक्षित गर्नुहोस्</Text>
+            <Text style={styles.uploadButtonText}>Save</Text>
           )}
         </TouchableOpacity>
       </View>

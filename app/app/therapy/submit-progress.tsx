@@ -31,23 +31,23 @@ interface StatusOption {
 const STATUS_OPTIONS: StatusOption[] = [
   {
     value: "done_without_help",
-    label: "सहायता बिना गर्यो",
+    label: "Did it alone",
     emoji: "🌟",
-    description: "बच्चाले आफैं गर्न सक्यो",
+    description: "Child was able to do it independently",
     color: "#4CAF50",
   },
   {
     value: "done_with_help",
-    label: "सहायतासँग गर्यो",
+    label: "Did with help",
     emoji: "🤝",
-    description: "बच्चालाई केही सहयोग चाहियो",
+    description: "Child needed some assistance",
     color: "#2196F3",
   },
   {
     value: "not_done",
-    label: "गर्न सकेन",
+    label: "Couldn't do",
     emoji: "😔",
-    description: "आज गर्न सकिएन",
+    description: "Could not complete today",
     color: "#FF9800",
   },
 ];
@@ -72,8 +72,8 @@ export default function SubmitProgressScreen() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(
-        "अनुमति आवश्यक",
-        "भिडियो छान्नको लागि ग्यालेरी पहुँच आवश्यक छ।"
+        "Permission Required",
+        "Gallery access is required to select videos."
       );
       return;
     }
@@ -94,8 +94,8 @@ export default function SubmitProgressScreen() {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(
-        "अनुमति आवश्यक",
-        "भिडियो खिच्नको लागि क्यामेरा पहुँच आवश्यक छ।"
+        "Permission Required",
+        "Camera access is required to record videos."
       );
       return;
     }
@@ -114,7 +114,7 @@ export default function SubmitProgressScreen() {
 
   const handleSubmit = async () => {
     if (!selectedStatus) {
-      Alert.alert("त्रुटि", "कृपया कार्यको स्थिति छान्नुहोस्।");
+      Alert.alert("Error", "Please select a task status.");
       return;
     }
 
@@ -140,11 +140,11 @@ export default function SubmitProgressScreen() {
       );
 
       Alert.alert(
-        "सफलता",
-        "प्रगति सफलतापूर्वक पेश भयो!",
+        "Success",
+        "Progress submitted successfully!",
         [
           {
-            text: "ठीक छ",
+            text: "OK",
             onPress: () => router.replace({
               pathname: "/therapy/today",
               params: { childId },
@@ -155,8 +155,8 @@ export default function SubmitProgressScreen() {
     } catch (error: any) {
       console.error("Error submitting progress:", error);
       Alert.alert(
-        "त्रुटि",
-        error.response?.data?.message || "प्रगति पेश गर्न सकिएन"
+        "Error",
+        error.response?.data?.message || "Failed to submit progress"
       );
     } finally {
       setSubmitting(false);
@@ -171,7 +171,7 @@ export default function SubmitProgressScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>प्रगति पेश गर्नुहोस्</Text>
+          <Text style={styles.headerTitle}>Submit Progress</Text>
           <Text style={styles.headerSubtitle} numberOfLines={1}>
             {taskTitle}
           </Text>
@@ -181,9 +181,9 @@ export default function SubmitProgressScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Status Selection */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>कार्य कसरी गयो?</Text>
+          <Text style={styles.sectionTitle}>How did the task go?</Text>
           <Text style={styles.sectionSubtitle}>
-            तपाईंको बच्चाले कार्य कसरी पूरा गर्यो छान्नुहोस्
+            Select how your child completed the task
           </Text>
 
           {STATUS_OPTIONS.map((option) => (
@@ -239,9 +239,9 @@ export default function SubmitProgressScreen() {
 
         {/* Video Upload */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>भिडियो (ऐच्छिक)</Text>
+          <Text style={styles.sectionTitle}>Video (Optional)</Text>
           <Text style={styles.sectionSubtitle}>
-            बच्चाको प्रगति देखाउने भिडियो थप्नुहोस्
+            Add a video showing the child's progress
           </Text>
 
           {videoUri ? (
@@ -257,18 +257,18 @@ export default function SubmitProgressScreen() {
                 style={styles.removeVideoButton}
                 onPress={() => setVideoUri(null)}
               >
-                <Text style={styles.removeVideoText}>भिडियो हटाउनुहोस्</Text>
+                <Text style={styles.removeVideoText}>Remove Video</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.videoOptions}>
               <TouchableOpacity style={styles.videoButton} onPress={recordVideo}>
                 <Text style={styles.videoButtonEmoji}>📹</Text>
-                <Text style={styles.videoButtonText}>भिडियो खिच्नुहोस्</Text>
+                <Text style={styles.videoButtonText}>Record Video</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.videoButton} onPress={pickVideo}>
                 <Text style={styles.videoButtonEmoji}>📁</Text>
-                <Text style={styles.videoButtonText}>ग्यालेरीबाट छान्नुहोस्</Text>
+                <Text style={styles.videoButtonText}>Select from Gallery</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -276,10 +276,10 @@ export default function SubmitProgressScreen() {
 
         {/* Notes */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>नोटहरू (ऐच्छिक)</Text>
+          <Text style={styles.sectionTitle}>Notes (Optional)</Text>
           <TextInput
             style={styles.notesInput}
-            placeholder="कुनै टिप्पणी वा अवलोकन..."
+            placeholder="Any comments or observations..."
             placeholderTextColor={AppColors.textLight}
             value={notes}
             onChangeText={setNotes}
@@ -305,7 +305,7 @@ export default function SubmitProgressScreen() {
           {submitting ? (
             <ActivityIndicator color={AppColors.white} />
           ) : (
-            <Text style={styles.submitButtonText}>प्रगति पेश गर्नुहोस्</Text>
+            <Text style={styles.submitButtonText}>Submit Progress</Text>
           )}
         </TouchableOpacity>
       </View>
