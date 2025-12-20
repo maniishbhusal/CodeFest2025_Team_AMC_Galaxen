@@ -106,6 +106,7 @@ export default function TabLayout() {
 
       {/* Hiding Unwanted Tabs */}
       <Tabs.Screen name="chat" options={{ href: null }} />
+      <Tabs.Screen name="explore" options={{ href: null }} />
     </Tabs>
   );
 }
