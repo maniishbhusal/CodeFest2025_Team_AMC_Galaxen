@@ -245,13 +245,22 @@ export default function PatientProgressPage() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setShowReviewModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
-            >
-              <FileText className="w-4 h-4" />
-              Create Review
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowReviewModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+              >
+                <FileText className="w-4 h-4" />
+                Create Review
+              </button>
+              <button
+                onClick={() => navigate(`/doctor/patient/${childId}/diagnosis`)}
+                className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition"
+              >
+                <ClipboardList className="w-4 h-4" />
+                Diagnosis Report
+              </button>
+            </div>
           </div>
         </div>
       </header>

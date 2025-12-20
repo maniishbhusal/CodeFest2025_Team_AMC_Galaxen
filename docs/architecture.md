@@ -1847,7 +1847,7 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 6.8 Diagnosis Report Form
+✅ 6.8 Diagnosis Report Form
    - Has autism: Yes/No
    - Spectrum type dropdown
    - Detailed report textarea
@@ -1855,7 +1855,7 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
    - Share with parent checkbox
    - Submit
 
-□ 6.9 UI Polish
+✅ 6.9 UI Polish
    - Loading states
    - Error handling
    - Responsive design

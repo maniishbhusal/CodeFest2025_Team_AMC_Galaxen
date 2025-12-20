@@ -190,6 +190,13 @@ export default function PatientDetailPage() {
                   <BarChart3 className="w-4 h-4" />
                   View Progress
                 </button>
+                <button
+                  onClick={() => navigate(`/doctor/patient/${childId}/diagnosis`)}
+                  className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition"
+                >
+                  <FileText className="w-4 h-4" />
+                  Diagnosis Report
+                </button>
               </div>
             )}
           </div>
