@@ -138,7 +138,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF007F" />
+        <ActivityIndicator size="large" color="#F97316" />
         <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
     );
@@ -157,7 +157,7 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#FF007F"]} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#F97316"]} />
         }
       >
         {/* Profile Card */}
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#FF007F",
+    backgroundColor: "#F97316",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,

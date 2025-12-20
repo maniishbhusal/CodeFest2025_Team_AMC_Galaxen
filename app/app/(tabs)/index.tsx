@@ -209,7 +209,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#FF007F"]} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#F97316"]} />
         }
       >
         {/* Progress & Streak Bar */}
@@ -217,13 +217,19 @@ export default function HomeScreen() {
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Daily Progress</Text>
             <View style={styles.progressBg}>
-              <View style={[styles.progressFill, { width: "45%" }]} />
+              <View style={[styles.progressFill, {
+                width: `${todayTasks.length > 0
+                  ? (todayTasks.filter((t: any) => t.status !== "not_done").length / todayTasks.length) * 100
+                  : 0}%`
+              }]} />
             </View>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Streak</Text>
-            <Text style={styles.streakVal}>🔥 5 Days</Text>
+            <Text style={styles.statLabel}>Day</Text>
+            <Text style={styles.streakVal}>
+              📅 {activeCurriculum ? `${activeCurriculum.current_day}/${activeCurriculum.total_days}` : "0"}
+            </Text>
           </View>
         </View>
 
@@ -434,7 +440,7 @@ export default function HomeScreen() {
                 <Text style={styles.viewAllText}>
                   View all {todayTasks.length} tasks
                 </Text>
-                <Ionicons name="arrow-forward" size={16} color="#FF007F" />
+                <Ionicons name="arrow-forward" size={16} color="#F97316" />
               </TouchableOpacity>
             )}
           </>
@@ -489,7 +495,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#FF007F",
+    backgroundColor: "#F97316",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -572,7 +578,7 @@ const styles = StyleSheet.create({
   insightTitle: { fontSize: 14, fontWeight: "700" },
   insightSub: { fontSize: 12, color: "#6B7280" },
   pinkBtn: {
-    backgroundColor: "#FF007F",
+    backgroundColor: "#F97316",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -595,7 +601,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   secTitle: { fontSize: 18, fontWeight: "700" },
-  viewHist: { fontSize: 13, color: "#FF007F", fontWeight: "600" },
+  viewHist: { fontSize: 13, color: "#F97316", fontWeight: "600" },
 
   docCard: {
     backgroundColor: "#FFF",
@@ -621,7 +627,7 @@ const styles = StyleSheet.create({
   docName: { fontSize: 15, fontWeight: "700" },
   timeAgo: { fontSize: 11, color: "#9CA3AF" },
   bubble: {
-    backgroundColor: "#FFF0F6",
+    backgroundColor: "#FFF7ED",
     padding: 12,
     borderRadius: 15,
     borderTopLeftRadius: 0,
@@ -631,7 +637,7 @@ const styles = StyleSheet.create({
   replyRow: { flexDirection: "row", alignItems: "center", marginTop: 10 },
   replyLabel: {
     fontSize: 13,
-    color: "#FF007F",
+    color: "#F97316",
     fontWeight: "700",
     marginLeft: 6,
   },
@@ -680,7 +686,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: "#FF007F",
+    color: "#F97316",
     fontWeight: "600",
     marginRight: 4,
   },

@@ -164,7 +164,7 @@ export default function ReportScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF007F" />
+        <ActivityIndicator size="large" color="#F97316" />
         <Text style={styles.loadingText}>Loading reports...</Text>
       </View>
     );
@@ -191,7 +191,7 @@ export default function ReportScreen() {
         style={styles.content}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#FF007F"]} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#F97316"]} />
         }
       >
         {/* M-CHAT Results Card */}
@@ -234,7 +234,7 @@ export default function ReportScreen() {
                 }
               >
                 <Text style={styles.viewDetailsBtnText}>View Full Report</Text>
-                <Ionicons name="arrow-forward" size={16} color="#FF007F" />
+                <Ionicons name="arrow-forward" size={16} color="#F97316" />
               </TouchableOpacity>
             </View>
           ) : (
@@ -294,7 +294,7 @@ export default function ReportScreen() {
                 onPress={() => router.push("/therapy/today")}
               >
                 <Text style={styles.viewDetailsBtnText}>View Today&apos;s Tasks</Text>
-                <Ionicons name="arrow-forward" size={16} color="#FF007F" />
+                <Ionicons name="arrow-forward" size={16} color="#F97316" />
               </TouchableOpacity>
             </View>
           ) : (
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
   viewDetailsBtnText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#FF007F",
+    color: "#F97316",
     marginRight: 4,
   },
   emptyState: {
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   startBtn: {
-    backgroundColor: "#FF007F",
+    backgroundColor: "#F97316",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
