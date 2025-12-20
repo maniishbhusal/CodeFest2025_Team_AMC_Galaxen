@@ -255,8 +255,14 @@ class DoctorAssignCurriculumView(APIView):
         assessment = get_object_or_404(ChildAssessment, child=child, assigned_doctor=doctor)
 
         # Check if child already has an active curriculum
-        if ChildCurriculum.objects.filter(child=child, status='active').exists():
-            return Response({'error': 'Child already has an active curriculum'}, status=status.HTTP_400_BAD_REQUEST)
+        existing_active = ChildCurriculum.objects.filter(child=child, status='active').first()
+        if existing_active:
+            # If existing curriculum is an assessment type, mark it completed and allow new assignment
+            if existing_active.curriculum.type == 'assessment':
+                existing_active.status = 'completed'
+                existing_active.save()
+            else:
+                return Response({'error': 'Child already has an active curriculum'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = AssignCurriculumSerializer(data=request.data)
         if serializer.is_valid():
