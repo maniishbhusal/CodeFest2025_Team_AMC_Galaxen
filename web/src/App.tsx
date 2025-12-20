@@ -6,6 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import DoctorLandingPage from "./pages/doctor/DoctorLandingPage";
+import DoctorDashboard from "./pages/doctor/Dashboard";
+import PatientDetail from "./pages/doctor/PatientDetail";
+import AssignCurriculum from "./pages/doctor/AssignCurriculum";
+import PatientProgress from "./pages/doctor/PatientProgress";
+import DiagnosisReport from "./pages/doctor/DiagnosisReport";
 
 import Register from "./components/doctor/Register";
 import Login from "./components/doctor/Login";
@@ -22,6 +27,11 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/doctor" element={<DoctorLandingPage />} />
           <Route path="/doctor/login" element={<Login />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor/patient/:childId" element={<PatientDetail />} />
+          <Route path="/doctor/patient/:childId/assign" element={<AssignCurriculum />} />
+          <Route path="/doctor/patient/:childId/progress" element={<PatientProgress />} />
+          <Route path="/doctor/patient/:childId/diagnosis" element={<DiagnosisReport />} />
 
           <Route path="/register" element={<Register />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

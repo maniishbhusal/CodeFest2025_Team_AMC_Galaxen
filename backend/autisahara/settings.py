@@ -131,6 +131,18 @@ SIMPLE_JWT = {
 # CORS Settings - Allow all for hackathon
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'ngrok-skip-browser-warning',
+]
 
 # CSRF Settings for ngrok tunneling
 # Add your ngrok URL here when you start the tunnel
