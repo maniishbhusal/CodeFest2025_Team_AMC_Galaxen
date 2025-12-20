@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   RefreshControl,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -22,6 +21,7 @@ export default function HomeScreen() {
   const [userData, setUserData] = useState<any>(null);
   const [mchatResults, setMchatResults] = useState<{ [key: number]: any }>({});
   const [therapyData, setTherapyData] = useState<{ [key: number]: any }>({});
+  const [doctorFeedback, setDoctorFeedback] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -104,6 +104,21 @@ export default function HomeScreen() {
             };
           }
         } catch (err) {}
+
+        // Fetch doctor feedback for first child
+        if (childrenData.indexOf(child) === 0) {
+          try {
+            const feedbackRes = await axios.get(
+              `${BASE_URL}/api/therapy/child/${child.id}/feedback/`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+            if (feedbackRes.data?.has_feedback) {
+              setDoctorFeedback(feedbackRes.data.latest_review);
+            }
+          } catch (err) {}
+        }
       }
       setMchatResults(results);
       setTherapyData(therapy);
@@ -308,34 +323,48 @@ export default function HomeScreen() {
           })()}
         {/* 3. Feedback Section */}
         <View style={styles.secHeader}>
-          <Text style={styles.secTitle}>Doctor's Feedback</Text>
-          <TouchableOpacity>
-            <Text style={styles.viewHist}>View History</Text>
-          </TouchableOpacity>
+          <Text style={styles.secTitle}>Doctor&apos;s Feedback</Text>
+          {doctorFeedback && (
+            <TouchableOpacity>
+              <Text style={styles.viewHist}>View History</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View style={styles.docCard}>
-          <Image
-            source={{ uri: "https://i.pravatar.cc/150?u=doc" }}
-            style={styles.docPic}
-          />
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <View style={styles.rowBetween}>
-              <Text style={styles.docName}>Dr. Emily</Text>
-              <Text style={styles.timeAgo}>2h ago</Text>
+        {doctorFeedback ? (
+          <View style={styles.docCard}>
+            <View style={styles.docAvatar}>
+              <Ionicons name="person" size={20} color="#FFF" />
             </View>
-            <View style={styles.bubble}>
-              <Text style={styles.bubbleText}>
-                Great job! I noticed {childName} responding well. Let's focus on
-                vowel sounds.
-              </Text>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <View style={styles.rowBetween}>
+                <Text style={styles.docName}>{doctorFeedback.doctor_name || "Doctor"}</Text>
+                <Text style={styles.timeAgo}>Day {doctorFeedback.review_period}</Text>
+              </View>
+              <View style={styles.bubble}>
+                <Text style={styles.bubbleText}>
+                  {doctorFeedback.observations}
+                </Text>
+              </View>
+              {doctorFeedback.recommendations && (
+                <View style={[styles.bubble, { backgroundColor: "#E8F5E9", marginTop: 8 }]}>
+                  <Text style={[styles.bubbleText, { color: "#2E7D32" }]}>
+                    <Text style={{ fontWeight: "700" }}>Recommendation: </Text>
+                    {doctorFeedback.recommendations}
+                  </Text>
+                </View>
+              )}
             </View>
-            <TouchableOpacity style={styles.replyRow}>
-              <Ionicons name="arrow-undo" size={14} color="#FF007F" />
-              <Text style={styles.replyLabel}>Reply to Doctor</Text>
-            </TouchableOpacity>
           </View>
-        </View>
+        ) : (
+          <View style={styles.noFeedbackCard}>
+            <Ionicons name="chatbubble-ellipses-outline" size={32} color="#9CA3AF" />
+            <Text style={styles.noFeedbackTitle}>No feedback yet</Text>
+            <Text style={styles.noFeedbackSub}>
+              Doctor feedback will appear here after reviews
+            </Text>
+          </View>
+        )}
 
         {/* 4. Focus Section - Show real tasks if curriculum active */}
         <View style={styles.secHeader}>
@@ -574,8 +603,16 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 2,
     marginBottom: 20,
+    flexDirection: "row",
   },
-  docPic: { width: 42, height: 42, borderRadius: 21 },
+  docAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#7C3AED",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   rowBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -663,6 +700,28 @@ const styles = StyleSheet.create({
   emptyTaskSub: {
     fontSize: 14,
     color: "#15803D",
+    marginTop: 4,
+    textAlign: "center",
+  },
+  noFeedbackCard: {
+    backgroundColor: "#F9FAFB",
+    borderRadius: 16,
+    padding: 24,
+    alignItems: "center",
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderStyle: "dashed",
+  },
+  noFeedbackTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#6B7280",
+    marginTop: 12,
+  },
+  noFeedbackSub: {
+    fontSize: 13,
+    color: "#9CA3AF",
     marginTop: 4,
     textAlign: "center",
   },

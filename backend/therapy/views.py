@@ -646,6 +646,46 @@ class ChildDiagnosisReportsView(APIView):
         })
 
 
+class ChildDoctorFeedbackView(APIView):
+    """Get doctor reviews/feedback for a child (for parent home screen)"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, child_id):
+        child = get_object_or_404(Child, pk=child_id)
+
+        # Check access - parent can only see their own child's feedback
+        if request.user.role == 'parent' and child.parent != request.user:
+            return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Get active or most recent curriculum
+        child_curriculum = ChildCurriculum.objects.filter(child=child).order_by('-created_at').first()
+
+        if not child_curriculum:
+            return Response({
+                'has_feedback': False,
+                'reviews': [],
+                'message': 'No curriculum assigned yet'
+            })
+
+        # Get all reviews for this curriculum
+        reviews = DoctorReview.objects.filter(
+            child_curriculum=child_curriculum
+        ).select_related('doctor', 'doctor__user').order_by('-reviewed_at')
+
+        if not reviews.exists():
+            return Response({
+                'has_feedback': False,
+                'reviews': [],
+                'message': 'No doctor feedback yet'
+            })
+
+        return Response({
+            'has_feedback': True,
+            'reviews': DoctorReviewSerializer(reviews, many=True).data,
+            'latest_review': DoctorReviewSerializer(reviews.first()).data,
+        })
+
+
 class DoctorToggleReportShareView(APIView):
     """Toggle whether a diagnosis report is shared with parent"""
     permission_classes = [IsAuthenticated]
