@@ -5,9 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
@@ -16,71 +18,75 @@ const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 export default function HomeScreen() {
   const router = useRouter();
   const [children, setChildren] = useState<any[]>([]);
+  const [userData, setUserData] = useState<any>(null);
   const [mchatResults, setMchatResults] = useState<{ [key: number]: any }>({});
   const [therapyData, setTherapyData] = useState<{ [key: number]: any }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadChildren();
+    loadDashboardData();
   }, []);
 
-  const loadChildren = async () => {
+  const loadDashboardData = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) return;
 
+      // Real User Profile Fetching
+      try {
+        const userRes = await axios.get(`${BASE_URL}/api/auth/profile/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserData(userRes.data);
+      } catch (e) {}
+
+      // Children Fetching
       const response = await axios.get(`${BASE_URL}/api/children/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const childrenData = response.data || [];
       setChildren(childrenData);
 
-      // Fetch M-CHAT results for each child
       const results: { [key: number]: any } = {};
-      for (const child of childrenData) {
-        try {
-          const mchatResponse = await axios.get(
-            `${BASE_URL}/api/children/${child.id}/mchat/`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          if (mchatResponse.data && mchatResponse.data.total_score !== undefined) {
-            results[child.id] = mchatResponse.data;
-          }
-        } catch (err) {
-          // No M-CHAT results yet for this child
-        }
-      }
-      setMchatResults(results);
-
-      // Fetch therapy curriculum data for each child
       const therapy: { [key: number]: any } = {};
+
       for (const child of childrenData) {
+        // M-CHAT logic
         try {
-          const therapyResponse = await axios.get(
-            `${BASE_URL}/api/therapy/child/${child.id}/curriculum/`,
-            { headers: { Authorization: `Bearer ${token}` } }
+          const mchatRes = await axios.get(
+            `${BASE_URL}/api/children/${child.id}/mchat/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
           );
-          // API returns { curricula: [...] } - get the active one
-          const curricula = therapyResponse.data?.curricula || [];
-          const activeCurriculum = curricula.find((c: any) => c.status === "active");
-          if (activeCurriculum) {
+          if (mchatRes.data?.total_score !== undefined)
+            results[child.id] = mchatRes.data;
+        } catch (err) {}
+
+        // Therapy logic
+        try {
+          const therapyRes = await axios.get(
+            `${BASE_URL}/api/therapy/child/${child.id}/curriculum/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const active = (therapyRes.data?.curricula || []).find(
+            (c: any) => c.status === "active"
+          );
+          if (active) {
             therapy[child.id] = {
-              curriculum: {
-                name: activeCurriculum.curriculum_title,
-                id: activeCurriculum.curriculum,
-              },
-              current_day: activeCurriculum.current_day,
-              total_days: activeCurriculum.curriculum_duration,
-              status: activeCurriculum.status,
+              name: active.curriculum_title,
+              current_day: active.current_day,
+              total_days: active.curriculum_duration,
             };
           }
-        } catch (err) {
-          // No therapy curriculum assigned yet for this child
-        }
+        } catch (err) {}
       }
+      setMchatResults(results);
       setTherapyData(therapy);
     } catch (error) {
-      console.log("Error loading children:", error);
+      console.log("Dashboard Error:", error);
     } finally {
       setLoading(false);
     }
@@ -89,7 +95,6 @@ export default function HomeScreen() {
   const handleMChatPress = (child: any) => {
     const result = mchatResults[child.id];
     if (result) {
-      // M-CHAT already completed - show results
       router.push({
         pathname: "/mchat/results",
         params: {
@@ -99,7 +104,6 @@ export default function HomeScreen() {
         },
       });
     } else {
-      // Start new M-CHAT screening
       router.push({
         pathname: "/mchat/medical-history",
         params: { childId: child.id.toString() },
@@ -107,243 +111,156 @@ export default function HomeScreen() {
     }
   };
 
-  const getRiskLevelText = (riskLevel: string) => {
-    switch (riskLevel) {
-      case "low":
-        return "कम जोखिम";
-      case "medium":
-        return "मध्यम जोखिम";
-      case "high":
-        return "उच्च जोखिम";
-      default:
-        return riskLevel;
-    }
-  };
-
-  const getRiskLevelColor = (riskLevel: string) => {
-    switch (riskLevel) {
-      case "low":
-        return "#4CAF50";
-      case "medium":
-        return "#FF9800";
-      case "high":
-        return "#F44336";
-      default:
-        return "#1565C0";
-    }
-  };
-
-  const handleTherapyPress = (child: any) => {
-    router.push({
-      pathname: "/therapy/curriculum",
-      params: { childId: child.id.toString() },
-    });
-  };
-
-  const handleTodayTasksPress = (child: any) => {
-    router.push({
-      pathname: "/therapy/today",
-      params: { childId: child.id.toString() },
-    });
-  };
+  const displayName = userData?.first_name || "Parent";
+  const childName = children[0]?.full_name?.split(" ")[0] || "Leo";
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.content}>
-        {/* Welcome Card */}
-        <View style={styles.welcomeCard}>
-          <Text style={styles.greeting}>Welcome back! 👋</Text>
-          <Text style={styles.question}>How are you feeling today?</Text>
-        </View>
+      <StatusBar style="dark" />
 
-        {/* Mood Tracker */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Daily Mood Check</Text>
-          <View style={styles.moodContainer}>
-            <TouchableOpacity style={styles.moodButton}>
-              <Text style={styles.moodEmoji}>😊</Text>
-              <Text style={styles.moodLabel}>Great</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.moodButton}>
-              <Text style={styles.moodEmoji}>🙂</Text>
-              <Text style={styles.moodLabel}>Good</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.moodButton}>
-              <Text style={styles.moodEmoji}>😐</Text>
-              <Text style={styles.moodLabel}>Okay</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.moodButton}>
-              <Text style={styles.moodEmoji}>😔</Text>
-              <Text style={styles.moodLabel}>Low</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.actionsGrid}>
-            <TouchableOpacity style={styles.actionCard}>
-              <Text style={styles.actionEmoji}>🧘</Text>
-              <Text style={styles.actionTitle}>Meditation</Text>
-              <Text style={styles.actionSubtitle}>5 min</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
-              <Text style={styles.actionEmoji}>📝</Text>
-              <Text style={styles.actionTitle}>Journal</Text>
-              <Text style={styles.actionSubtitle}>Write</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
-              <Text style={styles.actionEmoji}>💬</Text>
-              <Text style={styles.actionTitle}>Talk</Text>
-              <Text style={styles.actionSubtitle}>Chat now</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
-              <Text style={styles.actionEmoji}>📊</Text>
-              <Text style={styles.actionTitle}>Progress</Text>
-              <Text style={styles.actionSubtitle}>View</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* M-CHAT Screening Section */}
-        {children.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>M-CHAT स्क्रीनिङ</Text>
-            <Text style={styles.sectionSubtitle}>
-              तपाईंको बच्चाको लागि अटिज्म स्क्रीनिङ
+      {/* 1. Header Section */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Image
+            source={{ uri: "https://i.pravatar.cc/150?u=parent" }}
+            style={styles.profilePic}
+          />
+          <View>
+            <Text style={styles.welcomeText}>Good Morning, {displayName}</Text>
+            <Text style={styles.subWelcomeText}>
+              Here is {childName}'s progress today
             </Text>
-            {children.map((child) => {
-              const result = mchatResults[child.id];
-              const isCompleted = !!result;
-              return (
-                <TouchableOpacity
-                  key={child.id}
-                  style={[
-                    styles.mchatCard,
-                    isCompleted && {
-                      backgroundColor: "#E8F5E9",
-                      borderColor: getRiskLevelColor(result?.risk_level),
-                    },
-                  ]}
-                  onPress={() => handleMChatPress(child)}
-                >
-                  <View
-                    style={[
-                      styles.mchatIcon,
-                      isCompleted && {
-                        backgroundColor: getRiskLevelColor(result?.risk_level) + "30",
-                      },
-                    ]}
-                  >
-                    <Text style={styles.mchatEmoji}>
-                      {isCompleted ? "✅" : "📋"}
-                    </Text>
-                  </View>
-                  <View style={styles.mchatContent}>
-                    <Text style={styles.mchatName}>{child.full_name}</Text>
-                    <Text style={styles.mchatAge}>
-                      {child.age_years} वर्ष {child.age_months} महिना
-                    </Text>
-                    {isCompleted ? (
-                      <View style={styles.resultRow}>
-                        <Text
-                          style={[
-                            styles.mchatResult,
-                            { color: getRiskLevelColor(result.risk_level) },
-                          ]}
-                        >
-                          स्कोर: {result.total_score}/20 • {getRiskLevelText(result.risk_level)}
-                        </Text>
-                        <Text style={styles.viewResultText}>नतिजा हेर्नुहोस् →</Text>
-                      </View>
-                    ) : (
-                      <Text style={styles.mchatStatus}>स्क्रीनिङ सुरु गर्नुहोस् →</Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
           </View>
-        )}
+        </View>
+        <TouchableOpacity style={styles.notificationBtn}>
+          <Ionicons name="notifications" size={20} color="#333" />
+          <View style={styles.redDot} />
+        </TouchableOpacity>
+      </View>
 
-        {/* Therapy Section - Show only for children with assigned curriculum */}
-        {children.filter((child) => therapyData[child.id]).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>थेरापी पाठ्यक्रम</Text>
-            <Text style={styles.sectionSubtitle}>
-              तपाईंको बच्चाको दैनिक थेरापी कार्यहरू
-            </Text>
-            {children
-              .filter((child) => therapyData[child.id])
-              .map((child) => {
-                const therapy = therapyData[child.id];
-                const progressPercent = therapy.total_days > 0
-                  ? Math.round((therapy.current_day / therapy.total_days) * 100)
-                  : 0;
-                return (
-                  <View key={child.id} style={styles.therapyCard}>
-                    <View style={styles.therapyHeader}>
-                      <View style={styles.therapyIcon}>
-                        <Text style={styles.therapyEmoji}>📚</Text>
-                      </View>
-                      <View style={styles.therapyInfo}>
-                        <Text style={styles.therapyChildName}>{child.full_name}</Text>
-                        <Text style={styles.therapyCurriculumName}>
-                          {therapy.curriculum?.name || "थेरापी पाठ्यक्रम"}
-                        </Text>
-                        <Text style={styles.therapyProgress}>
-                          दिन {therapy.current_day}/{therapy.total_days} • {progressPercent}% पूरा
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={styles.therapyActions}>
-                      <TouchableOpacity
-                        style={styles.therapyActionButton}
-                        onPress={() => handleTodayTasksPress(child)}
-                      >
-                        <Text style={styles.therapyActionEmoji}>📋</Text>
-                        <Text style={styles.therapyActionText}>आजका कार्य</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.therapyActionButton, styles.therapyActionSecondary]}
-                        onPress={() => handleTherapyPress(child)}
-                      >
-                        <Text style={styles.therapyActionEmoji}>📊</Text>
-                        <Text style={styles.therapyActionText}>विवरण</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              })}
-          </View>
-        )}
-
-        {/* Daily Tips */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Today's Tip</Text>
-          <View style={styles.tipCard}>
-            <Text style={styles.tipEmoji}>💡</Text>
-            <View style={styles.tipContent}>
-              <Text style={styles.tipTitle}>Practice Gratitude</Text>
-              <Text style={styles.tipText}>
-                Take a moment to think of three things you're grateful for
-                today.
-              </Text>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent} // Padding for TabBar overlap fixed here
+      >
+        {/* Progress & Streak Bar */}
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Daily Progress</Text>
+            <View style={styles.progressBg}>
+              <View style={[styles.progressFill, { width: "45%" }]} />
             </View>
           </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Streak</Text>
+            <Text style={styles.streakVal}>🔥 5 Days</Text>
+          </View>
         </View>
 
-        {/* Emergency Support */}
-        <TouchableOpacity style={styles.emergencyButton}>
-          <Text style={styles.emergencyEmoji}>🆘</Text>
-          <View style={styles.emergencyContent}>
-            <Text style={styles.emergencyTitle}>Need Immediate Help?</Text>
-            <Text style={styles.emergencyText}>
-              24/7 Crisis Support Available
+        {/* 2. M-CHAT Assessment Card */}
+        {children.length > 0 && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>M-CHAT Assessment</Text>
+              {/* पहिलो बच्चाको result चेक गर्ने */}
+              {mchatResults[children[0].id] && (
+                <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
+              )}
+            </View>
+
+            <Text style={styles.cardSub}>
+              {mchatResults[children[0].id]
+                ? `Completed on Oct 24`
+                : `Assessment for ${children[0].full_name}`}
             </Text>
+
+            <View style={styles.insightBox}>
+              <MaterialCommunityIcons
+                name="chart-timeline-variant"
+                size={20}
+                color="#03A9F4"
+              />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.insightTitle}>Insights Available</Text>
+                <Text style={styles.insightSub}>
+                  We've analyzed the responses.
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.pinkBtn}
+              onPress={() => handleMChatPress(children[0])}
+            >
+              <Text style={styles.pinkBtnText}>
+                {mchatResults[children[0].id]
+                  ? "View Full Report"
+                  : "Start Screening"}
+              </Text>
+              <Ionicons name="arrow-forward" size={18} color="#fff" />
+            </TouchableOpacity>
           </View>
+        )}
+        {/* 3. Feedback Section */}
+        <View style={styles.secHeader}>
+          <Text style={styles.secTitle}>Doctor's Feedback</Text>
+          <TouchableOpacity>
+            <Text style={styles.viewHist}>View History</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.docCard}>
+          <Image
+            source={{ uri: "https://i.pravatar.cc/150?u=doc" }}
+            style={styles.docPic}
+          />
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.docName}>Dr. Emily</Text>
+              <Text style={styles.timeAgo}>2h ago</Text>
+            </View>
+            <View style={styles.bubble}>
+              <Text style={styles.bubbleText}>
+                Great job! I noticed {childName} responding well. Let's focus on
+                vowel sounds.
+              </Text>
+            </View>
+            <TouchableOpacity style={styles.replyRow}>
+              <Ionicons name="arrow-undo" size={14} color="#FF007F" />
+              <Text style={styles.replyLabel}>Reply to Doctor</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* 4. Focus Section */}
+        <View style={styles.secHeader}>
+          <Text style={styles.secTitle}>Today's Focus</Text>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>3 Tasks</Text>
+          </View>
+        </View>
+
+        {/* Task Placeholder Items */}
+        <TouchableOpacity style={styles.taskItem}>
+          <View style={[styles.taskIcon, { backgroundColor: "#FFF3E0" }]}>
+            <Ionicons name="videocam" size={20} color="#FF9800" />
+          </View>
+          <View style={{ flex: 1, marginLeft: 15 }}>
+            <Text style={styles.tTitle}>Record "Ba-Ba"</Text>
+            <Text style={styles.tSub}>2 mins • Verbal</Text>
+          </View>
+          <Ionicons name="play-circle" size={26} color="#D1D5DB" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.taskItem}>
+          <View style={[styles.taskIcon, { backgroundColor: "#F3E5F5" }]}>
+            <Ionicons name="car" size={20} color="#9C27B0" />
+          </View>
+          <View style={{ flex: 1, marginLeft: 15 }}>
+            <Text style={styles.tTitle}>Sensory Play</Text>
+            <Text style={styles.tSub}>15 mins • Tactile</Text>
+          </View>
+          <Ionicons name="play-circle" size={26} color="#D1D5DB" />
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -351,258 +268,171 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
-  },
-  content: {
-    padding: 20,
-  },
-  welcomeCard: {
-    backgroundColor: "#1e40af",
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 24,
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#ffffff",
-    marginBottom: 8,
-  },
-  question: {
-    fontSize: 16,
-    color: "#dbeafe",
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1e293b",
-    marginBottom: 12,
-  },
-  moodContainer: {
+  container: { flex: 1, backgroundColor: "#FFF" },
+  header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 16,
-  },
-  moodButton: {
     alignItems: "center",
-    flex: 1,
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 15,
   },
-  moodEmoji: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  moodLabel: {
-    fontSize: 12,
-    color: "#64748b",
-  },
-  actionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
-  actionCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 20,
-    width: "48%",
-    alignItems: "center",
-  },
-  actionEmoji: {
-    fontSize: 40,
-    marginBottom: 8,
-  },
-  actionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1e293b",
-    marginBottom: 4,
-  },
-  actionSubtitle: {
-    fontSize: 12,
-    color: "#64748b",
-  },
-  tipCard: {
-    backgroundColor: "#fef3c7",
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  tipEmoji: {
-    fontSize: 32,
-    marginRight: 16,
-  },
-  tipContent: {
-    flex: 1,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#92400e",
-    marginBottom: 4,
-  },
-  tipText: {
-    fontSize: 14,
-    color: "#78350f",
-    lineHeight: 20,
-  },
-  emergencyButton: {
-    backgroundColor: "#ef4444",
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  emergencyEmoji: {
-    fontSize: 32,
-    marginRight: 16,
-  },
-  emergencyContent: {
-    flex: 1,
-  },
-  emergencyTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#ffffff",
-    marginBottom: 4,
-  },
-  emergencyText: {
-    fontSize: 14,
-    color: "#fecaca",
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: "#64748b",
-    marginBottom: 12,
-  },
-  mchatCard: {
-    backgroundColor: "#E3F2FD",
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: "#90CAF9",
-  },
-  mchatIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#BBDEFB",
+  headerLeft: { flexDirection: "row", alignItems: "center" },
+  profilePic: { width: 44, height: 44, borderRadius: 22 },
+  welcomeText: { fontSize: 18, fontWeight: "700", marginLeft: 12 },
+  subWelcomeText: { fontSize: 13, color: "#6B7280", marginLeft: 12 },
+  notificationBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
+    elevation: 2,
   },
-  mchatEmoji: {
-    fontSize: 24,
+  redDot: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#FF3B30",
+    borderWidth: 1.5,
+    borderColor: "#FFF",
   },
-  mchatContent: {
-    flex: 1,
-  },
-  mchatName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1e293b",
-    marginBottom: 4,
-  },
-  mchatAge: {
-    fontSize: 13,
-    color: "#64748b",
-    marginBottom: 4,
-  },
-  mchatStatus: {
-    fontSize: 14,
-    color: "#1565C0",
-    fontWeight: "500",
-  },
-  resultRow: {
-    flexDirection: "column",
-  },
-  mchatResult: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 2,
-  },
-  viewResultText: {
-    fontSize: 13,
-    color: "#666",
-    fontStyle: "italic",
-  },
-  therapyCard: {
-    backgroundColor: "#F3E5F5",
+
+  // FIXED PADDING FOR TAB BAR (position absolute)
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 110 },
+
+  statsRow: {
+    flexDirection: "row",
+    backgroundColor: "#F0F9FF",
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: "#CE93D8",
-  },
-  therapyHeader: {
-    flexDirection: "row",
+    padding: 15,
+    marginVertical: 10,
     alignItems: "center",
-    marginBottom: 12,
   },
-  therapyIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#E1BEE7",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
+  statBox: { flex: 1, alignItems: "center" },
+  statLabel: {
+    fontSize: 11,
+    color: "#64748B",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    marginBottom: 5,
   },
-  therapyEmoji: {
-    fontSize: 24,
+  progressBg: {
+    width: "80%",
+    height: 6,
+    backgroundColor: "#E2E8F0",
+    borderRadius: 3,
   },
-  therapyInfo: {
-    flex: 1,
+  progressFill: { height: "100%", backgroundColor: "#00C2FF", borderRadius: 3 },
+  statDivider: { width: 1, height: "60%", backgroundColor: "#CBD5E1" },
+  streakVal: { fontSize: 14, fontWeight: "700" },
+
+  card: {
+    backgroundColor: "#FFF",
+    borderRadius: 24,
+    padding: 20,
+    elevation: 3,
+    shadowOpacity: 0.05,
+    marginVertical: 10,
   },
-  therapyChildName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1e293b",
-    marginBottom: 2,
-  },
-  therapyCurriculumName: {
-    fontSize: 14,
-    color: "#7B1FA2",
-    marginBottom: 2,
-  },
-  therapyProgress: {
-    fontSize: 13,
-    color: "#64748b",
-  },
-  therapyActions: {
+  cardHeader: { flexDirection: "row", justifyContent: "space-between" },
+  cardTitle: { fontSize: 18, fontWeight: "700" },
+  cardSub: { fontSize: 13, color: "#9CA3AF", marginTop: 4 },
+  insightBox: {
     flexDirection: "row",
-    gap: 12,
-  },
-  therapyActionButton: {
-    flex: 1,
-    backgroundColor: "#7B1FA2",
-    borderRadius: 12,
+    backgroundColor: "#F0F9FF",
     padding: 12,
-    flexDirection: "row",
+    borderRadius: 16,
+    marginTop: 15,
     alignItems: "center",
+  },
+  insightTitle: { fontSize: 14, fontWeight: "700" },
+  insightSub: { fontSize: 12, color: "#6B7280" },
+  pinkBtn: {
+    backgroundColor: "#FF007F",
+    flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 14,
+    borderRadius: 16,
+    marginTop: 18,
   },
-  therapyActionSecondary: {
-    backgroundColor: "#9C27B0",
-  },
-  therapyActionEmoji: {
-    fontSize: 18,
+  pinkBtnText: {
+    color: "#FFF",
+    fontSize: 15,
+    fontWeight: "700",
     marginRight: 8,
   },
-  therapyActionText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#ffffff",
+
+  secHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 15,
   },
+  secTitle: { fontSize: 18, fontWeight: "700" },
+  viewHist: { fontSize: 13, color: "#FF007F", fontWeight: "600" },
+
+  docCard: {
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    padding: 16,
+    elevation: 2,
+    marginBottom: 20,
+  },
+  docPic: { width: 42, height: 42, borderRadius: 21 },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  docName: { fontSize: 15, fontWeight: "700" },
+  timeAgo: { fontSize: 11, color: "#9CA3AF" },
+  bubble: {
+    backgroundColor: "#FFF0F6",
+    padding: 12,
+    borderRadius: 15,
+    borderTopLeftRadius: 0,
+    marginTop: 8,
+  },
+  bubbleText: { fontSize: 13, color: "#4B5563" },
+  replyRow: { flexDirection: "row", alignItems: "center", marginTop: 10 },
+  replyLabel: {
+    fontSize: 13,
+    color: "#FF007F",
+    fontWeight: "700",
+    marginLeft: 6,
+  },
+
+  badge: {
+    backgroundColor: "#E0F2FE",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  badgeText: { fontSize: 12, color: "#0369A1", fontWeight: "700" },
+
+  taskItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    padding: 15,
+    borderRadius: 20,
+    marginBottom: 12,
+    elevation: 2,
+  },
+  taskIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tTitle: { fontSize: 15, fontWeight: "700" },
+  tSub: { fontSize: 12, color: "#9CA3AF", marginTop: 2 },
 });

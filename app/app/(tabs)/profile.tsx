@@ -4,13 +4,64 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const [userName, setUserName] = useState("User");
+  const [userEmail, setUserEmail] = useState("user@example.com");
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        const user = JSON.parse(userData);
+        setUserName(user.full_name || user.first_name || "User");
+        setUserEmail(user.email || "user@example.com");
+      }
+    } catch (error) {
+      console.log("Error loading user data:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await AsyncStorage.multiRemove([
+              "authToken",
+              "userData",
+              "formSection1",
+              "formSection2",
+              "formSection3",
+              "formSection4",
+              "formSection5",
+              "formSection6",
+            ]);
+            router.replace("/auth/login");
+          } catch (error) {
+            console.log("Error logging out:", error);
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
@@ -18,10 +69,12 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.profileHeader}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>👤</Text>
+            <Text style={styles.avatarText}>
+              {userName.charAt(0).toUpperCase()}
+            </Text>
           </View>
-          <Text style={styles.name}>User Name</Text>
-          <Text style={styles.email}>user@example.com</Text>
+          <Text style={styles.name}>{userName}</Text>
+          <Text style={styles.email}>{userEmail}</Text>
         </View>
 
         <View style={styles.section}>
@@ -62,7 +115,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
