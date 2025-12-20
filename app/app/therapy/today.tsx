@@ -42,17 +42,18 @@ interface TodayData {
 export default function TodayTasksScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const childId = params.childId as string;
+  const paramChildId = params.childId as string;
 
+  const [childId, setChildId] = useState<string | null>(paramChildId || null);
   const [todayData, setTodayData] = useState<TodayData | null>(null);
   const [loading, setLoading] = useState(true);
   const [advancingDay, setAdvancingDay] = useState(false);
 
   useEffect(() => {
-    loadTodayTasks();
+    initializeAndLoad();
   }, []);
 
-  const loadTodayTasks = async () => {
+  const initializeAndLoad = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
@@ -60,8 +61,45 @@ export default function TodayTasksScreen() {
         return;
       }
 
+      // If no childId from params, fetch children list first
+      let activeChildId = paramChildId;
+      if (!activeChildId) {
+        const childrenRes = await axios.get(`${BASE_URL}/api/children/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const children = childrenRes.data || [];
+        if (children.length > 0) {
+          activeChildId = children[0].id.toString();
+          setChildId(activeChildId);
+        } else {
+          setLoading(false);
+          return;
+        }
+      }
+
+      await loadTodayTasks(activeChildId, token);
+    } catch (error: any) {
+      console.error("Error initializing:", error);
+      setLoading(false);
+    }
+  };
+
+  const loadTodayTasks = async (cid?: string, existingToken?: string) => {
+    try {
+      const token = existingToken || await AsyncStorage.getItem("authToken");
+      if (!token) {
+        router.replace("/auth/login");
+        return;
+      }
+
+      const targetChildId = cid || childId;
+      if (!targetChildId) {
+        setLoading(false);
+        return;
+      }
+
       const response = await axios.get(
-        `${BASE_URL}/api/therapy/child/${childId}/today/`,
+        `${BASE_URL}/api/therapy/child/${targetChildId}/today/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -69,7 +107,10 @@ export default function TodayTasksScreen() {
       setTodayData(response.data);
     } catch (error: any) {
       console.error("Error loading today's tasks:", error);
-      Alert.alert("त्रुटि", "कार्यहरू लोड गर्न सकिएन");
+      // Don't show alert for 404 - just means no active curriculum
+      if (error.response?.status !== 404) {
+        Alert.alert("त्रुटि", "कार्यहरू लोड गर्न सकिएन");
+      }
     } finally {
       setLoading(false);
     }
