@@ -136,6 +136,7 @@ class DoctorPatientDetailView(APIView):
         assessment = getattr(child, 'assessment', None)
 
         data = {
+            'id': assessment.id if assessment else None,
             'child': {
                 'id': child.id,
                 'full_name': child.full_name,
@@ -145,14 +146,16 @@ class DoctorPatientDetailView(APIView):
                 'gender': child.gender,
             },
             'parent': {
-                'name': child.parent.full_name,
+                'id': child.parent.id,
+                'full_name': child.parent.full_name,
                 'email': child.parent.email,
                 'phone': child.parent.phone,
             },
-            'mchat': {
+            'mchat_result': {
+                'id': mchat.id,
                 'total_score': mchat.total_score,
                 'risk_level': mchat.risk_level,
-                'responses': {f'q{i}': getattr(mchat, f'q{i}') for i in range(1, 21)}
+                'created_at': mchat.created_at,
             } if mchat else None,
             'medical_history': {
                 'pregnancy_infection': medical_history.pregnancy_infection,
@@ -164,17 +167,32 @@ class DoctorPatientDetailView(APIView):
                 'family_autism_history': medical_history.family_autism_history,
                 'requires_specialist': medical_history.requires_specialist,
             } if medical_history else None,
+            'education': {
+                'is_in_school': education.goes_to_school,
+                'school_name': education.school_name,
+                'grade_class': education.grade_class,
+                'school_type': education.school_type,
+            } if education else None,
+            'health': {
+                'height': str(health.height_cm) if health.height_cm else None,
+                'weight': str(health.weight_kg) if health.weight_kg else None,
+                'has_vaccinations': health.has_vaccinations,
+                'medical_conditions': health.medical_conditions,
+                'taking_medication': health.takes_medication,
+                'medication_list': health.medication_list,
+            } if health else None,
             'videos': [
                 {
                     'id': v.id,
-                    'type': v.video_type,
-                    'url': v.video_url,
+                    'video_type': v.video_type,
+                    'video_url': v.video_url,
                     'description': v.description,
                     'uploaded_at': v.uploaded_at,
                 }
                 for v in videos
             ],
-            'assessment_status': assessment.status if assessment else None,
+            'status': assessment.status if assessment else 'pending',
+            'submitted_at': assessment.submitted_at if assessment else None,
         }
 
         return Response(data)
@@ -194,7 +212,17 @@ class DoctorAcceptPatientView(APIView):
         if assessment.status != 'pending':
             return Response({'error': 'Patient already accepted'}, status=status.HTTP_400_BAD_REQUEST)
 
-        doctor = request.user.doctor_profile
+        # Get or create doctor profile
+        from accounts.models import Doctor
+        doctor, created = Doctor.objects.get_or_create(
+            user=request.user,
+            defaults={
+                'license_number': 'PENDING',
+                'specialization': 'General',
+                'is_approved': True,
+            }
+        )
+
         assessment.assigned_doctor = doctor
         assessment.status = 'accepted'
         assessment.reviewed_at = timezone.now()

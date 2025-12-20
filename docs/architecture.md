@@ -1586,13 +1586,13 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 3.11 Pending Patients List
+✅ 3.11 Pending Patients List
    - Show all pending assessments
    - Display child name, age, M-CHAT risk level
    - Color code by risk (high priority = red)
    - Click to view details
 
-□ 3.12 Patient Detail View
+✅ 3.12 Patient Detail View
    - All Section 1-7 info
    - Medical history (A1-A4) with flags
    - M-CHAT results and score
@@ -1666,14 +1666,14 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 4.12 Patient Videos View
+✅ 4.12 Patient Videos View
    - List all videos for patient
-   - Video player
+   - Video player modal
    - Video type labels
 
-□ 4.13 Accept Patient Flow
+✅ 4.13 Accept Patient Flow
    - "Accept this patient" button
-   - Confirmation popup
+   - Confirmation popup with patient details
    - Update status to 'accepted'
 ```
 
@@ -1776,19 +1776,19 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 5.13 Assign Curriculum Page
+✅ 5.13 Assign Curriculum Page
    - Select patient
    - Select curriculum
    - Set start date
    - Assign button
 
-□ 5.14 Progress Review Table
+✅ 5.14 Progress Review Table
    - Rows: Tasks
    - Columns: Days (1-15)
    - Cells: Status + Video link
    - Color coded status
 
-□ 5.15 Review Form
+✅ 5.15 Review Form
    - Select review period (15/30/45)
    - Observations text
    - Spectrum identified (optional)
@@ -1847,7 +1847,7 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
 #### Dashboard Tasks
 
 ```
-□ 6.8 Diagnosis Report Form
+✅ 6.8 Diagnosis Report Form
    - Has autism: Yes/No
    - Spectrum type dropdown
    - Detailed report textarea
@@ -1855,7 +1855,7 @@ POST   /api/therapy/doctor/report/{id}/toggle-share/       # Toggle sharing with
    - Share with parent checkbox
    - Submit
 
-□ 6.9 UI Polish
+✅ 6.9 UI Polish
    - Loading states
    - Error handling
    - Responsive design
