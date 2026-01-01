@@ -55,31 +55,18 @@ const steps = [
   {
     id: "04",
     icon: Smartphone,
-    title: "Deep assesment task",
-
-    checkpoints: ["Daily task", "Video sending", "Step by step guide"],
+    title: "Deep Assessment to IP",
+    subtitle: "Continuous Progress",
+    checkpoints: ["Daily task", "Video sending", "Step by step guide", "15 days Progress dashboard"],
     color: "text-purple-600",
     bgColor: "bg-purple-50",
     gradientFrom: "from-purple-500",
     gradientTo: "to-pink-500",
     image: "/task.png",
   },
+
   {
     id: "05",
-    icon: TrendingUp,
-    title: "Track & IP",
-    subtitle: "Continuous Progress",
-
-    checkpoints: ["15 days Progress dashboard "],
-    color: "text-cyan-600",
-    bgColor: "bg-cyan-50",
-    gradientFrom: "from-cyan-500",
-    gradientTo: "to-blue-500",
-    image: "/tracking.png",
-  },
-
-  {
-    id: "06",
     icon: TrendingUp,
     title: "Final Reports & Agreement",
 
@@ -88,7 +75,7 @@ const steps = [
   },
 
   {
-    id: "07",
+    id: "06",
     icon: TrendingUp,
     title: "Daily structured Routines and Reporting",
 
