@@ -1,4 +1,4 @@
-# AutiSahara
+# NeuroCare
 
 Early autism screening and therapy management platform for children aged 16-30 months.
 
@@ -13,7 +13,7 @@ cd CodeFest2025_Team_AMC_Galaxen
 
 ## Overview
 
-AutiSahara helps parents screen their children for autism spectrum disorder using the M-CHAT-R/F questionnaire, upload behavioral videos, and follow structured therapy curricula assigned by doctors.
+NeuroCare helps parents screen their children for autism spectrum disorder using the M-CHAT-R/F questionnaire, upload behavioral videos, and follow structured therapy curricula assigned by doctors.
 
 ## Features
 

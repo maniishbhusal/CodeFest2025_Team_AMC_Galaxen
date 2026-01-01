@@ -1,5 +1,5 @@
 """
-Django settings for autisahara project.
+Django settings for NeuroCare project.
 """
 
 from pathlib import Path
@@ -52,7 +52,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "autisahara.urls"
+ROOT_URLCONF = "NeuroCare.urls"
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "autisahara.wsgi.application"
+WSGI_APPLICATION = "NeuroCare.wsgi.application"
 
 
 # Database - SQLite for hackathon

@@ -37,7 +37,7 @@ export default function SplashScreen() {
         <View style={styles.logoContainer}>
           <Text style={styles.logo}>🧩</Text>
         </View>
-        <Text style={styles.title}>AutiSahara</Text>
+        <Text style={styles.title}>NeuroCare</Text>
         <Text style={styles.subtitle}>Early Autism Screening & Therapy</Text>
       </Animated.View>
     </View>

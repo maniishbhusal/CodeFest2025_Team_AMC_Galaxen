@@ -46,12 +46,12 @@ const Navbar = () => {
               {/* Ensure your logo fits the warm theme, or use a placeholder */}
               <img
                 src="/logo.png"
-                alt="AutiSahara Logo"
+                alt="NeuroCare Logo"
                 className="w-10 h-10 object-contain"
               />
             </div>
             <span className="text-2xl font-black hidden sm:block text-slate-900 tracking-tight">
-              AutiSahara
+              NeuroCare
             </span>
           </motion.div>
 

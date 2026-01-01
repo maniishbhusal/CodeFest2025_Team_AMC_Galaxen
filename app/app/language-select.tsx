@@ -25,7 +25,7 @@ export default function LanguageSelectScreen() {
         <View style={styles.logoContainer}>
           <Text style={styles.logo}>🧩</Text>
         </View>
-        <Text style={styles.title}>AutiSahara</Text>
+        <Text style={styles.title}>NeuroCare</Text>
         <Text style={styles.subtitle}>
           Choose your preferred language{"\n"}
           आफ्नो भाषा छान्नुहोस्

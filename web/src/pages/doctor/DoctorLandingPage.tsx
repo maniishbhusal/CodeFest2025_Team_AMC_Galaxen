@@ -16,7 +16,7 @@ export default function DoctorLandingPage() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent">
-              Autisahara
+              NeuroCare
             </span>
           </div>
           <button

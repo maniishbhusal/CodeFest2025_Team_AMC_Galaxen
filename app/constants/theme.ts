@@ -5,7 +5,7 @@
 
 import { Platform } from "react-native";
 
-// Main theme colors: Orange theme for AutiSahara
+// Main theme colors: Orange theme for NeuroCare
 const primaryOrange = "#F97316"; // Orange 500
 const lightOrange = "#FFEDD5"; // Orange 100
 const darkOrange = "#EA580C"; // Orange 600

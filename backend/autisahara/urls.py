@@ -8,10 +8,10 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="AutiSahara Nepal API",
+        title="NeuroCare Nepal API",
         default_version='v1',
         description="""
-## AutiSahara Nepal - Autism Therapy Platform API
+## NeuroCare Nepal - Autism Therapy Platform API
 
 A mobile-first platform connecting Nepali families with autism therapists.
 
@@ -29,8 +29,8 @@ Include the token in the Authorization header:
 Authorization: Bearer <access_token>
 ```
         """,
-        terms_of_service="https://autisahara.com/terms/",
-        contact=openapi.Contact(email="support@autisahara.com"),
+        terms_of_service="https://NeuroCare.com/terms/",
+        contact=openapi.Contact(email="support@NeuroCare.com"),
         license=openapi.License(name="MIT License"),
     ),
     public=True,

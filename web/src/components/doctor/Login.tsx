@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const BASE_URL = "https://5bd65bd753d5.ngrok-free.app";
+const BASE_URL = "https://a96c50024798.ngrok-free.app";
 
 export default function DoctorLogin() {
   const navigate = useNavigate();

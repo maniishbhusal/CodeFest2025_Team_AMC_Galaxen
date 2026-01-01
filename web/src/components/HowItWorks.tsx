@@ -19,7 +19,7 @@ const steps = [
     title: "Quick Registration",
     subtitle: "Set up in 5 minutes",
     description:
-      "Download the AutiSahara app, enter your child's basic details, and select their specific challenges. We support both English and Nepali languages for your comfort.",
+      "Download the NeuroCare app, enter your child's basic details, and select their specific challenges. We support both English and Nepali languages for your comfort.",
     checkpoints: ["Basic Profile Setup", "Language Selection"],
     color: "text-orange-600",
     bgColor: "bg-orange-50",
@@ -165,7 +165,7 @@ const HowItWorks = () => {
           >
             Your Journey with{" "}
             <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent">
-              AutiSahara
+              NeuroCare
             </span>
           </motion.h2>
 
