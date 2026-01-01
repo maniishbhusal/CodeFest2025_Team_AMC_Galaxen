@@ -90,7 +90,7 @@ const steps = [
   {
     id: "07",
     icon: TrendingUp,
-    title: "Continue Process",
+    title: "Daily structured Routines and Reporting",
 
     checkpoints: [
       "Doctor Provides 15 day tasks",
