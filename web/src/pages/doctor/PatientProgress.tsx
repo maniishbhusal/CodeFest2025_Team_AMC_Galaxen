@@ -366,113 +366,131 @@ export default function PatientProgressPage() {
           </div>
         )}
 
-        {/* Progress Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Progress Table
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Daily task completion status
-            </p>
-          </div>
-
-          {progress.progress.length === 0 ? (
-            <div className="p-12 text-center">
-              <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No progress submitted yet</p>
-              <p className="text-sm text-gray-400 mt-1">
-                Parent will submit progress through the mobile app
+        {/* Progress Table - Only show for personalized curricula, not for assessment */}
+        {progress.curriculum.type !== 'assessment' ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Progress Table
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Daily task completion status
               </p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 sticky left-0 bg-gray-50 min-w-[200px]">
-                      Task
-                    </th>
-                    {daysWithProgress.map((day) => (
-                      <th
-                        key={day}
-                        className="text-center py-3 px-2 text-sm font-medium text-gray-600 min-w-[60px]"
-                      >
-                        Day {day}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {uniqueTasks.map((task) => (
-                    <tr key={task.id} className="border-t border-gray-100">
-                      <td className="py-3 px-4 text-sm text-gray-900 sticky left-0 bg-white">
-                        {task.title}
-                      </td>
-                      {daysWithProgress.map((day) => {
-                        const entry = progressByDay[day]?.find(
-                          (e) => e.task.id === task.id
-                        );
-                        return (
-                          <td key={day} className="py-3 px-2 text-center">
-                            {entry ? (
-                              <div className="flex flex-col items-center gap-1">
-                                <div
-                                  className={`w-7 h-7 rounded-full flex items-center justify-center ${getStatusColor(
-                                    entry.status
-                                  )}`}
-                                >
-                                  {getStatusIcon(entry.status)}
-                                </div>
-                                {entry.video_url && (
-                                  <button
-                                    onClick={() =>
-                                      setPlayingVideo(entry.video_url!)
-                                    }
-                                    className="text-xs text-orange-600 hover:underline flex items-center gap-0.5"
-                                  >
-                                    <Play className="w-3 h-3" />
-                                    Video
-                                  </button>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="w-7 h-7 rounded-full bg-gray-100 mx-auto" />
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
 
-          {/* Legend */}
-          <div className="p-4 border-t border-gray-100 bg-gray-50">
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                  <Check className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-gray-600">Done without help</span>
+            {progress.progress.length === 0 ? (
+              <div className="p-12 text-center">
+                <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">No progress submitted yet</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Parent will submit progress through the mobile app
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center">
-                  <HelpCircle className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-gray-600">Done with help</span>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 sticky left-0 bg-gray-50 min-w-[200px]">
+                        Task
+                      </th>
+                      {daysWithProgress.map((day) => (
+                        <th
+                          key={day}
+                          className="text-center py-3 px-2 text-sm font-medium text-gray-600 min-w-[60px]"
+                        >
+                          Day {day}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {uniqueTasks.map((task) => (
+                      <tr key={task.id} className="border-t border-gray-100">
+                        <td className="py-3 px-4 text-sm text-gray-900 sticky left-0 bg-white">
+                          {task.title}
+                        </td>
+                        {daysWithProgress.map((day) => {
+                          const entry = progressByDay[day]?.find(
+                            (e) => e.task.id === task.id
+                          );
+                          return (
+                            <td key={day} className="py-3 px-2 text-center">
+                              {entry ? (
+                                <div className="flex flex-col items-center gap-1">
+                                  <div
+                                    className={`w-7 h-7 rounded-full flex items-center justify-center ${getStatusColor(
+                                      entry.status
+                                    )}`}
+                                  >
+                                    {getStatusIcon(entry.status)}
+                                  </div>
+                                  {entry.video_url && (
+                                    <button
+                                      onClick={() =>
+                                        setPlayingVideo(entry.video_url!)
+                                      }
+                                      className="text-xs text-orange-600 hover:underline flex items-center gap-0.5"
+                                    >
+                                      <Play className="w-3 h-3" />
+                                      Video
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="w-7 h-7 rounded-full bg-gray-100 mx-auto" />
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-red-400 flex items-center justify-center">
-                  <X className="w-3 h-3 text-white" />
+            )}
+
+            {/* Legend */}
+            <div className="p-4 border-t border-gray-100 bg-gray-50">
+              <div className="flex items-center gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-gray-600">Done without help</span>
                 </div>
-                <span className="text-gray-600">Not done</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center">
+                    <HelpCircle className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-gray-600">Done with help</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-red-400 flex items-center justify-center">
+                    <X className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-gray-600">Not done</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-blue-50 rounded-2xl border border-blue-100 p-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <ClipboardList className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 mb-1">
+                  3-Day Pre-Assessment
+                </h3>
+                <p className="text-blue-700 text-sm">
+                  This is the initial 3-day assessment phase. The detailed progress data will be shown as a static summary on the patient's detail page once the assessment is complete. You can then create a personalized therapy curriculum based on the results.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Previous Reviews */}
         {progress.reviews.length > 0 && (

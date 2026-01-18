@@ -37,12 +37,14 @@ def get_or_create_doctor_profile(user):
 # ============== CURRICULUM ENDPOINTS ==============
 
 class CurriculumListView(generics.ListAPIView):
-    """List all available curricula (for doctors)"""
+    """List all available curricula (for doctors) - only published ones"""
     serializer_class = CurriculumSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Curriculum.objects.all()
+        # Only show published curricula (not drafts) and templates
+        queryset = Curriculum.objects.filter(status='published')
+
         # Optional filters
         curriculum_type = self.request.query_params.get('type')
         spectrum = self.request.query_params.get('spectrum')
@@ -347,6 +349,7 @@ class DoctorPatientProgressView(APIView):
                 'status': child_curriculum.status,
                 'start_date': child_curriculum.start_date,
                 'end_date': child_curriculum.end_date,
+                'type': child_curriculum.curriculum.type,  # 'assessment' or 'personalized'
             },
             'stats': {
                 'total_tasks_submitted': total_tasks,

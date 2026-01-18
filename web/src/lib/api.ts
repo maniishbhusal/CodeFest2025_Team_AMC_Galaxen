@@ -307,6 +307,7 @@ interface PatientProgress {
     status: 'active' | 'completed' | 'paused';
     start_date: string;
     end_date: string;
+    type: 'assessment' | 'personalized' | 'general' | 'specialized';
   };
   stats: {
     total_tasks_submitted: number;
