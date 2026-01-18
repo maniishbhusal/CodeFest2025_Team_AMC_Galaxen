@@ -160,16 +160,31 @@ export default function TodayTasksScreen() {
     setAdvancingDay(true);
     try {
       const token = await AsyncStorage.getItem("authToken");
-      await axios.post(
+      const response = await axios.post(
         `${BASE_URL}/api/therapy/child/${childId}/advance/`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      Alert.alert("Success", "Moved to next day!", [
-        { text: "OK", onPress: loadTodayTasks },
-      ]);
+
+      // Check if curriculum is completed
+      if (response.data?.status === 'completed') {
+        Alert.alert(
+          "Assessment Complete!",
+          "Congratulations! You've completed all the assessment tasks. Your doctor will review the results and create a personalized therapy plan.",
+          [
+            {
+              text: "Go to Home",
+              onPress: () => router.replace("/(tabs)"),
+            },
+          ]
+        );
+      } else {
+        Alert.alert("Success", `Moved to Day ${response.data?.current_day}!`, [
+          { text: "OK", onPress: () => loadTodayTasks() },
+        ]);
+      }
     } catch (error: any) {
       console.error("Error advancing day:", error);
       Alert.alert(
@@ -320,6 +335,7 @@ export default function TodayTasksScreen() {
             style={[
               styles.advanceButton,
               getCompletionPercentage() < 100 && styles.advanceButtonWarning,
+              todayData.current_day === todayData.total_days && getCompletionPercentage() === 100 && styles.advanceButtonComplete,
             ]}
             onPress={handleAdvanceDay}
             disabled={advancingDay}
@@ -329,11 +345,13 @@ export default function TodayTasksScreen() {
             ) : (
               <>
                 <Text style={styles.advanceButtonText}>
-                  {getCompletionPercentage() === 100
-                    ? "Go to Next Day"
-                    : "Skip Tasks and Continue"}
+                  {todayData.current_day === todayData.total_days
+                    ? (getCompletionPercentage() === 100 ? "Complete Assessment" : "Skip and Complete")
+                    : (getCompletionPercentage() === 100 ? "Go to Next Day" : "Skip Tasks and Continue")}
                 </Text>
-                <Text style={styles.advanceButtonArrow}>→</Text>
+                <Text style={styles.advanceButtonArrow}>
+                  {todayData.current_day === todayData.total_days ? "✓" : "→"}
+                </Text>
               </>
             )}
           </TouchableOpacity>
@@ -577,6 +595,9 @@ const styles = StyleSheet.create({
   },
   advanceButtonWarning: {
     backgroundColor: "#FF9800",
+  },
+  advanceButtonComplete: {
+    backgroundColor: "#4CAF50",
   },
   advanceButtonText: {
     fontSize: 16,

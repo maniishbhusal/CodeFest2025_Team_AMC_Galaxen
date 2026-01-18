@@ -433,13 +433,15 @@ export default function PatientDetailPage() {
             )}
 
             {/* Pre-Assessment Task Results - Hardcoded for Hackathon */}
+            {/* Only show after assessment curriculum is completed */}
+            {patient.curriculum_status === "completed" && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-indigo-100 rounded-xl">
                   <ClipboardList className="w-5 h-5 text-indigo-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  15-Day Pre-Assessment Results
+                  3-Day Pre-Assessment Results
                 </h3>
                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                   Completed
@@ -815,6 +817,7 @@ export default function PatientDetailPage() {
                 </div>
               </div>
             </div>
+            )}
 
             {/* Assessment Videos */}
             {patient.videos && patient.videos.length > 0 && (

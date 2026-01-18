@@ -166,6 +166,7 @@ interface PatientDetail {
   videos: AssessmentVideo[];
   status: 'pending' | 'in_review' | 'accepted' | 'completed';
   submitted_at: string;
+  curriculum_status?: 'active' | 'completed' | null;
 }
 
 // Helper to get auth headers

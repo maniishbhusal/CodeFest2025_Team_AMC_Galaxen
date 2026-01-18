@@ -151,6 +151,10 @@ class DoctorPatientDetailView(APIView):
         videos = child.videos.all()
         assessment = getattr(child, 'assessment', None)
 
+        # Get curriculum status (for showing pre-assessment results)
+        child_curriculum = ChildCurriculum.objects.filter(child=child).order_by('-created_at').first()
+        curriculum_status = child_curriculum.status if child_curriculum else None
+
         data = {
             'id': assessment.id if assessment else None,
             'child': {
@@ -209,6 +213,7 @@ class DoctorPatientDetailView(APIView):
             ],
             'status': assessment.status if assessment else 'pending',
             'submitted_at': assessment.submitted_at if assessment else None,
+            'curriculum_status': curriculum_status,  # 'active', 'completed', or None
         }
 
         return Response(data)
