@@ -32,7 +32,6 @@ export default function HomeScreen() {
   const [mchatResults, setMchatResults] = useState<{ [key: number]: any }>({});
   const [therapyData, setTherapyData] = useState<{ [key: number]: any }>({});
   const [assessmentData, setAssessmentData] = useState<{ [key: number]: any }>({});
-  const [doctorFeedback, setDoctorFeedback] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -129,21 +128,6 @@ export default function HomeScreen() {
           }
         } catch (err) {}
         setAssessmentData(prev => ({ ...prev, ...assessments }));
-
-        // Fetch doctor feedback for first child
-        if (childrenData.indexOf(child) === 0) {
-          try {
-            const feedbackRes = await axios.get(
-              `${BASE_URL}/api/therapy/child/${child.id}/feedback/`,
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            );
-            if (feedbackRes.data?.has_feedback) {
-              setDoctorFeedback(feedbackRes.data.latest_review);
-            }
-          } catch (err) {}
-        }
       }
       setMchatResults(results);
       setTherapyData(therapy);
@@ -470,52 +454,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         )}
-        {/* 3. Feedback Section */}
-        <View style={styles.secHeader}>
-          <Text style={styles.secTitle}>Doctor&apos;s Feedback</Text>
-          {doctorFeedback && (
-            <TouchableOpacity>
-              <Text style={styles.viewHist}>View History</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {doctorFeedback ? (
-          <View style={styles.docCard}>
-            <View style={styles.docAvatar}>
-              <Ionicons name="person" size={20} color="#FFF" />
-            </View>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <View style={styles.rowBetween}>
-                <Text style={styles.docName}>{doctorFeedback.doctor_name || "Doctor"}</Text>
-                <Text style={styles.timeAgo}>Day {doctorFeedback.review_period}</Text>
-              </View>
-              <View style={styles.bubble}>
-                <Text style={styles.bubbleText}>
-                  {doctorFeedback.observations}
-                </Text>
-              </View>
-              {doctorFeedback.recommendations && (
-                <View style={[styles.bubble, { backgroundColor: "#E8F5E9", marginTop: 8 }]}>
-                  <Text style={[styles.bubbleText, { color: "#2E7D32" }]}>
-                    <Text style={{ fontWeight: "700" }}>Recommendation: </Text>
-                    {doctorFeedback.recommendations}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </View>
-        ) : (
-          <View style={styles.noFeedbackCard}>
-            <Ionicons name="chatbubble-ellipses-outline" size={32} color="#9CA3AF" />
-            <Text style={styles.noFeedbackTitle}>No feedback yet</Text>
-            <Text style={styles.noFeedbackSub}>
-              Doctor feedback will appear here after reviews
-            </Text>
-          </View>
-        )}
-
-        {/* 4. Focus Section - Show based on assessment state */}
+        {/* 3. Focus Section - Show based on assessment state */}
         {(assessmentState === 'assessment_active' || assessmentState === 'personalized_active') && (
           <>
             <View style={styles.secHeader}>
