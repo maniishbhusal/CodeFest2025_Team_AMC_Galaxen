@@ -38,6 +38,7 @@ class CurriculumDetailSerializer(serializers.ModelSerializer):
 class ChildCurriculumSerializer(serializers.ModelSerializer):
     curriculum_title = serializers.CharField(source='curriculum.title', read_only=True)
     curriculum_duration = serializers.IntegerField(source='curriculum.duration_days', read_only=True)
+    curriculum_type = serializers.CharField(source='curriculum.type', read_only=True)
     child_name = serializers.CharField(source='child.full_name', read_only=True)
     assigned_by_name = serializers.SerializerMethodField()
     progress_percentage = serializers.SerializerMethodField()
@@ -46,7 +47,7 @@ class ChildCurriculumSerializer(serializers.ModelSerializer):
         model = ChildCurriculum
         fields = [
             'id', 'child', 'child_name', 'curriculum', 'curriculum_title', 'curriculum_duration',
-            'assigned_by_name', 'start_date', 'end_date', 'current_day', 'status',
+            'curriculum_type', 'assigned_by_name', 'start_date', 'end_date', 'current_day', 'status',
             'progress_percentage', 'created_at'
         ]
         read_only_fields = ['id', 'end_date', 'current_day', 'created_at']

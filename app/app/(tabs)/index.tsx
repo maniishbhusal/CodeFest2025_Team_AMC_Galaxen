@@ -15,12 +15,22 @@ import axios from "axios";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
+// Types for assessment state
+type AssessmentState =
+  | 'no_mchat'           // M-CHAT not completed
+  | 'waiting_for_doctor' // Assessment submitted, pending doctor review
+  | 'assessment_active'  // Assessment curriculum in progress
+  | 'assessment_complete'// Assessment done, waiting for personalized
+  | 'personalized_active'// Personalized curriculum in progress
+  | 'loading';
+
 export default function HomeScreen() {
   const router = useRouter();
   const [children, setChildren] = useState<any[]>([]);
   const [userData, setUserData] = useState<any>(null);
   const [mchatResults, setMchatResults] = useState<{ [key: number]: any }>({});
   const [therapyData, setTherapyData] = useState<{ [key: number]: any }>({});
+  const [assessmentData, setAssessmentData] = useState<{ [key: number]: any }>({});
   const [doctorFeedback, setDoctorFeedback] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -72,6 +82,7 @@ export default function HomeScreen() {
         } catch (err) {}
 
         // Therapy logic - get active curriculum with today's tasks
+        const assessments: { [key: number]: any } = {};
         try {
           const therapyRes = await axios.get(
             `${BASE_URL}/api/therapy/child/${child.id}/curriculum/`,
@@ -79,6 +90,14 @@ export default function HomeScreen() {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
+
+          // Store assessment status for state detection
+          assessments[child.id] = {
+            assessment_status: therapyRes.data?.assessment_status,
+            assessment_submitted_at: therapyRes.data?.assessment_submitted_at,
+            curricula: therapyRes.data?.curricula || [],
+          };
+
           const active = (therapyRes.data?.curricula || []).find(
             (c: any) => c.status === "active"
           );
@@ -101,9 +120,11 @@ export default function HomeScreen() {
               total_days: active.curriculum_duration,
               tasks: todayTasks,
               curriculum_id: active.id,
+              curriculum_type: active.curriculum_type,
             };
           }
         } catch (err) {}
+        setAssessmentData(prev => ({ ...prev, ...assessments }));
 
         // Fetch doctor feedback for first child
         if (childrenData.indexOf(child) === 0) {
@@ -182,6 +203,59 @@ export default function HomeScreen() {
   const activeCurriculum = hasActiveCurriculum ? therapyData[firstChild.id] : null;
   const todayTasks = activeCurriculum?.tasks || [];
 
+  // Determine the current assessment state
+  const getAssessmentState = (): AssessmentState => {
+    if (loading || !firstChild) return 'loading';
+
+    const childAssessment = assessmentData[firstChild.id];
+    const childMchat = mchatResults[firstChild.id];
+    const childTherapy = therapyData[firstChild.id];
+
+    // No M-CHAT completed yet
+    if (!childMchat) {
+      return 'no_mchat';
+    }
+
+    // PRIORITY: Check assessment status FIRST before checking curriculum
+    // If doctor hasn't accepted yet, show waiting state regardless of any stale data
+    if (childAssessment) {
+      const status = childAssessment.assessment_status;
+
+      // Pending doctor review - ALWAYS show waiting state
+      if (status === 'pending' || status === 'in_review') {
+        return 'waiting_for_doctor';
+      }
+
+      // Only if doctor has accepted, check for active curriculum
+      if (status === 'accepted' || status === 'completed') {
+        // Has active curriculum - check type
+        if (childTherapy) {
+          if (childTherapy.curriculum_type === 'personalized') {
+            return 'personalized_active';
+          }
+          // Assessment curriculum is active
+          return 'assessment_active';
+        }
+
+        // Check for completed assessment curriculum (no active curriculum)
+        const completedAssessment = childAssessment.curricula?.find(
+          (c: any) => c.curriculum_type === 'assessment' && c.status === 'completed'
+        );
+        if (completedAssessment) {
+          return 'assessment_complete';
+        }
+
+        // Doctor accepted but no curriculum yet (shouldn't happen with auto-assign)
+        return 'waiting_for_doctor';
+      }
+    }
+
+    // M-CHAT done but no assessment record or unknown status - waiting for doctor
+    return 'waiting_for_doctor';
+  };
+
+  const assessmentState = getAssessmentState();
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -233,20 +307,80 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Show Therapy Progress Card if active curriculum exists */}
-        {hasActiveCurriculum && activeCurriculum && (
+        {/* State 1: No M-CHAT - Show M-CHAT Card */}
+        {assessmentState === 'no_mchat' && children.length > 0 && (
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Today&apos;s Therapy</Text>
+              <Text style={styles.cardTitle}>M-CHAT Assessment</Text>
+            </View>
+            <Text style={styles.cardSub}>
+              Assessment for {children[0]?.full_name}
+            </Text>
+            <View style={styles.insightBox}>
+              <MaterialCommunityIcons
+                name="chart-timeline-variant"
+                size={20}
+                color="#03A9F4"
+              />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.insightTitle}>Start Screening</Text>
+                <Text style={styles.insightSub}>
+                  Complete the M-CHAT screening
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.pinkBtn}
+              onPress={() => handleMChatPress(children[0])}
+            >
+              <Text style={styles.pinkBtnText}>Start Screening</Text>
+              <Ionicons name="arrow-forward" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* State 2: Waiting for Doctor Review */}
+        {assessmentState === 'waiting_for_doctor' && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Assessment Under Review</Text>
+              <View style={styles.pendingBadge}>
+                <Ionicons name="time-outline" size={14} color="#F59E0B" />
+              </View>
+            </View>
+            <Text style={styles.cardSub}>
+              Your assessment has been submitted
+            </Text>
+            <View style={[styles.insightBox, { backgroundColor: "#FFFBEB" }]}>
+              <Ionicons name="hourglass-outline" size={20} color="#F59E0B" />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.insightTitle}>Pending Review</Text>
+                <Text style={styles.insightSub}>
+                  A doctor will review your submission shortly
+                </Text>
+              </View>
+            </View>
+            <View style={styles.waitingInfo}>
+              <Ionicons name="information-circle-outline" size={16} color="#6B7280" />
+              <Text style={styles.waitingInfoText}>
+                You&apos;ll be notified once your doctor reviews and creates a therapy plan
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* State 3: Assessment Curriculum In Progress */}
+        {assessmentState === 'assessment_active' && activeCurriculum && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>3-Day Assessment</Text>
               <View style={styles.dayBadge}>
                 <Text style={styles.dayBadgeText}>
                   Day {activeCurriculum.current_day}/{activeCurriculum.total_days}
                 </Text>
               </View>
             </View>
-
             <Text style={styles.cardSub}>{activeCurriculum.name}</Text>
-
             <View style={styles.insightBox}>
               <MaterialCommunityIcons
                 name="clipboard-check-outline"
@@ -258,11 +392,10 @@ export default function HomeScreen() {
                   {todayTasks.length} Tasks Today
                 </Text>
                 <Text style={styles.insightSub}>
-                  Complete tasks to track progress
+                  Complete tasks to help us understand your child
                 </Text>
               </View>
             </View>
-
             <TouchableOpacity
               style={styles.pinkBtn}
               onPress={() => router.push("/therapy/today")}
@@ -273,60 +406,66 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Show M-CHAT Card if no active curriculum */}
-        {!hasActiveCurriculum && children.length > 0 &&
-          (() => {
-            const child = children[0];
-            const result = mchatResults[child.id];
-            return (
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.cardTitle}>M-CHAT Assessment</Text>
-                  {result && (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={22}
-                      color="#4CAF50"
-                    />
-                  )}
-                </View>
-
-                <Text style={styles.cardSub}>
-                  {result
-                    ? `Completed - Score: ${result.total_score}/20`
-                    : `Assessment for ${child.full_name}`}
+        {/* State 4: Assessment Complete - Waiting for Personalized Curriculum */}
+        {assessmentState === 'assessment_complete' && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Assessment Complete!</Text>
+              <Ionicons name="checkmark-circle" size={22} color="#10B981" />
+            </View>
+            <Text style={styles.cardSub}>
+              Great job completing the assessment
+            </Text>
+            <View style={[styles.insightBox, { backgroundColor: "#ECFDF5" }]}>
+              <Ionicons name="document-text-outline" size={20} color="#10B981" />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.insightTitle}>Results Under Review</Text>
+                <Text style={styles.insightSub}>
+                  Your doctor is reviewing the results
                 </Text>
-
-                <View style={styles.insightBox}>
-                  <MaterialCommunityIcons
-                    name="chart-timeline-variant"
-                    size={20}
-                    color="#03A9F4"
-                  />
-                  <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.insightTitle}>
-                      {result ? "Results Available" : "Start Screening"}
-                    </Text>
-                    <Text style={styles.insightSub}>
-                      {result
-                        ? "View your child's assessment results"
-                        : "Complete the M-CHAT screening"}
-                    </Text>
-                  </View>
-                </View>
-
-                <TouchableOpacity
-                  style={styles.pinkBtn}
-                  onPress={() => handleMChatPress(child)}
-                >
-                  <Text style={styles.pinkBtnText}>
-                    {result ? "View Full Report" : "Start Screening"}
-                  </Text>
-                  <Ionicons name="arrow-forward" size={18} color="#fff" />
-                </TouchableOpacity>
               </View>
-            );
-          })()}
+            </View>
+            <View style={styles.waitingInfo}>
+              <Ionicons name="sparkles" size={16} color="#7C3AED" />
+              <Text style={styles.waitingInfoText}>
+                A personalized therapy plan will be created based on your child&apos;s needs
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* State 5: Personalized Curriculum Active */}
+        {assessmentState === 'personalized_active' && activeCurriculum && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Personalized Therapy</Text>
+              <View style={[styles.dayBadge, { backgroundColor: "#F3E8FF" }]}>
+                <Text style={[styles.dayBadgeText, { color: "#7C3AED" }]}>
+                  Day {activeCurriculum.current_day}/{activeCurriculum.total_days}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.cardSub}>{activeCurriculum.name}</Text>
+            <View style={[styles.insightBox, { backgroundColor: "#F3E8FF" }]}>
+              <Ionicons name="star" size={20} color="#7C3AED" />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.insightTitle}>
+                  {todayTasks.length} Tasks Today
+                </Text>
+                <Text style={styles.insightSub}>
+                  Custom activities for your child
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={[styles.pinkBtn, { backgroundColor: "#7C3AED" }]}
+              onPress={() => router.push("/therapy/today")}
+            >
+              <Text style={styles.pinkBtnText}>View Today&apos;s Tasks</Text>
+              <Ionicons name="arrow-forward" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        )}
         {/* 3. Feedback Section */}
         <View style={styles.secHeader}>
           <Text style={styles.secTitle}>Doctor&apos;s Feedback</Text>
@@ -372,89 +511,98 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* 4. Focus Section - Show real tasks if curriculum active */}
-        <View style={styles.secHeader}>
-          <Text style={styles.secTitle}>Today&apos;s Focus</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>
-              {hasActiveCurriculum ? `${todayTasks.length} Tasks` : "Get Started"}
-            </Text>
-          </View>
-        </View>
-
-        {/* Show real therapy tasks if curriculum is active */}
-        {hasActiveCurriculum && todayTasks.length > 0 ? (
+        {/* 4. Focus Section - Show based on assessment state */}
+        {(assessmentState === 'assessment_active' || assessmentState === 'personalized_active') && (
           <>
-            {todayTasks.slice(0, 3).map((task: any, index: number) => (
-              <TouchableOpacity
-                key={task.id || index}
-                style={styles.taskItem}
-                onPress={() =>
-                  router.push({
-                    pathname: "/therapy/task-detail",
-                    params: {
-                      childId: firstChild?.id?.toString(),
-                      taskId: task.id?.toString(),
-                    },
-                  })
-                }
-              >
-                <View
-                  style={[
-                    styles.taskIcon,
-                    {
-                      backgroundColor: task.status === "done_without_help"
-                        ? "#E8F5E9"
-                        : task.status === "done_with_help"
-                        ? "#FFF3E0"
-                        : "#F3E5F5",
-                    },
-                  ]}
-                >
-                  {task.status === "done_without_help" ? (
-                    <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-                  ) : task.status === "done_with_help" ? (
-                    <Ionicons name="checkmark" size={20} color="#FF9800" />
-                  ) : (
-                    <Ionicons name="play" size={20} color="#9C27B0" />
-                  )}
-                </View>
-                <View style={{ flex: 1, marginLeft: 15 }}>
-                  <Text style={styles.tTitle}>{task.title}</Text>
-                  <Text style={styles.tSub}>
-                    Task {index + 1} • {task.status === "not_done" ? "Pending" : "Completed"}
-                  </Text>
-                </View>
-                <Ionicons
-                  name={task.status !== "not_done" ? "checkmark-circle" : "chevron-forward"}
-                  size={22}
-                  color={task.status !== "not_done" ? "#4CAF50" : "#D1D5DB"}
-                />
-              </TouchableOpacity>
-            ))}
-            {todayTasks.length > 3 && (
-              <TouchableOpacity
-                style={styles.viewAllBtn}
-                onPress={() => router.push("/therapy/today")}
-              >
-                <Text style={styles.viewAllText}>
-                  View all {todayTasks.length} tasks
+            <View style={styles.secHeader}>
+              <Text style={styles.secTitle}>Today&apos;s Focus</Text>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{todayTasks.length} Tasks</Text>
+              </View>
+            </View>
+
+            {todayTasks.length > 0 ? (
+              <>
+                {todayTasks.slice(0, 3).map((task: any, index: number) => (
+                  <TouchableOpacity
+                    key={task.id || index}
+                    style={styles.taskItem}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/therapy/task-detail",
+                        params: {
+                          childId: firstChild?.id?.toString(),
+                          taskId: task.id?.toString(),
+                        },
+                      })
+                    }
+                  >
+                    <View
+                      style={[
+                        styles.taskIcon,
+                        {
+                          backgroundColor: task.status === "done_without_help"
+                            ? "#E8F5E9"
+                            : task.status === "done_with_help"
+                            ? "#FFF3E0"
+                            : "#F3E5F5",
+                        },
+                      ]}
+                    >
+                      {task.status === "done_without_help" ? (
+                        <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                      ) : task.status === "done_with_help" ? (
+                        <Ionicons name="checkmark" size={20} color="#FF9800" />
+                      ) : (
+                        <Ionicons name="play" size={20} color="#9C27B0" />
+                      )}
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 15 }}>
+                      <Text style={styles.tTitle}>{task.title}</Text>
+                      <Text style={styles.tSub}>
+                        Task {index + 1} • {task.status === "not_done" ? "Pending" : "Completed"}
+                      </Text>
+                    </View>
+                    <Ionicons
+                      name={task.status !== "not_done" ? "checkmark-circle" : "chevron-forward"}
+                      size={22}
+                      color={task.status !== "not_done" ? "#4CAF50" : "#D1D5DB"}
+                    />
+                  </TouchableOpacity>
+                ))}
+                {todayTasks.length > 3 && (
+                  <TouchableOpacity
+                    style={styles.viewAllBtn}
+                    onPress={() => router.push("/therapy/today")}
+                  >
+                    <Text style={styles.viewAllText}>
+                      View all {todayTasks.length} tasks
+                    </Text>
+                    <Ionicons name="arrow-forward" size={16} color="#F97316" />
+                  </TouchableOpacity>
+                )}
+              </>
+            ) : (
+              <View style={styles.emptyTaskCard}>
+                <Ionicons name="checkmark-done-circle" size={48} color="#4CAF50" />
+                <Text style={styles.emptyTaskTitle}>All caught up!</Text>
+                <Text style={styles.emptyTaskSub}>
+                  No pending tasks for today. Great job!
                 </Text>
-                <Ionicons name="arrow-forward" size={16} color="#F97316" />
-              </TouchableOpacity>
+              </View>
             )}
           </>
-        ) : hasActiveCurriculum ? (
-          <View style={styles.emptyTaskCard}>
-            <Ionicons name="checkmark-done-circle" size={48} color="#4CAF50" />
-            <Text style={styles.emptyTaskTitle}>All caught up!</Text>
-            <Text style={styles.emptyTaskSub}>
-              No pending tasks for today. Great job!
-            </Text>
-          </View>
-        ) : (
+        )}
+
+        {/* Show get started section for no_mchat state */}
+        {assessmentState === 'no_mchat' && children.length > 0 && (
           <>
-            {/* Show placeholder for new users */}
+            <View style={styles.secHeader}>
+              <Text style={styles.secTitle}>Today&apos;s Focus</Text>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>Get Started</Text>
+              </View>
+            </View>
             <TouchableOpacity
               style={styles.taskItem}
               onPress={() =>
@@ -730,5 +878,25 @@ const styles = StyleSheet.create({
     color: "#9CA3AF",
     marginTop: 4,
     textAlign: "center",
+  },
+  pendingBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#FEF3C7",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  waitingInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+    paddingHorizontal: 4,
+  },
+  waitingInfoText: {
+    fontSize: 13,
+    color: "#6B7280",
+    marginLeft: 8,
+    flex: 1,
   },
 });

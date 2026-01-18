@@ -580,7 +580,7 @@ class ProgressHistoryView(APIView):
 
 
 class ChildCurriculumStatusView(APIView):
-    """Get curriculum status for a child"""
+    """Get curriculum status for a child, including assessment status"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, child_id):
@@ -592,9 +592,14 @@ class ChildCurriculumStatusView(APIView):
 
         curricula = ChildCurriculum.objects.filter(child=child)
 
+        # Get assessment status from ChildAssessment model
+        assessment = ChildAssessment.objects.filter(child=child).first()
+
         return Response({
             'child_id': child.id,
             'child_name': child.full_name,
+            'assessment_status': assessment.status if assessment else None,
+            'assessment_submitted_at': assessment.submitted_at.isoformat() if assessment and assessment.submitted_at else None,
             'curricula': ChildCurriculumSerializer(curricula, many=True).data,
         })
 
