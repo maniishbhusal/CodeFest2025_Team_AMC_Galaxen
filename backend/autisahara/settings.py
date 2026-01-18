@@ -52,7 +52,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "AutiSahara.urls"
+ROOT_URLCONF = "autisahara.urls"
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "AutiSahara.wsgi.application"
+WSGI_APPLICATION = "autisahara.wsgi.application"
 
 
 # Database - SQLite for hackathon
