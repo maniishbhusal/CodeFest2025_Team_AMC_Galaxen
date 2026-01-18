@@ -62,7 +62,7 @@ export default function ProfileScreen() {
 
       // Fetch user profile
       try {
-        const userRes = await axios.get(`${BASE_URL}/api/auth/profile/`, {
+        const userRes = await axios.get(`${BASE_URL}/api/auth/me/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserData(userRes.data);
@@ -75,9 +75,18 @@ export default function ProfileScreen() {
         const childrenRes = await axios.get(`${BASE_URL}/api/children/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setChildren(childrenRes.data || []);
+        // Handle both array response and paginated response {results: [...]}
+        const childrenData = childrenRes.data;
+        if (Array.isArray(childrenData)) {
+          setChildren(childrenData);
+        } else if (childrenData?.results && Array.isArray(childrenData.results)) {
+          setChildren(childrenData.results);
+        } else {
+          setChildren([]);
+        }
       } catch (err) {
         console.log("Error fetching children:", err);
+        setChildren([]);
       }
     } catch (error) {
       console.log("Error loading profile:", error);
