@@ -434,7 +434,7 @@ export default function PatientDetailPage() {
 
             {/* Pre-Assessment Task Results - Hardcoded for Hackathon */}
             {/* Only show after assessment curriculum is completed */}
-            {patient.curriculum_status === "completed" && (
+            {patient.assessment_completed && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-indigo-100 rounded-xl">

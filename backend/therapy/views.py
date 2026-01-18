@@ -153,9 +153,13 @@ class DoctorPatientDetailView(APIView):
         videos = child.videos.all()
         assessment = getattr(child, 'assessment', None)
 
-        # Get curriculum status (for showing pre-assessment results)
-        child_curriculum = ChildCurriculum.objects.filter(child=child).order_by('-created_at').first()
-        curriculum_status = child_curriculum.status if child_curriculum else None
+        # Check if assessment curriculum is completed (for showing pre-assessment results)
+        # This should be true even if a new personalized curriculum is assigned
+        assessment_curriculum = ChildCurriculum.objects.filter(
+            child=child,
+            curriculum__type='assessment'
+        ).first()
+        assessment_completed = assessment_curriculum.status == 'completed' if assessment_curriculum else False
 
         data = {
             'id': assessment.id if assessment else None,
@@ -215,7 +219,7 @@ class DoctorPatientDetailView(APIView):
             ],
             'status': assessment.status if assessment else 'pending',
             'submitted_at': assessment.submitted_at if assessment else None,
-            'curriculum_status': curriculum_status,  # 'active', 'completed', or None
+            'assessment_completed': assessment_completed,  # True if 3-day assessment is done
         }
 
         return Response(data)

@@ -166,7 +166,7 @@ interface PatientDetail {
   videos: AssessmentVideo[];
   status: 'pending' | 'in_review' | 'accepted' | 'completed';
   submitted_at: string;
-  curriculum_status?: 'active' | 'completed' | null;
+  assessment_completed?: boolean;  // True if 3-day assessment curriculum is done
 }
 
 // Helper to get auth headers
