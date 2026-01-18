@@ -146,7 +146,7 @@ const Pricing = () => {
             transition={{ delay: 0.3, duration: 0.7 }}
             className="text-xl text-slate-600 leading-relaxed font-sans max-w-3xl mx-auto"
           >
-            Comprehensive business insights showcasing market opportunity and financial projections for NeuroCare
+            Comprehensive business insights showcasing market opportunity and financial projections for AutiSahara
           </motion.p>
         </motion.div>
 

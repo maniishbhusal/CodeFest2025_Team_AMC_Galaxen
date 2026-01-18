@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Thank you for contributing to NeuroCare Nepal! Please follow these guidelines to maintain consistency across the project.
+Thank you for contributing to AutiSahara Nepal! Please follow these guidelines to maintain consistency across the project.
 
 ---
 

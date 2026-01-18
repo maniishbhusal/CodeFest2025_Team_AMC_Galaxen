@@ -280,7 +280,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         {/* App Version */}
-        <Text style={styles.versionText}>NeuroCare v1.0.0</Text>
+        <Text style={styles.versionText}>AutiSahara v1.0.0</Text>
 
         <View style={{ height: 100 }} />
       </ScrollView>

@@ -1,6 +1,6 @@
-# NeuroCare - Contributor Guide
+# AutiSahara - Contributor Guide
 
-A comprehensive guide for new contributors to understand the NeuroCare autism screening platform.
+A comprehensive guide for new contributors to understand the AutiSahara autism screening platform.
 
 ---
 
@@ -21,11 +21,11 @@ A comprehensive guide for new contributors to understand the NeuroCare autism sc
 
 ## 1. Project Overview
 
-**NeuroCare** is a mobile-first autism screening and therapy platform designed for Nepali families with children aged 16-30 months. It connects parents with therapists to provide early intervention through structured daily therapy.
+**AutiSahara** is a mobile-first autism screening and therapy platform designed for Nepali families with children aged 16-30 months. It connects parents with therapists to provide early intervention through structured daily therapy.
 
 ### The Problem We Solve
 
-In Nepal, many families lack access to professional autism screening and therapy services. NeuroCare bridges this gap by:
+In Nepal, many families lack access to professional autism screening and therapy services. AutiSahara bridges this gap by:
 
 - Enabling parents to screen their children using the standardized M-CHAT-R/F questionnaire
 - Allowing doctors to review assessments remotely
@@ -617,4 +617,4 @@ VITE_API_URL=http://localhost:8000
 - Review API docs at `/swagger/`
 - Look at test data in `CLAUDE.md`
 
-Welcome to the NeuroCare team! 🧠💙
+Welcome to the AutiSahara team! 🧠💙

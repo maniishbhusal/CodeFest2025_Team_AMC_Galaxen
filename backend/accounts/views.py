@@ -40,7 +40,7 @@ class ParentRegisterView(APIView):
     @swagger_auto_schema(
         operation_summary="Register a new parent",
         operation_description="""
-        Creates a new parent account in the NeuroCare platform.
+        Creates a new parent account in the AutiSahara platform.
 
         **Use Case**: First step for parents wanting to register their child for autism screening.
 
@@ -102,7 +102,7 @@ class DoctorRegisterView(APIView):
     @swagger_auto_schema(
         operation_summary="Register a new doctor/therapist",
         operation_description="""
-        Creates a new doctor account in the NeuroCare platform.
+        Creates a new doctor account in the AutiSahara platform.
 
         **Use Case**: Therapists and doctors who want to review autism screenings and provide treatment.
 
