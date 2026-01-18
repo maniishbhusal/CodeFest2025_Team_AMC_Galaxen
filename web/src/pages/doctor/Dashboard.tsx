@@ -13,6 +13,9 @@ import {
   CheckCircle2,
   ArrowRight,
   Stethoscope,
+  BookOpen,
+  Plus,
+  FolderOpen,
 } from "lucide-react";
 import PendingPatientsList from "@/components/doctor/PendingPatientsList";
 import ActivePatientsList from "@/components/doctor/ActivePatientsList";
@@ -119,16 +122,29 @@ export default function DoctorDashboard() {
               </span>
             </div>
 
-            {/* Search */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Search patients..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-orange-50/50 border-2 border-transparent rounded-xl focus:ring-2 focus:ring-orange-500 focus:bg-white focus:border-orange-500 transition-all"
-                />
-              </div>
+            {/* Navigation */}
+            <div className="hidden md:flex items-center gap-2 mx-8">
+              <button
+                onClick={() => navigate("/doctor/task-library")}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all"
+              >
+                <BookOpen className="w-4 h-4" />
+                Task Library
+              </button>
+              <button
+                onClick={() => navigate("/doctor/curriculum/drafts")}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all"
+              >
+                <FolderOpen className="w-4 h-4" />
+                Drafts
+              </button>
+              <button
+                onClick={() => navigate("/doctor/curriculum/create")}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 shadow-lg shadow-orange-500/30 transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                Create Curriculum
+              </button>
             </div>
 
             {/* Right side */}

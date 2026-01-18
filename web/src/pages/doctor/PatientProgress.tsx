@@ -15,6 +15,8 @@ import {
   X,
   AlertCircle,
   ClipboardList,
+  Plus,
+  Sparkles,
 } from "lucide-react";
 import {
   getPatientProgress,
@@ -329,6 +331,40 @@ export default function PatientProgressPage() {
             </div>
           </div>
         </div>
+
+        {/* Assessment Complete CTA */}
+        {progress.curriculum.status === "completed" && (
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 mb-8 text-white relative overflow-hidden shadow-xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-white/20 rounded-xl">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">
+                    Assessment Complete!
+                  </h3>
+                  <p className="text-orange-100 max-w-md">
+                    {patient.child.full_name} has completed the assessment
+                    curriculum. You can now create a personalized therapy plan
+                    based on their progress.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() =>
+                  navigate(`/doctor/curriculum/create/${childId}`)
+                }
+                className="flex items-center gap-2 px-6 py-3 bg-white text-orange-600 rounded-xl font-semibold hover:bg-orange-50 transition-all shadow-lg"
+              >
+                <Plus className="w-5 h-5" />
+                Create Personalized Curriculum
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Progress Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
