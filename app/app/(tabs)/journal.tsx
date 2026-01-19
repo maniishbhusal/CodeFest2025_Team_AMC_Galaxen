@@ -198,7 +198,7 @@ export default function ReportScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={styles.cardIconContainer}>
-              <Ionicons name="clipboard-outline" size={24} color="#7C3AED" />
+              <Ionicons name="clipboard-outline" size={28} color="#7C3AED" />
             </View>
             <View style={styles.cardTitleContainer}>
               <Text style={styles.cardTitle}>M-CHAT Screening</Text>
@@ -208,20 +208,20 @@ export default function ReportScreen() {
 
           {childMchat ? (
             <View style={styles.mchatContent}>
-              <View style={styles.scoreRow}>
-                <View style={styles.scoreBox}>
-                  <Text style={styles.scoreLabel}>Score</Text>
-                  <Text style={styles.scoreValue}>{childMchat.total_score}/20</Text>
+              {/* Large Score Display */}
+              <View style={styles.scoreContainer}>
+                <View style={styles.scoreBig}>
+                  <Text style={styles.scoreBigValue}>{childMchat.total_score}</Text>
+                  <Text style={styles.scoreBigLabel}>out of 20</Text>
                 </View>
-                <View style={styles.scoreBox}>
-                  <Text style={styles.scoreLabel}>Risk Level</Text>
-                  <View style={[styles.riskBadge, { backgroundColor: getRiskColor(childMchat.risk_level) }]}>
-                    <Text style={styles.riskBadgeText}>{childMchat.risk_level}</Text>
-                  </View>
+                <View style={[styles.riskBadgeLarge, { backgroundColor: getRiskColor(childMchat.risk_level) }]}>
+                  <Text style={styles.riskBadgeLargeText}>{childMchat.risk_level} Risk</Text>
                 </View>
               </View>
+
+              {/* Full-width CTA button */}
               <TouchableOpacity
-                style={styles.viewDetailsBtn}
+                style={styles.viewReportBtn}
                 onPress={() =>
                   router.push({
                     pathname: "/mchat/results",
@@ -233,13 +233,15 @@ export default function ReportScreen() {
                   })
                 }
               >
-                <Text style={styles.viewDetailsBtnText}>View Full Report</Text>
-                <Ionicons name="arrow-forward" size={16} color="#F97316" />
+                <Text style={styles.viewReportBtnText}>View Full Report</Text>
+                <Ionicons name="arrow-forward" size={20} color="#FFF" />
               </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>No M-CHAT assessment completed yet</Text>
+              <Text style={styles.emptyEmoji}>📋</Text>
+              <Text style={styles.emptyTitle}>No Assessment Yet</Text>
+              <Text style={styles.emptySubtitle}>Complete the M-CHAT screening to get started</Text>
               <TouchableOpacity
                 style={styles.startBtn}
                 onPress={() =>
@@ -255,57 +257,6 @@ export default function ReportScreen() {
           )}
         </View>
 
-        {/* Therapy Progress Card */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View style={[styles.cardIconContainer, { backgroundColor: "#DCFCE7" }]}>
-              <Ionicons name="fitness-outline" size={24} color="#16A34A" />
-            </View>
-            <View style={styles.cardTitleContainer}>
-              <Text style={styles.cardTitle}>Therapy Progress</Text>
-              <Text style={styles.cardSubtitle}>Current Curriculum Status</Text>
-            </View>
-          </View>
-
-          {childTherapy ? (
-            <View style={styles.therapyContent}>
-              <Text style={styles.curriculumName}>{childTherapy.curriculum_title}</Text>
-
-              <View style={styles.progressRow}>
-                <Text style={styles.progressLabel}>
-                  Day {childTherapy.current_day} of {childTherapy.total_days}
-                </Text>
-                <Text style={styles.progressPercent}>
-                  {Math.round((childTherapy.current_day / childTherapy.total_days) * 100)}%
-                </Text>
-              </View>
-
-              <View style={styles.progressBarBg}>
-                <View
-                  style={[
-                    styles.progressBarFill,
-                    { width: `${(childTherapy.current_day / childTherapy.total_days) * 100}%` },
-                  ]}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={styles.viewDetailsBtn}
-                onPress={() => router.push("/therapy/today")}
-              >
-                <Text style={styles.viewDetailsBtnText}>View Today&apos;s Tasks</Text>
-                <Ionicons name="arrow-forward" size={16} color="#F97316" />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>No active therapy curriculum</Text>
-              <Text style={styles.emptyStateHint}>
-                Complete the M-CHAT assessment to get started
-              </Text>
-            </View>
-          )}
-        </View>
 
         {/* Diagnosis Reports Card */}
         <View style={styles.card}>
@@ -401,43 +352,93 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     marginBottom: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
   },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 20,
   },
   cardIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 56,
+    height: 56,
+    borderRadius: 16,
     backgroundColor: "#EDE9FE",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 14,
   },
   cardTitleContainer: {
     flex: 1,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700",
     color: "#1F2937",
   },
   cardSubtitle: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#6B7280",
     marginTop: 2,
   },
   mchatContent: {},
+  scoreContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  scoreBig: {
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  scoreBigValue: {
+    fontSize: 56,
+    fontWeight: "800",
+    color: "#1F2937",
+  },
+  scoreBigLabel: {
+    fontSize: 16,
+    color: "#6B7280",
+    marginTop: 4,
+  },
+  riskBadgeLarge: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  riskBadgeLargeText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#FFF",
+    textTransform: "capitalize",
+  },
+  viewReportBtn: {
+    backgroundColor: "#F97316",
+    borderRadius: 20,
+    height: 64,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+    shadowColor: "#F97316",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  viewReportBtnText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#FFF",
+    marginRight: 8,
+  },
+  // Legacy styles (keep for compatibility)
   scoreRow: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -484,28 +485,52 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 32,
+  },
+  emptyEmoji: {
+    fontSize: 56,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1F2937",
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 16,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 24,
+    marginBottom: 20,
   },
   emptyStateText: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#6B7280",
     marginBottom: 8,
   },
   emptyStateHint: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#9CA3AF",
     textAlign: "center",
   },
   startBtn: {
     backgroundColor: "#F97316",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 20,
+    height: 64,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 8,
+    shadowColor: "#F97316",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   startBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "700",
     color: "#FFF",
   },
   therapyContent: {},
@@ -544,37 +569,37 @@ const styles = StyleSheet.create({
   diagnosisItem: {
     borderTopWidth: 1,
     borderTopColor: "#E5E7EB",
-    paddingTop: 12,
-    marginTop: 12,
+    paddingTop: 16,
+    marginTop: 16,
   },
   diagnosisHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   spectrumBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
   },
   spectrumBadgeText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "700",
     color: "#FFF",
   },
   diagnosisDate: {
-    fontSize: 12,
-    color: "#9CA3AF",
+    fontSize: 14,
+    color: "#6B7280",
   },
   doctorName: {
-    fontSize: 13,
+    fontSize: 15,
     color: "#6B7280",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   diagnosisReport: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#374151",
-    lineHeight: 20,
+    lineHeight: 22,
   },
 });

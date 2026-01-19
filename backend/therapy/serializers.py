@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from datetime import timedelta
-from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview, DiagnosisReport
+from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview, DiagnosisReport, SavedTask
 
 
 class CurriculumTaskSerializer(serializers.ModelSerializer):
@@ -38,6 +38,7 @@ class CurriculumDetailSerializer(serializers.ModelSerializer):
 class ChildCurriculumSerializer(serializers.ModelSerializer):
     curriculum_title = serializers.CharField(source='curriculum.title', read_only=True)
     curriculum_duration = serializers.IntegerField(source='curriculum.duration_days', read_only=True)
+    curriculum_type = serializers.CharField(source='curriculum.type', read_only=True)
     child_name = serializers.CharField(source='child.full_name', read_only=True)
     assigned_by_name = serializers.SerializerMethodField()
     progress_percentage = serializers.SerializerMethodField()
@@ -46,7 +47,7 @@ class ChildCurriculumSerializer(serializers.ModelSerializer):
         model = ChildCurriculum
         fields = [
             'id', 'child', 'child_name', 'curriculum', 'curriculum_title', 'curriculum_duration',
-            'assigned_by_name', 'start_date', 'end_date', 'current_day', 'status',
+            'curriculum_type', 'assigned_by_name', 'start_date', 'end_date', 'current_day', 'status',
             'progress_percentage', 'created_at'
         ]
         read_only_fields = ['id', 'end_date', 'current_day', 'created_at']
@@ -168,3 +169,68 @@ class CreateDiagnosisReportSerializer(serializers.Serializer):
     detailed_report = serializers.CharField()
     next_steps = serializers.CharField()
     shared_with_parent = serializers.BooleanField(default=False)
+
+
+# ============== SAVED TASK (TASK LIBRARY) SERIALIZERS ==============
+
+class SavedTaskSerializer(serializers.ModelSerializer):
+    """Serializer for doctor's saved tasks"""
+    class Meta:
+        model = SavedTask
+        fields = ['id', 'title', 'goal', 'instructions', 'video_url', 'category', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class CreateSavedTaskSerializer(serializers.Serializer):
+    """Serializer for creating a saved task"""
+    title = serializers.CharField(max_length=255)
+    goal = serializers.CharField()
+    instructions = serializers.CharField()
+    video_url = serializers.URLField(required=False, allow_blank=True)
+    category = serializers.CharField(max_length=50, required=False, allow_blank=True)
+
+
+# ============== PERSONALIZED CURRICULUM SERIALIZERS ==============
+
+class PersonalizedTaskInputSerializer(serializers.Serializer):
+    """Input for a single task when creating personalized curriculum"""
+    day_number = serializers.IntegerField(min_value=1)
+    title = serializers.CharField(max_length=255)
+    goal = serializers.CharField()
+    instructions = serializers.CharField()
+    video_url = serializers.URLField(required=False, allow_blank=True)
+    order_index = serializers.IntegerField(default=0)
+    saved_task_id = serializers.IntegerField(required=False, allow_null=True)
+
+
+class CreatePersonalizedCurriculumSerializer(serializers.Serializer):
+    """Serializer for creating a personalized curriculum for a child"""
+    child_id = serializers.IntegerField()
+    title = serializers.CharField(max_length=255)
+    description = serializers.CharField()
+    duration_days = serializers.ChoiceField(choices=[3, 7, 15, 30])
+    tasks = PersonalizedTaskInputSerializer(many=True)
+    is_draft = serializers.BooleanField(default=True)
+
+
+class PublishCurriculumSerializer(serializers.Serializer):
+    """Serializer for publishing a draft curriculum"""
+    start_date = serializers.DateField()
+
+
+class DraftCurriculumSerializer(serializers.ModelSerializer):
+    """Serializer for listing doctor's draft curricula"""
+    for_child_name = serializers.SerializerMethodField()
+    tasks_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Curriculum
+        fields = ['id', 'title', 'description', 'duration_days', 'for_child', 'for_child_name', 'tasks_count', 'created_at']
+
+    def get_for_child_name(self, obj):
+        if obj.for_child:
+            return obj.for_child.full_name
+        return None
+
+    def get_tasks_count(self, obj):
+        return obj.tasks.count()

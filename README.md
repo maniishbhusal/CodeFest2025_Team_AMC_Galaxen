@@ -1,25 +1,16 @@
-# NeuroCare
+# AutiSahara
 
 Early autism screening and therapy management platform for children aged 16-30 months.
 
-Built at **Code For Change Hackathon 2025** by Team AMC Galaxen.
-
-## Clone the Repository
-
-```bash
-git clone git@github.com:maniishbhusal/CodeFest2025_Team_AMC_Galaxen.git
-cd CodeFest2025_Team_AMC_Galaxen
-```
-
 ## Overview
 
-NeuroCare helps parents screen their children for autism spectrum disorder using the M-CHAT-R/F questionnaire, upload behavioral videos, and follow structured therapy curricula assigned by doctors.
+AutiSahara helps parents screen their children for autism spectrum disorder using the M-CHAT-R/F questionnaire, upload behavioral videos, and follow structured therapy curricula assigned by doctors.
 
 ## Features
 
 - **M-CHAT Screening**: Standardized autism screening questionnaire
 - **Video Upload**: Parents upload behavioral videos for doctor review
-- **15-Day Assessment Program**: Structured daily tasks across 5 categories
+- **Assessment Program**: Structured daily tasks across 5 categories
 - **Doctor Dashboard**: Review patients, track progress, create diagnosis reports
 - **Therapy Curriculum**: Doctors assign specialized curricula based on assessment
 
@@ -91,10 +82,3 @@ Create `.env` in `/web`:
 VITE_API_URL=http://your-backend-url:8000
 ```
 
-## Team AMC Galaxen
-
-Built with care for early autism intervention.
-
-## License
-
-MIT

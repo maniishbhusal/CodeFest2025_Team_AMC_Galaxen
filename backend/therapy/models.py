@@ -3,25 +3,81 @@ from django.conf import settings
 from children.models import Child
 
 
+class SavedTask(models.Model):
+    """
+    Doctor's personal task library - reusable task templates.
+    Each doctor has their own library of saved tasks they can use
+    when creating personalized curricula.
+    """
+    doctor = models.ForeignKey(
+        'accounts.Doctor',
+        on_delete=models.CASCADE,
+        related_name='saved_tasks'
+    )
+    title = models.CharField(max_length=255)
+    goal = models.TextField(help_text="What this task aims to achieve")
+    instructions = models.TextField(help_text="Step-by-step instructions for parents")
+    video_url = models.URLField(blank=True, help_text="Demo video URL")
+    category = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Optional category for organization (e.g., 'Communication', 'Motor Skills')"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['doctor', 'title']
+
+    def __str__(self):
+        return f"{self.title} (Dr. {self.doctor.user.full_name})"
+
+
 class Curriculum(models.Model):
     """
     Therapy curriculum template.
-    Can be general (for all children) or specialized (for specific spectrum types).
+    Can be general (for all children), specialized (for specific spectrum types),
+    assessment (initial 3-day observation), or personalized (doctor-created for specific child).
     """
     TYPE_CHOICES = [
         ('general', 'General'),
         ('specialized', 'Specialized'),
         ('assessment', 'Pre-Assessment'),
+        ('personalized', 'Personalized'),
+    ]
+
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('published', 'Published'),
     ]
 
     title = models.CharField(max_length=255)
     description = models.TextField()
-    duration_days = models.PositiveIntegerField(help_text="15, 30, or 45 days")
+    duration_days = models.PositiveIntegerField(help_text="Number of days (e.g., 3, 7, 15, 30)")
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='general')
     spectrum_type = models.CharField(
         max_length=100,
         blank=True,
         help_text="For specialized curriculum only"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='published',
+        help_text="Draft curricula are only visible to the creating doctor"
+    )
+    for_child = models.ForeignKey(
+        Child,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='personalized_curricula',
+        help_text="If set, this is a personalized curriculum for a specific child"
+    )
+    is_template = models.BooleanField(
+        default=True,
+        help_text="If True, this is a reusable template. If False, it's child-specific."
     )
     created_by = models.ForeignKey(
         'accounts.Doctor',

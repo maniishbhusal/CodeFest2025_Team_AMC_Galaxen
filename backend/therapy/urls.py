@@ -19,6 +19,16 @@ urlpatterns = [
     # Doctor report management
     path('doctor/report/<int:report_id>/toggle-share/', views.DoctorToggleReportShareView.as_view(), name='toggle-report-share'),
 
+    # Saved Tasks (Doctor's Task Library)
+    path('doctor/tasks/', views.SavedTaskListCreateView.as_view(), name='saved-task-list'),
+    path('doctor/tasks/<int:pk>/', views.SavedTaskDetailView.as_view(), name='saved-task-detail'),
+
+    # Personalized Curricula
+    path('doctor/curricula/create/', views.CreatePersonalizedCurriculumView.as_view(), name='create-personalized-curriculum'),
+    path('doctor/curricula/drafts/', views.DoctorDraftCurriculaView.as_view(), name='doctor-drafts'),
+    path('doctor/curricula/<int:curriculum_id>/publish/', views.PublishCurriculumView.as_view(), name='publish-curriculum'),
+    path('doctor/patients/ready-for-curriculum/', views.DoctorPatientsReadyForPersonalizedView.as_view(), name='patients-ready-for-curriculum'),
+
     # Parent endpoints
     path('child/<int:child_id>/today/', views.TodayTasksView.as_view(), name='today-tasks'),
     path('child/<int:child_id>/submit/', views.SubmitProgressView.as_view(), name='submit-progress'),

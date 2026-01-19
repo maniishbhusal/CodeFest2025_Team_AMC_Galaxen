@@ -7,7 +7,6 @@ import {
   Check,
   CheckCircle,
   Clock,
-  FileText,
   HelpCircle,
   Play,
   RefreshCw,
@@ -15,11 +14,12 @@ import {
   X,
   AlertCircle,
   ClipboardList,
+  Plus,
+  Sparkles,
 } from "lucide-react";
 import {
   getPatientProgress,
   getPatientDetail,
-  createReview,
   type PatientProgress,
   type PatientDetail,
   type ProgressEntry,
@@ -32,15 +32,7 @@ export default function PatientProgressPage() {
   const [progress, setProgress] = useState<PatientProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showReviewModal, setShowReviewModal] = useState(false);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
-
-  // Review form state
-  const [reviewPeriod, setReviewPeriod] = useState<number>(15);
-  const [observations, setObservations] = useState("");
-  const [spectrumIdentified, setSpectrumIdentified] = useState("");
-  const [recommendations, setRecommendations] = useState("");
-  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("doctorLoggedIn");
@@ -73,31 +65,6 @@ export default function PatientProgressPage() {
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSubmitReview = async () => {
-    if (!childId || !observations || !recommendations) return;
-
-    setSubmittingReview(true);
-    try {
-      await createReview(parseInt(childId), {
-        review_period: reviewPeriod,
-        observations,
-        spectrum_identified: spectrumIdentified || undefined,
-        recommendations,
-      });
-      setShowReviewModal(false);
-      setObservations("");
-      setSpectrumIdentified("");
-      setRecommendations("");
-      // Refresh data
-      await fetchData(parseInt(childId));
-    } catch (err) {
-      console.error(err);
-      alert("Failed to submit review");
-    } finally {
-      setSubmittingReview(false);
     }
   };
 
@@ -253,22 +220,13 @@ export default function PatientProgressPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowReviewModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
-              >
-                <FileText className="w-4 h-4" />
-                Create Review
-              </button>
-              <button
-                onClick={() => navigate(`/doctor/patient/${childId}/diagnosis`)}
-                className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition"
-              >
-                <ClipboardList className="w-4 h-4" />
-                Diagnosis Report
-              </button>
-            </div>
+            <button
+              onClick={() => navigate(`/doctor/patient/${childId}/diagnosis`)}
+              className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition"
+            >
+              <ClipboardList className="w-4 h-4" />
+              Diagnosis Report
+            </button>
           </div>
         </div>
       </header>
@@ -330,285 +288,200 @@ export default function PatientProgressPage() {
           </div>
         </div>
 
-        {/* Progress Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Progress Table
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Daily task completion status
-            </p>
-          </div>
-
-          {progress.progress.length === 0 ? (
-            <div className="p-12 text-center">
-              <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No progress submitted yet</p>
-              <p className="text-sm text-gray-400 mt-1">
-                Parent will submit progress through the mobile app
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 sticky left-0 bg-gray-50 min-w-[200px]">
-                      Task
-                    </th>
-                    {daysWithProgress.map((day) => (
-                      <th
-                        key={day}
-                        className="text-center py-3 px-2 text-sm font-medium text-gray-600 min-w-[60px]"
-                      >
-                        Day {day}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {uniqueTasks.map((task) => (
-                    <tr key={task.id} className="border-t border-gray-100">
-                      <td className="py-3 px-4 text-sm text-gray-900 sticky left-0 bg-white">
-                        {task.title}
-                      </td>
-                      {daysWithProgress.map((day) => {
-                        const entry = progressByDay[day]?.find(
-                          (e) => e.task.id === task.id
-                        );
-                        return (
-                          <td key={day} className="py-3 px-2 text-center">
-                            {entry ? (
-                              <div className="flex flex-col items-center gap-1">
-                                <div
-                                  className={`w-7 h-7 rounded-full flex items-center justify-center ${getStatusColor(
-                                    entry.status
-                                  )}`}
-                                >
-                                  {getStatusIcon(entry.status)}
-                                </div>
-                                {entry.video_url && (
-                                  <button
-                                    onClick={() =>
-                                      setPlayingVideo(entry.video_url!)
-                                    }
-                                    className="text-xs text-orange-600 hover:underline flex items-center gap-0.5"
-                                  >
-                                    <Play className="w-3 h-3" />
-                                    Video
-                                  </button>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="w-7 h-7 rounded-full bg-gray-100 mx-auto" />
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* Legend */}
-          <div className="p-4 border-t border-gray-100 bg-gray-50">
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                  <Check className="w-3 h-3 text-white" />
+        {/* Assessment Complete CTA - Only for assessment type curriculum */}
+        {progress.curriculum.status === "completed" && progress.curriculum.type === "assessment" && (
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 mb-8 text-white relative overflow-hidden shadow-xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-white/20 rounded-xl">
+                  <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-gray-600">Done without help</span>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">
+                    Assessment Complete!
+                  </h3>
+                  <p className="text-orange-100 max-w-md">
+                    {patient.child.full_name} has completed the assessment
+                    curriculum. You can now create a personalized therapy plan
+                    based on their progress.
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center">
-                  <HelpCircle className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-gray-600">Done with help</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-red-400 flex items-center justify-center">
-                  <X className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-gray-600">Not done</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Previous Reviews */}
-        {progress.reviews.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Previous Reviews
-              </h2>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {progress.reviews.map((review) => (
-                <div key={review.id} className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                      Day {review.review_period} Review
-                    </span>
-                    <span className="text-sm text-gray-400">
-                      {new Date(review.reviewed_at).toLocaleDateString()}
-                    </span>
-                    {review.spectrum_identified && (
-                      <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
-                        {review.spectrum_identified}
-                      </span>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700">
-                        Observations
-                      </h4>
-                      <p className="text-gray-600 text-sm mt-1">
-                        {review.observations}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700">
-                        Recommendations
-                      </h4>
-                      <p className="text-gray-600 text-sm mt-1">
-                        {review.recommendations}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <button
+                onClick={() =>
+                  navigate(`/doctor/curriculum/create/${childId}`)
+                }
+                className="flex items-center gap-2 px-6 py-3 bg-white text-orange-600 rounded-xl font-semibold hover:bg-orange-50 transition-all shadow-lg"
+              >
+                <Plus className="w-5 h-5" />
+                Create Personalized Curriculum
+              </button>
             </div>
           </div>
         )}
-      </main>
 
-      {/* Review Modal */}
-      {showReviewModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <FileText className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Create Review
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Checkpoint review for {patient.child.full_name}
-                    </p>
-                  </div>
+        {/* Personalized Curriculum Complete - Celebration UI */}
+        {progress.curriculum.status === "completed" && progress.curriculum.type !== "assessment" && (
+          <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl p-6 mb-8 text-white relative overflow-hidden shadow-xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-white/20 rounded-xl">
+                  <CheckCircle className="w-6 h-6 text-white" />
                 </div>
-                <button
-                  onClick={() => setShowReviewModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Review Period
-                </label>
-                <div className="flex gap-2">
-                  {[15, 30, 45].map((period) => (
-                    <button
-                      key={period}
-                      onClick={() => setReviewPeriod(period)}
-                      className={`flex-1 py-2 px-4 rounded-lg border-2 transition ${
-                        reviewPeriod === period
-                          ? "border-purple-500 bg-purple-50 text-purple-700"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300"
-                      }`}
-                    >
-                      Day {period}
-                    </button>
-                  ))}
+                <div>
+                  <h3 className="text-xl font-bold mb-1">
+                    Therapy Curriculum Complete!
+                  </h3>
+                  <p className="text-green-100 max-w-md">
+                    {patient.child.full_name} has successfully completed the {progress.curriculum.duration_days}-day therapy curriculum.
+                    Review their progress and create a diagnosis report.
+                  </p>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Observations <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={observations}
-                  onChange={(e) => setObservations(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Describe your observations about the child's progress..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Spectrum Identified (Optional)
-                </label>
-                <select
-                  value={spectrumIdentified}
-                  onChange={(e) => setSpectrumIdentified(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="">Not determined yet</option>
-                  <option value="none">No signs of autism</option>
-                  <option value="mild">Mild</option>
-                  <option value="moderate">Moderate</option>
-                  <option value="severe">Severe</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Recommendations <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={recommendations}
-                  onChange={(e) => setRecommendations(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="What do you recommend for the next steps?"
-                />
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-gray-100 flex gap-3">
               <button
-                onClick={() => setShowReviewModal(false)}
-                className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                onClick={() =>
+                  navigate(`/doctor/patient/${childId}/diagnosis`)
+                }
+                className="flex items-center gap-2 px-6 py-3 bg-white text-green-600 rounded-xl font-semibold hover:bg-green-50 transition-all shadow-lg"
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmitReview}
-                disabled={submittingReview || !observations || !recommendations}
-                className="flex-1 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {submittingReview ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-4 h-4" />
-                    Submit Review
-                  </>
-                )}
+                <ClipboardList className="w-5 h-5" />
+                Create Diagnosis Report
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Progress Table - Only show for personalized curricula, not for assessment */}
+        {progress.curriculum.type !== 'assessment' ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Progress Table
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Daily task completion status
+              </p>
+            </div>
+
+            {progress.progress.length === 0 ? (
+              <div className="p-12 text-center">
+                <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">No progress submitted yet</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Parent will submit progress through the mobile app
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 sticky left-0 bg-gray-50 min-w-[200px]">
+                        Task
+                      </th>
+                      {daysWithProgress.map((day) => (
+                        <th
+                          key={day}
+                          className="text-center py-3 px-2 text-sm font-medium text-gray-600 min-w-[60px]"
+                        >
+                          Day {day}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {uniqueTasks.map((task) => (
+                      <tr key={task.id} className="border-t border-gray-100">
+                        <td className="py-3 px-4 text-sm text-gray-900 sticky left-0 bg-white">
+                          {task.title}
+                        </td>
+                        {daysWithProgress.map((day) => {
+                          const entry = progressByDay[day]?.find(
+                            (e) => e.task.id === task.id
+                          );
+                          return (
+                            <td key={day} className="py-3 px-2 text-center">
+                              {entry ? (
+                                <div className="flex flex-col items-center gap-1">
+                                  <div
+                                    className={`w-7 h-7 rounded-full flex items-center justify-center ${getStatusColor(
+                                      entry.status
+                                    )}`}
+                                  >
+                                    {getStatusIcon(entry.status)}
+                                  </div>
+                                  {entry.video_url && (
+                                    <button
+                                      onClick={() =>
+                                        setPlayingVideo(entry.video_url!)
+                                      }
+                                      className="text-xs text-orange-600 hover:underline flex items-center gap-0.5"
+                                    >
+                                      <Play className="w-3 h-3" />
+                                      Video
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="w-7 h-7 rounded-full bg-gray-100 mx-auto" />
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="p-4 border-t border-gray-100 bg-gray-50">
+              <div className="flex items-center gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-gray-600">Done without help</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center">
+                    <HelpCircle className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-gray-600">Done with help</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-red-400 flex items-center justify-center">
+                    <X className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-gray-600">Not done</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-blue-50 rounded-2xl border border-blue-100 p-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <ClipboardList className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 mb-1">
+                  3-Day Pre-Assessment
+                </h3>
+                <p className="text-blue-700 text-sm">
+                  This is the initial 3-day assessment phase. The detailed progress data will be shown as a static summary on the patient's detail page once the assessment is complete. You can then create a personalized therapy curriculum based on the results.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </main>
 
       {/* Video Player Modal */}
       {playingVideo && (

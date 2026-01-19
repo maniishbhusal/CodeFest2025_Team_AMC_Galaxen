@@ -8,7 +8,7 @@ Run with: python seed_specialized_curriculum.py
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'NeuroCare.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AutiSahara.settings')
 django.setup()
 
 from therapy.models import Curriculum, CurriculumTask

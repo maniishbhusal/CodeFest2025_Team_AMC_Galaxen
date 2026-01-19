@@ -4,15 +4,17 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from datetime import date
+from datetime import date, timedelta
 
-from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview, DiagnosisReport
+from .models import Curriculum, CurriculumTask, ChildCurriculum, DailyProgress, DoctorReview, DiagnosisReport, SavedTask
 from .serializers import (
     CurriculumSerializer, CurriculumDetailSerializer, CurriculumTaskSerializer,
     ChildCurriculumSerializer, AssignCurriculumSerializer,
     DailyProgressSerializer, ProgressSubmitSerializer, TodayTaskSerializer,
     DoctorReviewSerializer, CreateReviewSerializer,
-    DiagnosisReportSerializer, CreateDiagnosisReportSerializer
+    DiagnosisReportSerializer, CreateDiagnosisReportSerializer,
+    SavedTaskSerializer, CreateSavedTaskSerializer,
+    CreatePersonalizedCurriculumSerializer, PublishCurriculumSerializer, DraftCurriculumSerializer
 )
 from children.models import Child
 from assessments.models import ChildAssessment
@@ -35,12 +37,14 @@ def get_or_create_doctor_profile(user):
 # ============== CURRICULUM ENDPOINTS ==============
 
 class CurriculumListView(generics.ListAPIView):
-    """List all available curricula (for doctors)"""
+    """List all available curricula (for doctors) - only published ones"""
     serializer_class = CurriculumSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Curriculum.objects.all()
+        # Only show published curricula (not drafts) and templates
+        queryset = Curriculum.objects.filter(status='published')
+
         # Optional filters
         curriculum_type = self.request.query_params.get('type')
         spectrum = self.request.query_params.get('spectrum')
@@ -149,6 +153,14 @@ class DoctorPatientDetailView(APIView):
         videos = child.videos.all()
         assessment = getattr(child, 'assessment', None)
 
+        # Check if assessment curriculum is completed (for showing pre-assessment results)
+        # This should be true even if a new personalized curriculum is assigned
+        assessment_curriculum = ChildCurriculum.objects.filter(
+            child=child,
+            curriculum__type='assessment'
+        ).first()
+        assessment_completed = assessment_curriculum.status == 'completed' if assessment_curriculum else False
+
         data = {
             'id': assessment.id if assessment else None,
             'child': {
@@ -207,13 +219,14 @@ class DoctorPatientDetailView(APIView):
             ],
             'status': assessment.status if assessment else 'pending',
             'submitted_at': assessment.submitted_at if assessment else None,
+            'assessment_completed': assessment_completed,  # True if 3-day assessment is done
         }
 
         return Response(data)
 
 
 class DoctorAcceptPatientView(APIView):
-    """Doctor accepts a patient for treatment"""
+    """Doctor accepts a patient for treatment and auto-assigns 3-day assessment curriculum"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, child_id):
@@ -233,10 +246,43 @@ class DoctorAcceptPatientView(APIView):
         assessment.reviewed_at = timezone.now()
         assessment.save()
 
+        # AUTO-ASSIGN 3-DAY ASSESSMENT CURRICULUM
+        # Look for assessment curriculum (3 days for hackathon, can be 15 for production)
+        assessment_curriculum = Curriculum.objects.filter(
+            type='assessment',
+            status='published',
+            is_template=True
+        ).first()
+
+        child_curriculum = None
+        if assessment_curriculum:
+            # Check if child already has an assessment curriculum (prevent duplicates)
+            existing = ChildCurriculum.objects.filter(
+                child=child,
+                curriculum__type='assessment'
+            ).first()
+
+            if existing:
+                child_curriculum = existing
+            else:
+                start_date = date.today()
+                end_date = start_date + timedelta(days=assessment_curriculum.duration_days)
+
+                child_curriculum = ChildCurriculum.objects.create(
+                    child=child,
+                    curriculum=assessment_curriculum,
+                    assigned_by=doctor,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
+
         return Response({
             'message': 'Patient accepted successfully',
             'child_id': child.id,
             'child_name': child.full_name,
+            'curriculum_assigned': child_curriculum is not None,
+            'curriculum_id': child_curriculum.id if child_curriculum else None,
+            'curriculum_title': assessment_curriculum.title if assessment_curriculum else None,
         })
 
 
@@ -316,6 +362,7 @@ class DoctorPatientProgressView(APIView):
                 'status': child_curriculum.status,
                 'start_date': child_curriculum.start_date,
                 'end_date': child_curriculum.end_date,
+                'type': child_curriculum.curriculum.type,  # 'assessment' or 'personalized'
             },
             'stats': {
                 'total_tasks_submitted': total_tasks,
@@ -554,7 +601,7 @@ class ProgressHistoryView(APIView):
 
 
 class ChildCurriculumStatusView(APIView):
-    """Get curriculum status for a child"""
+    """Get curriculum status for a child, including assessment status"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, child_id):
@@ -566,9 +613,14 @@ class ChildCurriculumStatusView(APIView):
 
         curricula = ChildCurriculum.objects.filter(child=child)
 
+        # Get assessment status from ChildAssessment model
+        assessment = ChildAssessment.objects.filter(child=child).first()
+
         return Response({
             'child_id': child.id,
             'child_name': child.full_name,
+            'assessment_status': assessment.status if assessment else None,
+            'assessment_submitted_at': assessment.submitted_at.isoformat() if assessment and assessment.submitted_at else None,
             'curricula': ChildCurriculumSerializer(curricula, many=True).data,
         })
 
@@ -720,3 +772,306 @@ class DoctorToggleReportShareView(APIView):
             'report_id': report.id,
             'shared_with_parent': report.shared_with_parent,
         })
+
+
+# ============== SAVED TASK (TASK LIBRARY) ENDPOINTS ==============
+
+class SavedTaskListCreateView(APIView):
+    """List and create saved tasks for doctor's personal library"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        saved_tasks = SavedTask.objects.filter(doctor=doctor)
+
+        # Optional category filter
+        category = request.query_params.get('category')
+        if category:
+            saved_tasks = saved_tasks.filter(category__icontains=category)
+
+        # Optional search
+        search = request.query_params.get('search')
+        if search:
+            saved_tasks = saved_tasks.filter(title__icontains=search)
+
+        serializer = SavedTaskSerializer(saved_tasks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        serializer = CreateSavedTaskSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check for duplicate title
+            if SavedTask.objects.filter(doctor=doctor, title=serializer.validated_data['title']).exists():
+                return Response(
+                    {'error': 'A task with this title already exists in your library'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            saved_task = SavedTask.objects.create(
+                doctor=doctor,
+                title=serializer.validated_data['title'],
+                goal=serializer.validated_data['goal'],
+                instructions=serializer.validated_data['instructions'],
+                video_url=serializer.validated_data.get('video_url', ''),
+                category=serializer.validated_data.get('category', ''),
+            )
+            return Response(SavedTaskSerializer(saved_task).data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SavedTaskDetailView(APIView):
+    """Retrieve, update, delete a saved task"""
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk, doctor):
+        return get_object_or_404(SavedTask, pk=pk, doctor=doctor)
+
+    def get(self, request, pk):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        saved_task = self.get_object(pk, doctor)
+        return Response(SavedTaskSerializer(saved_task).data)
+
+    def put(self, request, pk):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        saved_task = self.get_object(pk, doctor)
+
+        serializer = CreateSavedTaskSerializer(data=request.data)
+        if serializer.is_valid():
+            saved_task.title = serializer.validated_data['title']
+            saved_task.goal = serializer.validated_data['goal']
+            saved_task.instructions = serializer.validated_data['instructions']
+            saved_task.video_url = serializer.validated_data.get('video_url', '')
+            saved_task.category = serializer.validated_data.get('category', '')
+            saved_task.save()
+            return Response(SavedTaskSerializer(saved_task).data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        saved_task = self.get_object(pk, doctor)
+        saved_task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ============== PERSONALIZED CURRICULUM ENDPOINTS ==============
+
+class CreatePersonalizedCurriculumView(APIView):
+    """Doctor creates a personalized curriculum for a child"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        serializer = CreatePersonalizedCurriculumSerializer(data=request.data)
+
+        if serializer.is_valid():
+            child_id = serializer.validated_data['child_id']
+            child = get_object_or_404(Child, pk=child_id)
+
+            # Verify doctor is assigned to this child
+            assessment = ChildAssessment.objects.filter(
+                child=child, assigned_doctor=doctor
+            ).first()
+            if not assessment:
+                return Response(
+                    {'error': 'You are not assigned to this patient'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Create curriculum
+            curriculum = Curriculum.objects.create(
+                title=serializer.validated_data['title'],
+                description=serializer.validated_data['description'],
+                duration_days=serializer.validated_data['duration_days'],
+                type='personalized',
+                status='draft' if serializer.validated_data.get('is_draft', True) else 'published',
+                created_by=doctor,
+                for_child=child,
+                is_template=False,
+            )
+
+            # Create tasks
+            for task_data in serializer.validated_data['tasks']:
+                # If saved_task_id provided, copy from saved task
+                if task_data.get('saved_task_id'):
+                    saved_task = SavedTask.objects.filter(
+                        pk=task_data['saved_task_id'], doctor=doctor
+                    ).first()
+                    if saved_task:
+                        CurriculumTask.objects.create(
+                            curriculum=curriculum,
+                            day_number=task_data['day_number'],
+                            title=saved_task.title,
+                            why_description=saved_task.goal,
+                            instructions=saved_task.instructions,
+                            demo_video_url=saved_task.video_url,
+                            order_index=task_data.get('order_index', 0),
+                        )
+                        continue
+
+                # Create from provided data
+                CurriculumTask.objects.create(
+                    curriculum=curriculum,
+                    day_number=task_data['day_number'],
+                    title=task_data['title'],
+                    why_description=task_data['goal'],
+                    instructions=task_data['instructions'],
+                    demo_video_url=task_data.get('video_url', ''),
+                    order_index=task_data.get('order_index', 0),
+                )
+
+            return Response({
+                'message': 'Personalized curriculum created',
+                'curriculum_id': curriculum.id,
+                'status': curriculum.status,
+                'tasks_count': curriculum.tasks.count(),
+            }, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DoctorDraftCurriculaView(APIView):
+    """Get all draft curricula created by this doctor"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        drafts = Curriculum.objects.filter(
+            created_by=doctor,
+            status='draft'
+        ).select_related('for_child')
+
+        serializer = DraftCurriculumSerializer(drafts, many=True)
+        return Response(serializer.data)
+
+
+class PublishCurriculumView(APIView):
+    """Publish a draft curriculum and assign to child"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, curriculum_id):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+        curriculum = get_object_or_404(Curriculum, pk=curriculum_id, created_by=doctor)
+
+        if curriculum.status != 'draft':
+            return Response(
+                {'error': 'Curriculum is already published'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = PublishCurriculumSerializer(data=request.data)
+        if serializer.is_valid():
+            # Validate curriculum has tasks
+            if curriculum.tasks.count() == 0:
+                return Response(
+                    {'error': 'Cannot publish curriculum with no tasks'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Publish curriculum
+            curriculum.status = 'published'
+            curriculum.save()
+
+            # If curriculum is for a specific child, auto-assign it
+            child_curriculum = None
+            if curriculum.for_child:
+                start_date = serializer.validated_data['start_date']
+                end_date = start_date + timedelta(days=curriculum.duration_days)
+
+                # Complete any active curriculum first
+                ChildCurriculum.objects.filter(
+                    child=curriculum.for_child,
+                    status='active'
+                ).update(status='completed')
+
+                # Assign new curriculum
+                child_curriculum = ChildCurriculum.objects.create(
+                    child=curriculum.for_child,
+                    curriculum=curriculum,
+                    assigned_by=doctor,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
+
+            return Response({
+                'message': 'Curriculum published and assigned' if child_curriculum else 'Curriculum published',
+                'curriculum_id': curriculum.id,
+                'child_curriculum_id': child_curriculum.id if child_curriculum else None,
+                'start_date': str(serializer.validated_data['start_date']) if child_curriculum else None,
+            })
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DoctorPatientsReadyForPersonalizedView(APIView):
+    """Get patients who have completed assessment and are ready for personalized curriculum"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        doctor = get_or_create_doctor_profile(request.user)
+
+        # Find children assigned to this doctor whose assessment curriculum is completed
+        # and don't have an active personalized curriculum
+        ready_patients = []
+
+        assessments = ChildAssessment.objects.filter(
+            assigned_doctor=doctor,
+            status__in=['accepted', 'completed']
+        ).select_related('child')
+
+        for assessment in assessments:
+            child = assessment.child
+
+            # Check if assessment curriculum is completed
+            assessment_curriculum = ChildCurriculum.objects.filter(
+                child=child,
+                curriculum__type='assessment',
+                status='completed'
+            ).first()
+
+            # Check if already has active personalized curriculum
+            has_active_personalized = ChildCurriculum.objects.filter(
+                child=child,
+                curriculum__type='personalized',
+                status='active'
+            ).exists()
+
+            if assessment_curriculum and not has_active_personalized:
+                ready_patients.append({
+                    'child_id': child.id,
+                    'child_name': child.full_name,
+                    'age': f"{child.age_years}y {child.age_months}m",
+                    'assessment_completed_at': assessment_curriculum.end_date,
+                })
+
+        return Response(ready_patients)

@@ -1,66 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   ScrollView,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+import { useRouter } from "expo-router";
 import { AppColors } from "@/constants/theme";
-
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
-
-interface AssessmentStatus {
-  status: string;
-  parent_confirmed: boolean;
-  assigned_doctor: string | null;
-  created_at: string;
-}
 
 export default function SuccessScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const childId = params.childId as string;
-
-  const [status, setStatus] = useState<AssessmentStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadStatus();
-  }, []);
-
-  const loadStatus = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) return;
-
-      const response = await axios.get(
-        `${BASE_URL}/api/children/${childId}/assessment/status/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setStatus(response.data);
-    } catch (error) {
-      console.error("Error loading status:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoHome = () => {
     router.replace("/(tabs)");
-  };
-
-  const handleStartTasks = () => {
-    router.push({
-      pathname: "/therapy/today",
-      params: { childId },
-    });
   };
 
   return (
@@ -70,22 +23,22 @@ export default function SuccessScreen() {
         <View style={styles.successCircle}>
           <Text style={styles.successIcon}>✓</Text>
         </View>
-        <Text style={styles.successTitle}>Ready!</Text>
+        <Text style={styles.successTitle}>Assessment Submitted!</Text>
         <Text style={styles.successSubtitle}>
-          You can now start your child's 15-day assessment program
+          Your child's assessment has been submitted for review
         </Text>
       </View>
 
       {/* What's Next Card */}
       <View style={styles.nextStepsCard}>
-        <Text style={styles.nextStepsTitle}>🎯 What's Next?</Text>
+        <Text style={styles.nextStepsTitle}>🎯 What Happens Next?</Text>
 
         <View style={styles.stepItem}>
           <View style={styles.stepNumber}>
             <Text style={styles.stepNumberText}>1</Text>
           </View>
           <Text style={styles.stepText}>
-            Complete 5 simple tasks every day
+            A doctor will review your child's M-CHAT results and videos
           </Text>
         </View>
 
@@ -94,7 +47,7 @@ export default function SuccessScreen() {
             <Text style={styles.stepNumberText}>2</Text>
           </View>
           <Text style={styles.stepText}>
-            Record how the child performed
+            Once accepted, you'll receive a therapy curriculum
           </Text>
         </View>
 
@@ -103,52 +56,35 @@ export default function SuccessScreen() {
             <Text style={styles.stepNumberText}>3</Text>
           </View>
           <Text style={styles.stepText}>
-            After 15 days, a doctor will review the results
+            You can then start completing daily therapy tasks
           </Text>
         </View>
       </View>
 
-      {/* Task Categories Info */}
-      <View style={styles.categoriesCard}>
-        <Text style={styles.categoriesTitle}>📚 Daily Task Categories</Text>
-        <View style={styles.categoryRow}>
-          <Text style={styles.categoryIcon}>👋</Text>
-          <Text style={styles.categoryText}>Social Engagement</Text>
+      {/* Waiting Info Card */}
+      <View style={styles.waitingCard}>
+        <View style={styles.waitingIconContainer}>
+          <Text style={styles.waitingIcon}>⏳</Text>
         </View>
-        <View style={styles.categoryRow}>
-          <Text style={styles.categoryIcon}>👀</Text>
-          <Text style={styles.categoryText}>Joint Attention</Text>
-        </View>
-        <View style={styles.categoryRow}>
-          <Text style={styles.categoryIcon}>🗣️</Text>
-          <Text style={styles.categoryText}>Communication</Text>
-        </View>
-        <View style={styles.categoryRow}>
-          <Text style={styles.categoryIcon}>🎮</Text>
-          <Text style={styles.categoryText}>Play Skills</Text>
-        </View>
-        <View style={styles.categoryRow}>
-          <Text style={styles.categoryIcon}>🧠</Text>
-          <Text style={styles.categoryText}>Cognitive/Self-Help</Text>
-        </View>
+        <Text style={styles.waitingTitle}>Waiting for Doctor Review</Text>
+        <Text style={styles.waitingText}>
+          This usually takes 1-2 business days. You'll be notified once a doctor
+          reviews your submission and assigns a therapy plan.
+        </Text>
       </View>
 
       {/* Info Note */}
       <View style={styles.infoNote}>
         <Text style={styles.infoIcon}>💡</Text>
         <Text style={styles.infoText}>
-          Each task takes only 2-5 minutes. You can do them while playing with your child!
+          Check the home page regularly for updates on your assessment status
         </Text>
       </View>
 
-      {/* Buttons */}
+      {/* Button */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.startButton} onPress={handleStartTasks}>
-          <Text style={styles.startButtonText}>🚀 Start Tasks</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.homeButton} onPress={handleGoHome}>
-          <Text style={styles.homeButtonText}>🏠 Go to Home</Text>
+          <Text style={styles.homeButtonText}>Go to Home</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -189,10 +125,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   successTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "bold",
     color: AppColors.textPrimary,
     marginBottom: 8,
+    textAlign: "center",
   },
   successSubtitle: {
     fontSize: 16,
@@ -240,37 +177,44 @@ const styles = StyleSheet.create({
     color: AppColors.textPrimary,
     lineHeight: 22,
   },
-  categoriesCard: {
-    backgroundColor: "#FFF8E1",
+  waitingCard: {
+    backgroundColor: "#FFFBEB",
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#FFE082",
-  },
-  categoriesTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#F57C00",
-    marginBottom: 12,
-  },
-  categoryRow: {
-    flexDirection: "row",
+    borderColor: "#FDE68A",
     alignItems: "center",
-    marginBottom: 8,
   },
-  categoryIcon: {
+  waitingIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#FEF3C7",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  waitingIcon: {
+    fontSize: 32,
+  },
+  waitingTitle: {
     fontSize: 18,
-    marginRight: 10,
+    fontWeight: "bold",
+    color: "#B45309",
+    marginBottom: 8,
+    textAlign: "center",
   },
-  categoryText: {
+  waitingText: {
     fontSize: 14,
-    color: "#E65100",
+    color: "#92400E",
+    textAlign: "center",
+    lineHeight: 22,
   },
   infoNote: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E8F5E9",
+    backgroundColor: "#E0F2FE",
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -282,13 +226,13 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: "#2E7D32",
+    color: "#0369A1",
     lineHeight: 20,
   },
   footer: {
     gap: 12,
   },
-  startButton: {
+  homeButton: {
     backgroundColor: AppColors.primary,
     borderRadius: 12,
     padding: 18,
@@ -299,22 +243,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  startButtonText: {
+  homeButtonText: {
     color: AppColors.white,
     fontSize: 18,
     fontWeight: "bold",
-  },
-  homeButton: {
-    backgroundColor: AppColors.white,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: AppColors.border,
-  },
-  homeButtonText: {
-    color: AppColors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

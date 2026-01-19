@@ -166,6 +166,7 @@ interface PatientDetail {
   videos: AssessmentVideo[];
   status: 'pending' | 'in_review' | 'accepted' | 'completed';
   submitted_at: string;
+  assessment_completed?: boolean;  // True if 3-day assessment curriculum is done
 }
 
 // Helper to get auth headers
@@ -244,8 +245,11 @@ interface Curriculum {
   title: string;
   description: string;
   duration_days: number;
-  type: 'general' | 'specialized';
+  type: 'general' | 'specialized' | 'assessment' | 'personalized';
   spectrum_type?: string;
+  status?: 'draft' | 'published';
+  is_template?: boolean;
+  for_child?: number | null;
 }
 
 interface CurriculumTask {
@@ -303,6 +307,7 @@ interface PatientProgress {
     status: 'active' | 'completed' | 'paused';
     start_date: string;
     end_date: string;
+    type: 'assessment' | 'personalized' | 'general' | 'specialized';
   };
   stats: {
     total_tasks_submitted: number;
@@ -464,6 +469,183 @@ export async function toggleReportSharing(reportId: number): Promise<{ message: 
   return response.json();
 }
 
+// ============== SAVED TASK (TASK LIBRARY) TYPES & API ==============
+
+interface SavedTask {
+  id: number;
+  title: string;
+  goal: string;
+  instructions: string;
+  video_url?: string;
+  category?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CreateSavedTaskData {
+  title: string;
+  goal: string;
+  instructions: string;
+  video_url?: string;
+  category?: string;
+}
+
+export async function getSavedTasks(category?: string): Promise<SavedTask[]> {
+  const url = category
+    ? `${BASE_URL}/api/therapy/doctor/tasks/?category=${encodeURIComponent(category)}`
+    : `${BASE_URL}/api/therapy/doctor/tasks/`;
+
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch saved tasks');
+  }
+
+  return response.json();
+}
+
+export async function createSavedTask(data: CreateSavedTaskData): Promise<SavedTask> {
+  const response = await fetch(`${BASE_URL}/api/therapy/doctor/tasks/`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(result.error || 'Failed to create saved task');
+  }
+
+  return response.json();
+}
+
+export async function updateSavedTask(id: number, data: Partial<CreateSavedTaskData>): Promise<SavedTask> {
+  const response = await fetch(`${BASE_URL}/api/therapy/doctor/tasks/${id}/`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(result.error || 'Failed to update saved task');
+  }
+
+  return response.json();
+}
+
+export async function deleteSavedTask(id: number): Promise<void> {
+  const response = await fetch(`${BASE_URL}/api/therapy/doctor/tasks/${id}/`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete saved task');
+  }
+}
+
+// ============== PERSONALIZED CURRICULUM TYPES & API ==============
+
+interface PersonalizedTaskInput {
+  day_number: number;
+  title: string;
+  goal: string;
+  instructions: string;
+  video_url?: string;
+  order_index?: number;
+  saved_task_id?: number | null;
+}
+
+interface CreatePersonalizedCurriculumData {
+  child_id: number;
+  title: string;
+  description: string;
+  duration_days: 3 | 7 | 15 | 30;
+  tasks: PersonalizedTaskInput[];
+  is_draft?: boolean;
+}
+
+interface DraftCurriculum {
+  id: number;
+  title: string;
+  description: string;
+  duration_days: number;
+  for_child: number | null;
+  for_child_name: string | null;
+  tasks_count: number;
+  created_at: string;
+}
+
+interface PatientReadyForCurriculum {
+  child_id: number;
+  child_name: string;
+  age: string;
+  assessment_completed_at: string;
+  assessment_curriculum_title: string;
+}
+
+export async function createPersonalizedCurriculum(
+  data: CreatePersonalizedCurriculumData
+): Promise<{ message: string; curriculum_id: number; status: string }> {
+  const response = await fetch(`${BASE_URL}/api/therapy/doctor/curricula/create/`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(result.error || 'Failed to create curriculum');
+  }
+
+  return response.json();
+}
+
+export async function getDraftCurricula(): Promise<DraftCurriculum[]> {
+  const response = await fetch(`${BASE_URL}/api/therapy/doctor/curricula/drafts/`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch draft curricula');
+  }
+
+  return response.json();
+}
+
+export async function publishCurriculum(
+  curriculumId: number,
+  startDate: string
+): Promise<{ message: string; curriculum_id: number; child_curriculum_id: number }> {
+  const response = await fetch(`${BASE_URL}/api/therapy/doctor/curricula/${curriculumId}/publish/`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ start_date: startDate }),
+  });
+
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(result.error || 'Failed to publish curriculum');
+  }
+
+  return response.json();
+}
+
+export async function getPatientsReadyForCurriculum(): Promise<PatientReadyForCurriculum[]> {
+  const response = await fetch(`${BASE_URL}/api/therapy/doctor/patients/ready-for-curriculum/`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch patients ready for curriculum');
+  }
+
+  return response.json();
+}
+
 export type {
   LoginCredentials,
   User,
@@ -486,4 +668,10 @@ export type {
   PatientProgress,
   DiagnosisReport,
   CreateDiagnosisData,
+  SavedTask,
+  CreateSavedTaskData,
+  PersonalizedTaskInput,
+  CreatePersonalizedCurriculumData,
+  DraftCurriculum,
+  PatientReadyForCurriculum,
 };

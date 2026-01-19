@@ -114,7 +114,7 @@ export default function Index() {
           </View>
         </View>
 
-        <Text style={styles.title}>NeuroCare</Text>
+        <Text style={styles.title}>AutiSahara</Text>
       </Animated.View>
 
       <Animated.View style={[styles.taglineContainer, taglineStyle]}>

@@ -31,7 +31,7 @@ interface VideoItem {
   video_type: string;
   video_url: string;
   description: string;
-  created_at: string;
+  uploaded_at: string;
 }
 
 export default function VideoListScreen() {
@@ -112,12 +112,18 @@ export default function VideoListScreen() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    if (!dateString) return "Today";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Today";
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return "Today";
+    }
   };
 
   const handleBack = () => {
@@ -174,7 +180,7 @@ export default function VideoListScreen() {
             <Text style={styles.emptyEmoji}>📹</Text>
             <Text style={styles.emptyTitle}>No Videos</Text>
             <Text style={styles.emptySubtitle}>
-              Press the button below to upload child's video
+              Press the button below to upload video
             </Text>
             <TouchableOpacity
               style={styles.addButtonEmpty}
@@ -247,7 +253,7 @@ export default function VideoListScreen() {
                     ) : null}
 
                     <Text style={styles.dateText}>
-                      📅 {formatDate(video.created_at)}
+                      📅 {formatDate(video.uploaded_at)}
                     </Text>
                   </View>
                 </View>
@@ -294,47 +300,51 @@ export default function VideoListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: "#F8FAFC",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: AppColors.background,
+    backgroundColor: "#F8FAFC",
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 14,
-    color: AppColors.textLight,
+    fontSize: 16,
+    color: "#6B7280",
+    fontWeight: "600",
   },
   header: {
     backgroundColor: AppColors.primary,
-    paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 16,
+    paddingTop: 60,
+    paddingBottom: 25,
+    paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(255,255,255,0.25)",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 16,
   },
   backIcon: {
     fontSize: 24,
-    color: AppColors.white,
+    color: "#FFF",
+    fontWeight: "700",
   },
   headerContent: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: AppColors.white,
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#FFF",
   },
   headerSubtitle: {
     fontSize: 14,
@@ -343,50 +353,63 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: 20,
   },
   emptyState: {
     alignItems: "center",
-    paddingVertical: 60,
+    paddingVertical: 80,
+    backgroundColor: "#FFF",
+    borderRadius: 24,
+    marginTop: 20,
   },
   emptyEmoji: {
-    fontSize: 64,
-    marginBottom: 16,
+    fontSize: 80,
+    marginBottom: 20,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: AppColors.textPrimary,
-    marginBottom: 8,
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1F2937",
+    marginBottom: 12,
   },
   emptySubtitle: {
-    fontSize: 14,
-    color: AppColors.textLight,
+    fontSize: 16,
+    color: "#6B7280",
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 32,
     paddingHorizontal: 40,
+    lineHeight: 24,
   },
   addButtonEmpty: {
-    backgroundColor: AppColors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
+    backgroundColor: "#F97316",
+    paddingHorizontal: 32,
+    paddingVertical: 18,
+    borderRadius: 20,
+    minHeight: 64,
+    justifyContent: "center",
+    shadowColor: "#F97316",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   addButtonEmptyText: {
-    color: AppColors.white,
-    fontSize: 16,
-    fontWeight: "600",
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "700",
   },
   videoCard: {
-    backgroundColor: AppColors.white,
-    borderRadius: 16,
-    marginBottom: 16,
+    backgroundColor: "#FFF",
+    borderRadius: 24,
+    marginBottom: 20,
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: AppColors.border,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
   },
   videoThumbnail: {
-    height: 180,
+    height: 200,
     backgroundColor: "#000",
   },
   videoPlayer: {
@@ -400,110 +423,130 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
   },
   playIcon: {
-    fontSize: 48,
+    fontSize: 56,
     marginBottom: 8,
   },
   tapToPlay: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "600",
   },
   videoInfo: {
-    padding: 16,
+    padding: 20,
   },
   videoHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   typeBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: AppColors.primaryLight,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: "#FFF7ED",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "#FDBA74",
   },
   typeEmoji: {
-    fontSize: 16,
-    marginRight: 6,
+    fontSize: 20,
+    marginRight: 8,
   },
   typeText: {
-    fontSize: 13,
-    color: AppColors.primaryDark,
-    fontWeight: "500",
+    fontSize: 16,
+    color: "#EA580C",
+    fontWeight: "700",
   },
   deleteButton: {
-    padding: 8,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#FEE2E2",
+    justifyContent: "center",
+    alignItems: "center",
   },
   deleteIcon: {
-    fontSize: 20,
+    fontSize: 24,
   },
   description: {
-    fontSize: 14,
-    color: AppColors.textPrimary,
-    lineHeight: 20,
-    marginBottom: 8,
+    fontSize: 15,
+    color: "#374151",
+    lineHeight: 22,
+    marginBottom: 12,
   },
   dateText: {
-    fontSize: 12,
-    color: AppColors.textLight,
+    fontSize: 14,
+    color: "#6B7280",
+    fontWeight: "500",
   },
   addMoreButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: AppColors.white,
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    padding: 24,
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: AppColors.primary,
+    borderColor: "#F97316",
     borderStyle: "dashed",
+    minHeight: 72,
   },
   addMoreIcon: {
-    fontSize: 24,
-    color: AppColors.primary,
-    marginRight: 8,
+    fontSize: 28,
+    color: "#F97316",
+    marginRight: 12,
   },
   addMoreText: {
-    fontSize: 16,
-    color: AppColors.primary,
-    fontWeight: "500",
+    fontSize: 18,
+    color: "#F97316",
+    fontWeight: "700",
   },
   infoCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E3F2FD",
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: "#E0F2FE",
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#BAE6FD",
   },
   infoIcon: {
-    fontSize: 20,
-    marginRight: 12,
+    fontSize: 24,
+    marginRight: 14,
   },
   infoText: {
     flex: 1,
-    fontSize: 13,
-    color: "#1565C0",
-    lineHeight: 20,
+    fontSize: 15,
+    color: "#0369A1",
+    lineHeight: 22,
+    fontWeight: "500",
   },
   footer: {
-    padding: 16,
-    backgroundColor: AppColors.white,
+    padding: 20,
+    backgroundColor: "#FFF",
     borderTopWidth: 1,
-    borderTopColor: AppColors.border,
+    borderTopColor: "#E2E8F0",
   },
   continueButton: {
-    backgroundColor: AppColors.secondary,
-    borderRadius: 12,
-    padding: 18,
+    backgroundColor: "#F97316",
+    borderRadius: 20,
+    height: 64,
+    justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#F97316",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   continueButtonText: {
-    color: AppColors.white,
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
 });

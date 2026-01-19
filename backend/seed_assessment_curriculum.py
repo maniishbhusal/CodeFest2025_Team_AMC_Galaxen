@@ -1,28 +1,31 @@
 """
-Seed script for Pre-Assessment Curriculum (15-day autism screening tasks)
+Seed script for Pre-Assessment Curriculum (3-day autism screening tasks for hackathon)
 Run with: python seed_assessment_curriculum.py
 """
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'NeuroCare.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'autisahara.settings')
 django.setup()
 
 from therapy.models import Curriculum, CurriculumTask
 
 def create_assessment_curriculum():
-    """Create the pre-assessment curriculum with 15 days of tasks (3 days for hackathon)"""
+    """Create the pre-assessment curriculum with 3 days of tasks (hackathon version)"""
 
     # Delete existing assessment curriculum if any
     Curriculum.objects.filter(type='assessment').delete()
 
     # Create the assessment curriculum
     curriculum = Curriculum.objects.create(
-        title="15-Day Pre-Assessment Program",
-        description="A structured 15-day observation program to help identify developmental patterns. Each day includes 5 tasks across Social Engagement, Joint Attention, Communication, Play Skills, and Cognitive/Self-Help categories.",
-        duration_days=15,
+        title="3-Day Pre-Assessment Program",
+        description="A structured 3-day observation program to help identify developmental patterns. Each day includes 5 tasks across Social Engagement, Joint Attention, Communication, Play Skills, and Cognitive/Self-Help categories.",
+        duration_days=3,
         type='assessment',
         spectrum_type='',
+        status='published',
+        is_template=True,
+        for_child=None,
         created_by=None  # System-created
     )
 

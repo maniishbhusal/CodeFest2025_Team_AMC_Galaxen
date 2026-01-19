@@ -11,6 +11,9 @@ import PatientDetail from "./pages/doctor/PatientDetail";
 import AssignCurriculum from "./pages/doctor/AssignCurriculum";
 import PatientProgress from "./pages/doctor/PatientProgress";
 import DiagnosisReport from "./pages/doctor/DiagnosisReport";
+import TaskLibrary from "./pages/doctor/TaskLibrary";
+import CreateCurriculum from "./pages/doctor/CreateCurriculum";
+import DraftCurricula from "./pages/doctor/DraftCurricula";
 
 import Register from "./components/doctor/Register";
 import Login from "./components/doctor/Login";
@@ -40,6 +43,16 @@ const App = () => (
           <Route
             path="/doctor/patient/:childId/diagnosis"
             element={<DiagnosisReport />}
+          />
+          <Route path="/doctor/task-library" element={<TaskLibrary />} />
+          <Route path="/doctor/curriculum/create" element={<CreateCurriculum />} />
+          <Route
+            path="/doctor/curriculum/create/:childId"
+            element={<CreateCurriculum />}
+          />
+          <Route
+            path="/doctor/curriculum/drafts"
+            element={<DraftCurricula />}
           />
 
           <Route path="/register" element={<Register />} />

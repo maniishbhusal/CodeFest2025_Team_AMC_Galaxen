@@ -64,7 +64,7 @@ const AppShowcase = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 text-white"
         >
-          <h2 className="section-title mb-4 text-white">See NeuroCare in Action</h2>
+          <h2 className="section-title mb-4 text-white">See AutiSahara in Action</h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
             A glimpse into the platform that's transforming autism care
           </p>

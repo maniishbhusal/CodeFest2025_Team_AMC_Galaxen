@@ -61,7 +61,26 @@ export default function LoginScreen() {
         await AsyncStorage.setItem("userData", JSON.stringify(data.user));
       }
 
-      router.replace("/form/section-1");
+      // Check if user already has children registered
+      try {
+        const childrenResponse = await axios.get(`${BASE_URL}/api/children/`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        const children = childrenResponse.data || [];
+
+        if (children.length > 0) {
+          // Has children - go to main dashboard
+          router.replace("/(tabs)");
+        } else {
+          // No children - go to child registration
+          router.replace("/form/section-1");
+        }
+      } catch (childError) {
+        // If API fails, default to form (safer for new users)
+        console.log("Could not check children, defaulting to form");
+        router.replace("/form/section-1");
+      }
     } catch (error: any) {
       console.error("Login error:", error.response?.data || error.message);
       const errorMessage =
