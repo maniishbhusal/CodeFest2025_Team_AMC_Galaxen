@@ -18,11 +18,12 @@ const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 // Types for assessment state
 type AssessmentState =
-  | 'no_mchat'           // M-CHAT not completed
-  | 'waiting_for_doctor' // Assessment submitted, pending doctor review
-  | 'assessment_active'  // Assessment curriculum in progress
-  | 'assessment_complete'// Assessment done, waiting for personalized
-  | 'personalized_active'// Personalized curriculum in progress
+  | 'no_mchat'              // M-CHAT not completed
+  | 'waiting_for_doctor'    // Assessment submitted, pending doctor review
+  | 'assessment_active'     // Assessment curriculum in progress
+  | 'assessment_complete'   // Assessment done, waiting for personalized
+  | 'personalized_active'   // Personalized curriculum in progress
+  | 'personalized_complete' // Personalized curriculum done - therapy journey complete!
   | 'loading';
 
 export default function HomeScreen() {
@@ -223,6 +224,14 @@ export default function HomeScreen() {
           }
           // Assessment curriculum is active
           return 'assessment_active';
+        }
+
+        // No active curriculum - check for completed ones
+        const completedPersonalized = childAssessment.curricula?.find(
+          (c: any) => c.curriculum_type === 'personalized' && c.status === 'completed'
+        );
+        if (completedPersonalized) {
+          return 'personalized_complete';
         }
 
         // Check for completed assessment curriculum (no active curriculum)
@@ -454,6 +463,35 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         )}
+
+        {/* State 6: Personalized Curriculum Complete - Therapy Journey Done! */}
+        {assessmentState === 'personalized_complete' && (
+          <View style={[styles.card, { backgroundColor: "#ECFDF5", borderWidth: 2, borderColor: "#10B981" }]}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Therapy Complete!</Text>
+              <Ionicons name="trophy" size={24} color="#10B981" />
+            </View>
+            <Text style={styles.cardSub}>
+              Congratulations on completing the therapy program
+            </Text>
+            <View style={[styles.insightBox, { backgroundColor: "#D1FAE5" }]}>
+              <Ionicons name="ribbon" size={20} color="#059669" />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.insightTitle}>Amazing Progress!</Text>
+                <Text style={styles.insightSub}>
+                  Your child has completed all therapy tasks
+                </Text>
+              </View>
+            </View>
+            <View style={styles.waitingInfo}>
+              <Ionicons name="calendar-outline" size={16} color="#059669" />
+              <Text style={[styles.waitingInfoText, { color: "#059669" }]}>
+                Your doctor will schedule a follow-up to discuss next steps
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* 3. Focus Section - Show based on assessment state */}
         {(assessmentState === 'assessment_active' || assessmentState === 'personalized_active') && (
           <>

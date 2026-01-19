@@ -288,8 +288,8 @@ export default function PatientProgressPage() {
           </div>
         </div>
 
-        {/* Assessment Complete CTA */}
-        {progress.curriculum.status === "completed" && (
+        {/* Assessment Complete CTA - Only for assessment type curriculum */}
+        {progress.curriculum.status === "completed" && progress.curriculum.type === "assessment" && (
           <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 mb-8 text-white relative overflow-hidden shadow-xl">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
@@ -317,6 +317,39 @@ export default function PatientProgressPage() {
               >
                 <Plus className="w-5 h-5" />
                 Create Personalized Curriculum
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Personalized Curriculum Complete - Celebration UI */}
+        {progress.curriculum.status === "completed" && progress.curriculum.type !== "assessment" && (
+          <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl p-6 mb-8 text-white relative overflow-hidden shadow-xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-white/20 rounded-xl">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">
+                    Therapy Curriculum Complete!
+                  </h3>
+                  <p className="text-green-100 max-w-md">
+                    {patient.child.full_name} has successfully completed the {progress.curriculum.duration_days}-day therapy curriculum.
+                    Review their progress and create a diagnosis report.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() =>
+                  navigate(`/doctor/patient/${childId}/diagnosis`)
+                }
+                className="flex items-center gap-2 px-6 py-3 bg-white text-green-600 rounded-xl font-semibold hover:bg-green-50 transition-all shadow-lg"
+              >
+                <ClipboardList className="w-5 h-5" />
+                Create Diagnosis Report
               </button>
             </div>
           </div>
