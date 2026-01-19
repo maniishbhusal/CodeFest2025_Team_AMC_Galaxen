@@ -256,16 +256,25 @@ class DoctorAcceptPatientView(APIView):
 
         child_curriculum = None
         if assessment_curriculum:
-            start_date = date.today()
-            end_date = start_date + timedelta(days=assessment_curriculum.duration_days)
-
-            child_curriculum = ChildCurriculum.objects.create(
+            # Check if child already has an assessment curriculum (prevent duplicates)
+            existing = ChildCurriculum.objects.filter(
                 child=child,
-                curriculum=assessment_curriculum,
-                assigned_by=doctor,
-                start_date=start_date,
-                end_date=end_date,
-            )
+                curriculum__type='assessment'
+            ).first()
+
+            if existing:
+                child_curriculum = existing
+            else:
+                start_date = date.today()
+                end_date = start_date + timedelta(days=assessment_curriculum.duration_days)
+
+                child_curriculum = ChildCurriculum.objects.create(
+                    child=child,
+                    curriculum=assessment_curriculum,
+                    assigned_by=doctor,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
 
         return Response({
             'message': 'Patient accepted successfully',
